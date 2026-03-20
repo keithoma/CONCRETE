@@ -1,0 +1,33 @@
+name: CONCRETE-VERIFICATION
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  verification:
+    name: Structural Integrity Audit
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy, rustfmt
+
+      - name: Cache Dependencies
+        uses: Swatinem/rust-cache@v2
+
+      - name: Check Compilation
+        run: cargo check --workspace --verbose
+
+      - name: Execute Hamiltonian Proofs (Tests)
+        run: cargo test --workspace --verbose
+
+      - name: Enforce Coding Discipline (Clippy)
+        run: cargo clippy --workspace -- -D warnings
