@@ -8,12 +8,12 @@ trait PrimeGeneration {
 }
 
 /// Primality test by trivial division.
-struct TrivialDivision;
+struct TrialDivision;
 
 /// Primality test by Sieve of Eratosthenes.
 struct SieveOfEratosthenes;
 
-impl Primality for TrivialDivision {
+impl Primality for TrialDivision {
     fn is_prime(n: u64) -> bool {
         // 0 and 1 are not primes by convention.
         if n <= 1 {
@@ -64,6 +64,20 @@ impl Primality for SieveOfEratosthenes {
 
         // If the last remaining integer is `n`, then it is prime.
         integer_line.last() == Some(&n) 
+    }
+}
+
+impl PrimeGeneration for TrialDivision {
+    fn primes_up_to(n: u64) -> Result<Vec<u64>, String> {
+        let mut set_of_primes: Vec<u64>;
+
+        for i in 2..=n {
+            if TrialDivision::Primality(i) {
+
+            }
+        }
+
+        set_of_primes;
     }
 }
 
