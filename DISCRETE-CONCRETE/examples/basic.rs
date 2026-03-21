@@ -6,6 +6,9 @@ trait Primality {
 /// Primality test by trivial division.
 struct TrivialDivision;
 
+/// Primality test by Sieve of Eratosthenes.
+struct SieveOfEratosthenes;
+
 impl Primality for TrivialDivision {
     fn is_prime(n: u64) -> bool {
         // 0 and 1 are not primes by convention.
@@ -28,6 +31,36 @@ impl Primality for TrivialDivision {
     }
 }
 
+impl Primality for SieveOfEratosthenes {
+    fn is_prime(n: u64) -> bool {
+        // 0 and 1 are not primes by convention.
+        if n <= 1 {
+            return false;
+        }
+
+        // We start with the entire natural number line from 2 to n.
+        let mut integer_line: Vec<u64> = (2..=n).collect();
+
+        let mut i: usize = 0;
+        while i < integer_line.len() {
+            let x = integer_line[i];
+
+            // We only need to check up to the floor of the square root of n.
+            if x > n / x {
+                break;
+            }
+
+            // Remove all multiples of x.
+            integer_line.retain(|y| *y == x || *y % x != 0);
+
+            i = i + 1;
+        }
+
+        // If the last remaining integer is `n`, then it is prime.
+        integer_line.last() == Some(&n) 
+    }
+}
+
 
 trait PrimeFactorizationAlgorithm {
     fn prime_factorization(a: u64) -> Result<Vec<(u64, u32)>, String>;
@@ -47,5 +80,7 @@ impl GCDAlgorithm for Euclidean {
 
 fn main() {
     let a: u64 = 64;
-    println!("{}", TrivialDivision::is_prime(a));
+    // println!("{}", TrivialDivision::is_prime(a));
+    println!("{}", SieveOfEratosthenes::is_prime(8));
+    println!("{}", SieveOfEratosthenes::is_prime(17));
 }
