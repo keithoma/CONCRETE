@@ -81,8 +81,11 @@ impl GCDAlgorithm for Euclidean {
 }
 
 fn main() {
-    let a: u64 = 64;
+    // let a: u64 = 64;
     // println!("{}", TrivialDivision::is_prime(a));
+    println!("{}", SieveOfEratosthenes::is_prime(14));
     println!("{}", SieveOfEratosthenes::is_prime(8));
-    println!("{}", SieveOfEratosthenes::is_prime(17));
+    println!("{}", TrivialDivision::is_prime(310000001));
+
+    // 2, 3, 5, 7, 11, 13, 17, 23, 29, 31
 }
