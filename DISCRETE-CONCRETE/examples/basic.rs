@@ -69,15 +69,11 @@ impl Primality for SieveOfEratosthenes {
 
 impl PrimeGeneration for TrialDivision {
     fn primes_up_to(n: u64) -> Result<Vec<u64>, String> {
-        let mut set_of_primes: Vec<u64> = Vec::new();
-
-        for i in 2..=n {
-            if TrialDivision::is_prime(i) {
-                set_of_primes.push(i)
-            }
-        }
-
-        Ok(set_of_primes)
+        let primes = (2..=n)
+            .filter(TrialDivision::is_prime)
+            .collect()::<Vec<u64>>();
+        
+        Ok(primes)
     }
 }
 
