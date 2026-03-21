@@ -6,6 +6,9 @@ authors.workspace = true
 license.workspace = true
 repository.workspace = true
 
+[lib]
+name = "RNGCONCRETE"
+
 [dependencies]
 
 [lints]
