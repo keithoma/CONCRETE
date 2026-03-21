@@ -69,17 +69,22 @@ impl Primality for SieveOfEratosthenes {
 
 impl PrimeGeneration for TrialDivision {
     fn primes_up_to(n: u64) -> Result<Vec<u64>, String> {
-        let mut set_of_primes: Vec<u64>;
+        let mut set_of_primes: Vec<u64> = Vec::new();
 
         for i in 2..=n {
-            if TrialDivision::Primality(i) {
+            if TrialDivision::is_prime(i) {
                 set_of_primes.push(i)
             }
         }
 
-        set_of_primes;
+        Ok(set_of_primes)
     }
 }
+
+// impl PrimeGeneration for SieveOfEratosthenes {
+//    fn primes_up_to(n: u64) -> Result<Vec<u64>, String> {
+//    }
+//}
 
 
 
@@ -102,9 +107,13 @@ impl GCDAlgorithm for Euclidean {
 fn main() {
     // let a: u64 = 64;
     // println!("{}", TrivialDivision::is_prime(a));
-    println!("{}", SieveOfEratosthenes::is_prime(14));
-    println!("{}", SieveOfEratosthenes::is_prime(8));
-    println!("{}", TrivialDivision::is_prime(310000001));
+    // println!("{}", SieveOfEratosthenes::is_prime(14));
+    // println!("{}", SieveOfEratosthenes::is_prime(8));
+    // println!("{}", TrivialDivision::is_prime(310000001));
+
+
+    println!("{:?}", TrialDivision::primes_up_to(100));
+
 
     // 2, 3, 5, 7, 11, 13, 17, 23, 29, 31
 }
