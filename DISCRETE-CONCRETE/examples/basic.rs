@@ -73,14 +73,13 @@ impl PrimeGeneration for TrialDivision {
 
         for i in 2..=n {
             if TrialDivision::Primality(i) {
-
+                set_of_primes.push(i)
             }
         }
 
         set_of_primes;
     }
 }
-
 
 
 
