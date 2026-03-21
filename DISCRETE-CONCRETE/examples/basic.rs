@@ -50,10 +50,12 @@ impl Primality for SieveOfEratosthenes {
                 break;
             }
 
-            // Remove all multiples of x.
-            integer_line.retain(|y| *y == x || *y % x != 0);
+            // Remove all multiples of x. We only need to check from the square
+            // of x.
+            let xx = x * x;
+            integer_line.retain(|y| *y < xx || *y % x != 0);
 
-            i = i + 1;
+            i += 1;
         }
 
         // If the last remaining integer is `n`, then it is prime.
