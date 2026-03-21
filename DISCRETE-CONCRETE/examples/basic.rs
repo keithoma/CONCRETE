@@ -3,6 +3,10 @@ trait Primality {
     fn is_prime(n: u64) -> bool;
 }
 
+trait PrimeGeneration {
+    fn primes_up_to(n: u64) -> Result<Vec<u64>, String>;
+}
+
 /// Primality test by trivial division.
 struct TrivialDivision;
 
@@ -62,6 +66,8 @@ impl Primality for SieveOfEratosthenes {
         integer_line.last() == Some(&n) 
     }
 }
+
+
 
 
 trait PrimeFactorizationAlgorithm {
