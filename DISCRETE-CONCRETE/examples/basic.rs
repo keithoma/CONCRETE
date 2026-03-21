@@ -77,6 +77,32 @@ impl PrimeGeneration for TrialDivision {
     }
 }
 
+impl PrimeGeneration for SieveOfEratosthenes {
+    fn primes_up_to(n: u64) -> Result<Vec<u64>, String> {
+        // We start with the entire natural number line from 2 to n.
+        let mut integer_line: Vec<u64> = (2..=n).collect();
+
+        let mut i: usize = 0;
+        while i < integer_line.len() {
+            let x = integer_line[i];
+
+            // We only need to check up to the floor of the square root of n.
+            if x > n / x {
+                break;
+            }
+
+            // Remove all multiples of x. We only need to check from the square
+            // of x.
+            let xx = x * x;
+            integer_line.retain(|y| *y < xx || *y % x != 0);
+
+            i += 1;
+        }
+
+        Ok(integer_line)
+    }
+}
+
 // impl PrimeGeneration for SieveOfEratosthenes {
 //    fn primes_up_to(n: u64) -> Result<Vec<u64>, String> {
 //    }
