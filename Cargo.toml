@@ -1,5 +1,7 @@
 [workspace]
 members = [
+    "DISCRETE-CONCRETE",
+    "RATIONAL-CONCRETE",
     "RNG-CONCRETE",
 ]
 resolver = "2"
