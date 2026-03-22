@@ -139,7 +139,7 @@ impl DivisibilityStrategy for strategy::By3 {
                 if difference < 10 {
                     crate::digit::three_divides(difference)
                 } else {
-                    difference.is_divisible_by(Self::DigitClassCount)
+                    difference.is_divisible_by::<Self>()
                 }
             }
 
@@ -148,7 +148,7 @@ impl DivisibilityStrategy for strategy::By3 {
                     crate::digit::three_divides(n)
                 } else {
                     let new_n: u64 = (n / 10).abs_diff(2 * (n % 10));
-                    new_n.is_divisible_by(Self::SubtractDoubleLastDigit)
+                    new_n.is_divisible_by::<Self>()
                 }
             }
 
@@ -185,7 +185,7 @@ impl DivisibilityStrategy for strategy::By4 {
                     crate::digit::four_divides(n)
                 } else {
                     let intermediate_result: u64 = 2 * ((n % 100) / 10) + (n % 10);
-                    intermediate_result.is_divisible_by(Self::TwiceTensPlusOnes)
+                    intermediate_result.is_divisible_by::<Self>()
                 }
             }
 
@@ -217,7 +217,7 @@ impl DivisibilityStrategy for strategy::By6 {
         match self {
             Self::TwoAndThree => {
                 n.is_divisible_by::<strategy::By2>() &&
-                n.is_divisible_by::<strategy::By2>()
+                n.is_divisible_by::<strategy::By3>()
             }
 
             Self::WeightedSumOfDigits => {
@@ -228,7 +228,7 @@ impl DivisibilityStrategy for strategy::By6 {
                 if intermediate < 10 {
                     crate::digit::six_divides(intermediate)
                 } else {
-                    intermediate.is_divisible_by(Self::WeightedSumOfDigits)
+                    intermediate.is_divisible_by::<Self>()
                 }
             }
 
@@ -246,7 +246,14 @@ impl Divisible for u64 {
     }
 }
 
-impl u64 {
+trait u64Helpers {
+    fn digit_count(self) -> u32;
+    fn get_digit(self, i: u32) -> u64;
+    fn digit_sum(self) -> u64;
+    fn to_digits(self) -> Vec<u64>;
+}
+
+impl u64Helpers for u64 {
     /// Returns the number of digits in base-10.
     fn digit_count(self) -> u32 {
         if self == 0 {
@@ -316,4 +323,10 @@ fn main() {
     println!("{:?}", 101.is_divisible_with(strategy::By4::LastTwoDigits));
     println!("{:?}", 101.is_divisible_with(strategy::By4::TensDigitOnesDigit));
     println!("{:?}", 101.is_divisible_with(strategy::By4::TwiceTensPlusOnes));
+
+    println!("{:?}", 24.is_divisible_by::<strategy::By2>());
+    println!("{:?}", 24.is_divisible_by::<strategy::By3>());
+    println!("{:?}", 24.is_divisible_by::<strategy::By4>());
+    println!("{:?}", 24.is_divisible_by::<strategy::By5>());
+    println!("{:?}", 24.is_divisible_by::<strategy::By6>());
 }
