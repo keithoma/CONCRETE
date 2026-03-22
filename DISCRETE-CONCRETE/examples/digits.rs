@@ -31,6 +31,17 @@ impl Digits {
         }
     }
 
+    fn to_u64(&self) -> u64 {
+        let mut u: u64 = 0;
+        let mut i: u32 = self.len() as u32;
+        for &d in &self.digits {
+            u += (d as u64) * 10u64.pow(i - 1);
+            i -= 1;
+        }
+        u
+    }
+
+    /// Checks if the digits are empty or not.
     fn is_empty(&self) -> bool {
         self.digits.is_empty()
     }
@@ -72,6 +83,7 @@ impl Digits {
 fn main() {
     let mut d = Digits::from_u64(123456);
     let mut n = Digits::new();
+    println!("{:?}", d.to_u64());
     println!("{:?}", d.is_empty());
     println!("{:?}", n.is_empty());
     println!("{:?}", d.digits);
