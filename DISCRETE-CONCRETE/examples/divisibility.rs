@@ -4,7 +4,7 @@
 pub mod strategy {
     /// Strategies for checking if a number is divisible by 2.
     #[derive(Default)]
-    enum By2 {
+    pub enum By2 {
         /// The last digit is even.
         #[default]
         LastDigitEven,
@@ -15,7 +15,7 @@ pub mod strategy {
 
     /// Strategies for checking if a number is divisible by 3.
     #[derive(Default)]
-    enum By3 {
+    pub enum By3 {
         /// The sum of digits is divisible by 3.
         #[default]
         DigitSum,
@@ -31,7 +31,7 @@ pub mod strategy {
 
     /// Strategies for checking if a number is divisible by 4.
     #[derive(Default)]
-    enum By4 {
+    pub enum By4 {
         /// The last two digits are divisible by 4.
         #[default]
         LastTwoDigits,
@@ -48,7 +48,7 @@ pub mod strategy {
 
     /// Strategies for checking if a number is divisible by 5.
     #[derive(Default)]
-    enum By5 {
+    pub enum By5 {
         /// The last digit is 0 or 5.
         #[default]
         LastDigit,
@@ -59,7 +59,7 @@ pub mod strategy {
 
     /// Strategies for checking if a number is divisible by 6.
     #[derive(Default)]
-    enum By6 {
+    pub enum By6 {
         /// Divisible by both 2 and 3.
         #[default]
         TwoAndThree,
@@ -72,19 +72,39 @@ pub mod strategy {
     }
 }
 
-trait Divisible {
-    fn divisible_by_with(self, method: impl DivisibilityByMethodTrait) -> bool;
 
-    fn is_divisible_by<M: DivisibilityByMethodTrait + Default>(self) -> bool 
+
+trait DivisibilityStrategy {
+    /// Returns `true` if `n` satisfies the strategy's logic.
+    fn is_satisfied_by(&self, n: u64) -> bool;
+}
+
+trait Divisible {
+    fn is_divisible_with(self, method: impl DivisibilityStrategy) -> bool;
+
+    fn is_divisible_by<S: DivisibilityStrategy + Default>(self) -> bool 
     where 
         Self: Sized 
     {
-        self.divisible_by_with(M::default())
+        self.divisible_by_with(S::default())
     }
 }
 
-trait DivisibilityByMethodTrait {
-    fn check(&self, x: u64) -> bool;
+
+
+impl DivisibilityStrategy for strategy::by2 {
+    fn is_satisfied_by(&self, n: u64) -> bool {
+        match self {
+            strategy::by2::LastDigitEven => {
+                matches!(n % 10, 0 | 2 | 4 | 6 | 8)
+            }
+
+            strategy::by2::ModuloOperator => {
+                n % 2 == 0
+            }
+        }
+    }
+
 }
 
 fn digit_sum(n: u64) -> u64 {
@@ -121,20 +141,7 @@ mod digits {
     }
 }
 
-impl DivisibilityByMethodTrait for DivisibleBy2Method {
-    fn check(&self, n: u64) -> bool {
-        match self {
-            DivisibleBy2Method::LastDigitEven => {
-                matches!(n % 10, 0 | 2 | 4 | 6 | 8)
-            }
 
-            DivisibleBy2Method::ModuloOperator => {
-                n % 2 == 0
-            }
-        }
-    }
-
-}
 
 impl DivisibilityByMethodTrait for DivisibleBy3Method {
     fn check(&self, x: u64) -> bool {
