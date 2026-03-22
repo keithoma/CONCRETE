@@ -21,8 +21,6 @@
      instead of needing `{:?}`.
 
 3. NEW FEATURES TO ADD (For Divisibility):
-   - `is_divisible_by_3(&self) -> bool` (using `self.sum() % 3 == 0`)
-   - `is_divisible_by_11(&self) -> bool` (using `self.alternating_sum() % 11 == 0`)
    - `FromStr`: Implement `std::str::FromStr` to construct `Digits` from a String.
 =============================================================================
 */
@@ -41,8 +39,6 @@ RULE: NO business logic or divisibility checks belong in this file.
 
 THE "DEFINITION OF DONE" CHECKLIST:
 [ ] 1. SAFETY & SPEED: 
-       - Refactor `to_u64()` to use Horner's Method (no `pow()`).
-       - Remove panics in `last()` and `first()` by relying on `Vec` methods.
 
 [ ] 2. IDIOMATIC TRAITS:
        - `impl Default for Digits`
@@ -79,7 +75,6 @@ THE FINAL CHECKLIST:
 
 [ ] 2. RECREATIONAL MATH PROPERTIES:
 
-       - `is_narcissistic(&self) -> bool` (Armstrong number check)
 
 [ ] 3. COMBINATORICS & FREQUENCY:
        - `frequency_map(&self) -> [u8; 10]`
@@ -122,6 +117,15 @@ impl Digits {
         digits_vector.reverse();
         Self {
             digits: digits_vector
+        }
+    }
+
+    fn from_String(s: str) -> Self {
+        Self {
+            digits: s.chars()
+                .filter_map(|c| c.to_digit(10))
+                .map(|d| d as u8)
+                .collect()
         }
     }
 
@@ -231,4 +235,10 @@ fn main() {
 
     let mut d3 = Digits::from_u64(548834);
     println!("is narcisstic: {:?}", d3.is_narcissistic());
+
+    let mut d4 = Digits::from_String("2132131");
+    println!("{:?}", d4);
+
+    let mut d5 = Digits::from_String("a2132131");
+    println!("{:?}", d5);
 }
