@@ -206,4 +206,7 @@ fn main() {
     println!("{:?}", d.last());
     d.reverse();
     println!("{:?}", d.digits);
+
+    let mut d2 = Digits::from_u64(123454321);
+    println!("{:?}", d2.is_palindrome());
 }
