@@ -35,38 +35,6 @@ impl Primality for TrialDivision {
     }
 }
 
-impl Primality for SieveOfEratosthenes {
-    fn is_prime(n: u64) -> bool {
-        // 0 and 1 are not primes by convention.
-        if n <= 1 {
-            return false;
-        }
-
-        // We start with the entire natural number line from 2 to n.
-        let mut integer_line: Vec<u64> = (2..=n).collect();
-
-        let mut i: usize = 0;
-        while i < integer_line.len() {
-            let x = integer_line[i];
-
-            // We only need to check up to the floor of the square root of n.
-            if x > n / x {
-                break;
-            }
-
-            // Remove all multiples of x. We only need to check from the square
-            // of x.
-            let xx = x * x;
-            integer_line.retain(|y| *y < xx || *y % x != 0);
-
-            i += 1;
-        }
-
-        // If the last remaining integer is `n`, then it is prime.
-        integer_line.last() == Some(&n) 
-    }
-}
-
 impl PrimeGeneration for TrialDivision {
     fn primes_up_to(n: u64) -> Result<Vec<u64>, String> {
         let primes = (2..=n)
@@ -102,6 +70,21 @@ impl PrimeGeneration for SieveOfEratosthenes {
         Ok(integer_line)
     }
 }
+
+impl Primality for SieveOfEratosthenes {
+    fn is_prime(n: u64) -> bool {
+        // 0 and 1 are not primes by convention.
+        if n <= 1 {
+            return false;
+        }
+
+        // If the last remaining integer is `n`, then it is prime.
+        SieveOfEratosthenes::primes_up_to(n).last() == Some(&n) 
+    }
+}
+
+
+
 
 // impl PrimeGeneration for SieveOfEratosthenes {
 //    fn primes_up_to(n: u64) -> Result<Vec<u64>, String> {
