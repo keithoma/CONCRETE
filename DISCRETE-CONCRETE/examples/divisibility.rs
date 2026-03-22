@@ -15,6 +15,64 @@ enum DivisibleBy3Method {
     ModuloOperator
 }
 
+
+trait Divisible {
+    fn divisible_by_with(self, n: u64, method: impl DivMethodTrait) -> bool;
+}
+
+trait DivisibilityByMethodTrait {
+    fn check(&self, x: u64) -> bool;
+}
+
+fn digit_sum(n: u64) -> u64 {
+    let mut n = n;
+    let mut result: u64 = 0;
+
+    while n > 0 {
+        result += n % 10;
+        n /= 10;
+    }
+
+    result
+}
+
+mod digits {
+    pub(super) fn is_divisible_by_3_digit(n: u64) -> bool {
+        matches!(n, 0 | 3 | 6 | 9)
+    }
+}
+
+
+impl DivisibilityByMethodTrait for DivisibleBy2Method {
+    fn check(&self, x: u64) -> bool {
+        match self {
+            DivisibleBy2Method::LastDigitEven => {
+                matches!(x % 10, 0 | 2 | 4 | 6 | 8)
+            }
+
+            DivisibleBy2Method::ModuloOperator => {
+                x % 2 == 0
+            }
+        }
+    }
+
+}
+
+impl DivisibilityByMethodTrait for DivisibleBy3Method {
+    fn check(&self, x: u64) -> bool {
+        match self {
+            DivisibleBy3Method::DigitSum => {
+                if self < 10 {
+                    matches!(self, 0 | 3 | 6 | 9) // since I have the same code below, this should become helpers
+                } else {
+                    digit_sum(self).divisible_by_3_with(DivisibleBy3Method::DigitSum)
+                }
+            }
+        }
+    }
+}
+
+
 // should be
 // trait Divisible {
 //     fn divisible_by(self, n: u64) -> bool;
