@@ -2,47 +2,72 @@
 // let check = 369.is_divisible_by::<Three>();
 
 pub mod strategy {
+    /// Strategies for checking if a number is divisible by 2.
     #[derive(Default)]
     enum By2 {
+        /// The last digit is even.
         #[default]
         LastDigitEven,
+        /// Standard remainder check (n % 2 == 0).
         ModuloOperator
     }
 
 
+    /// Strategies for checking if a number is divisible by 3.
     #[derive(Default)]
     enum By3 {
+        /// The sum of digits is divisible by 3.
         #[default]
         DigitSum,
+        /// The difference of the count of digits {1, 4, 7} and the count of
+        /// digits {2, 5, 8} is divisible by 3.
         DigitClassCount,
+        /// Subtracting twice the last digit from the rest is divisible by 3.
         SubtractDoubleLastDigit,
+        /// Standard remainder check (n % 3 == 0).
         ModuloOperator
     }
 
 
+    /// Strategies for checking if a number is divisible by 4.
     #[derive(Default)]
     enum By4 {
+        /// The last two digits are divisible by 4.
         #[default]
         LastTwoDigits,
+        /// If the tens digit is even, the ones is 0, 4 or 8. Otherwise the
+        /// ones are 2 or 6.
         TensDigitOnesDigit,
+        /// The sum of the ones digit and double the tens digit is divisible
+        /// by 4.
         TwiceTensPlusOnes,
+        /// Standard remainder check (n % 4 == 0).
         ModuloOperator
     }
 
 
+    /// Strategies for checking if a number is divisible by 5.
     #[derive(Default)]
     enum By5 {
+        /// The last digit is 0 or 5.
         #[default]
         LastDigit,
+        /// Standard remainder check (n % 5 == 0).
         ModuloOperator
     }
 
 
+    /// Strategies for checking if a number is divisible by 6.
     #[derive(Default)]
     enum By6 {
+        /// Divisible by both 2 and 3.
         #[default]
         TwoAndThree,
-        SumOfDigits,
+        /// The sum of the ones digit, 4 times the tens digit, 4 times the
+        /// hundreds digit, 4 times of the thousands digit is divisible by
+        /// 6.
+        WeightedSumOfDigits,
+        /// Standard remainder check (n % 6 == 0).
         ModuloOperator
     }
 }
