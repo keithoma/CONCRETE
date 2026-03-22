@@ -78,8 +78,7 @@ THE FINAL CHECKLIST:
        - Implement `std::fmt::Display`.
 
 [ ] 2. RECREATIONAL MATH PROPERTIES:
-       - `is_palindrome(&self) -> bool`
-       - `digital_root(&self) -> u8`
+
        - `is_narcissistic(&self) -> bool` (Armstrong number check)
 
 [ ] 3. COMBINATORICS & FREQUENCY:
@@ -162,10 +161,10 @@ impl Digits {
     }
 
     /// Returns the digit sum.
-    fn sum(&self) -> u32 {
-        let mut result: u32 = 0;
+    fn sum(&self) -> u64 {
+        let mut result: u64 = 0;
         for d in &self.digits {
-            result += *d as u32;
+            result += *d;
         }
         result
     }
@@ -194,6 +193,22 @@ impl Digits {
             .all(|(x, y)| x == y)
     }
 
+    // Computes the digital root using the modular trick.
+    fn digital_root(&self) -> u8 {
+        let s = self.sum();
+        if s == 0 { 0 } else { (1 + (s - 1) % 9) as u8 }
+    }
+
+    // Computes the digital root recursively.
+    fn digital_root_recursive(&self) -> u8 {
+        let result: u64 = self.sum();
+        if result < 10 {
+            result as u8
+        } else {
+            Self::from_u64(result).digital_root()
+        }
+    }
+
 }
 
 fn main() {
@@ -214,4 +229,5 @@ fn main() {
 
     let mut d2 = Digits::from_u64(123454321);
     println!("{:?}", d2.is_palindrome());
+    println!("{:?}", d2.digital_root());
 }
