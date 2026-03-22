@@ -1,63 +1,58 @@
 // to-do: use turbo fish to get one unifying function
 // let check = 369.is_divisible_by::<Three>();
 
-enum DivisibleBy2Method {
-    LastDigitEven,
-    ModuloOperator
-}
+pub mod strategy {
+    #[derive(Default)]
+    enum By2 {
+        #[default]
+        LastDigitEven,
+        ModuloOperator
+    }
 
-enum DivisibleBy3Method {
-    DigitSum,
-    DigitClassCount,
-    SubtractDoubleLastDigit,
-    ModuloOperator
-}
 
-enum DivisibleBy4Method {
-    LastTwoDigits,
-    TensDigitOnesDigit,
-    TwiceTensPlusOnes,
-    ModuloOperator
-}
+    #[derive(Default)]
+    enum By3 {
+        #[default]
+        DigitSum,
+        DigitClassCount,
+        SubtractDoubleLastDigit,
+        ModuloOperator
+    }
 
-enum DivisibleBy5Method {
-    LastDigit,
-    ModuloOperator
-}
 
-enum DivisibleBy6Method {
-    TwoAndThree,
-    SumOfDigits,
-    ModuloOperator
-}
+    #[derive(Default)]
+    enum By4 {
+        #[default]
+        LastTwoDigits,
+        TensDigitOnesDigit,
+        TwiceTensPlusOnes,
+        ModuloOperator
+    }
 
-enum DivisibleBy7Method {
-    ModuloOperator
-}
 
-enum DivisibleBy8Method {
-    ModuloOperator
-}
+    #[derive(Default)]
+    enum By5 {
+        #[default]
+        LastDigit,
+        ModuloOperator
+    }
 
-enum DivisibleBy9Method {
-    ModuloOperator
-}
 
-enum DivisibleBy10Method {
-    ModuloOperator
+    #[derive(Default)]
+    enum By6 {
+        #[default]
+        TwoAndThree,
+        SumOfDigits,
+        ModuloOperator
+    }
 }
-
-impl Default for DivisibleBy2Method { fn default() -> Self { Self::LastDigitEven } }
-impl Default for DivisibleBy3Method { fn default() -> Self { Self::DigitSum } }
-impl Default for DivisibleBy4Method { fn default() -> Self { Self::LastTwoDigits } }
-impl Default for DivisibleBy5Method { fn default() -> Self { Self::LastDigit } }
-impl Default for DivisibleBy6Method { fn default() -> Self { Self::TwoAndThree } }
 
 trait Divisible {
     fn divisible_by_with(self, method: impl DivisibilityByMethodTrait) -> bool;
 
-    fn is_divisible_by<M: DivisibilityByMethodTrait + Default>(self) -> bool
-    where Self: Sized 
+    fn is_divisible_by<M: DivisibilityByMethodTrait + Default>(self) -> bool 
+    where 
+        Self: Sized 
     {
         self.divisible_by_with(M::default())
     }
@@ -77,10 +72,6 @@ fn digit_sum(n: u64) -> u64 {
     }
 
     result
-}
-
-fn get_digit(n: u64, i: u64) -> u64 {
-    (n % (10.pow(i - 1))) / 10.pow(i - 1)
 }
 
 fn get_digit(n: u64, i: u32) -> u64 { 
