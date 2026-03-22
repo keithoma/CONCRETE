@@ -66,6 +66,36 @@ Once these boxes are checked, this file is COMPLETE.
 =============================================================================
 */
 
+/*
+=============================================================================
+ MODULE OBJECTIVES: `Digits` (Number Theory & Combinatorics)
+=============================================================================
+THE "REASON TO EXIST":
+Standard Rust integers represent scalar values, making it computationally 
+expensive to analyze their structural properties. This struct treats numbers 
+as sequences, enabling fast combinatorial and number-theoretic analysis.
+
+THE FINAL CHECKLIST:
+[ ] 1. SAFETY, SPEED & TRAITS (The Basics): 
+       - Refactor `to_u64()` (Horner's Method).
+       - Implement `Default`, `From<u64>`, `From<&Digits> for u64`.
+       - Implement `std::fmt::Display`.
+
+[ ] 2. RECREATIONAL MATH PROPERTIES:
+       - `is_palindrome(&self) -> bool`
+       - `digital_root(&self) -> u8`
+       - `is_narcissistic(&self) -> bool` (Armstrong number check)
+
+[ ] 3. COMBINATORICS & FREQUENCY:
+       - `frequency_map(&self) -> [u8; 10]`
+       - `is_anagram_of(&self, other: &Digits) -> bool`
+       - `next_permutation(&mut self) -> bool` 
+         (Finds the next largest sequence using the same digits)
+
+Once this is done, you have a highly specialized structural analysis tool.
+=============================================================================
+*/
+
 /// Represents the digits of a u64-integer.
 #[derive(Debug)]
 struct Digits {
@@ -91,7 +121,7 @@ impl Digits {
         let mut n = n;
         let mut digits_vector = Vec::new();
         while n > 0 {
-            digits_vector.insert(0, (n % 10) as u8);
+            digits_vector.push((n % 10) as u8).reverse();
             n /= 10;
         }
         Self {
