@@ -18,6 +18,7 @@ enum DivisibleBy4Method {
 }
 
 enum DivisibleBy5Method {
+    LastDigit,
     ModuloOperator
 }
 
@@ -120,7 +121,7 @@ impl DivisibilityByMethodTrait for DivisibleBy3Method {
                     quantity_1_4_7 - quantity_2_5_8
                 } else {
                     quantity_2_5_8 - quantity_1_4_7
-                }
+                };
 
                 if difference < 10 {
                     crate::digits::divisible_by_3(difference)
@@ -133,7 +134,7 @@ impl DivisibilityByMethodTrait for DivisibleBy3Method {
                 if x < 10 {
                     crate::digits::divisible_by_3(x)
                 } else {
-                    let new_x: u64 = (x / 10) - 2 * (x % 10);
+                    let new_x: u64 = (x / 10).abs_diff(2 * (x % 10));
                     new_x.divisible_by_with(DivisibleBy3Method::SubtractDoubleLastDigit)
                 }
             }
@@ -187,6 +188,20 @@ impl DivisibilityByMethodTrait for DivisibleBy4Method {
 
 }
 
+impl DivisibilityByMethodTrait for DivisibleBy5Method {
+    fn check(&self, n: u64) -> bool {
+        match self {
+            DivisibleBy5Method::LastDigit => {
+                matches!(n % 10, 0 | 5)
+            }
+
+            DivisibleBy5Method::ModuloOperator => {
+                n % 5 == 0
+            }
+        }
+    }
+}
+
 impl Divisible for u64 {
     fn divisible_by_with(self, method: impl DivisibilityByMethodTrait) -> bool {
         method.check(self)
@@ -197,4 +212,8 @@ fn main() {
     println!("{:?}", 369.divisible_by_with(DivisibleBy3Method::DigitSum));
     println!("{:?}", 369.divisible_by_with(DivisibleBy3Method::DigitClassCount));
     println!("{:?}", 369.divisible_by_with(DivisibleBy3Method::SubtractDoubleLastDigit));
+
+    println!("{:?}", 101.divisible_by_with(DivisibleBy4Method::LastTwoDigits));
+    println!("{:?}", 101.divisible_by_with(DivisibleBy4Method::TensDigitOnesDigit));
+    println!("{:?}", 101.divisible_by_with(DivisibleBy4Method::TwiceTensPlusOnes));
 }
