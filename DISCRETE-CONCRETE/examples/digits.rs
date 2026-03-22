@@ -36,10 +36,18 @@ impl Digits {
         self.digits.len()
     }
 
+    /// Returns the value at the index if it exists otherwise she returns None.
     fn get(&self, i: usize) -> Option<u8> {
         self.digits.get(i).copied()
     }
 
+    fn sum(&self) -> u32 {
+        let mut result: u32 = 0;
+        for d in &self.digits {
+            result += *d as u32;
+        }
+        result
+    }
 
 }
 
@@ -47,4 +55,6 @@ fn main() {
     let d = Digits::from_u64(123456);
     println!("{:?}", d.digits);
     println!("{:?}", d.len());
+    println!("{:?}", d.get(3));
+    println!("{:?}", d.sum());
 }
