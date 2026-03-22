@@ -1,88 +1,38 @@
 /*
 =============================================================================
- CODE REVIEW & IMPROVEMENT NOTES FOR `Digits`
-=============================================================================
-
-1. OPTIMIZATIONS & BUG FIXES:
-   - `to_u64`: Avoid `10u64.pow()`. Use Horner's method to accumulate the 
-     number: `let mut u = 0; for &d in &self.digits { u = u * 10 + (d as u64); }`
-   - `last`: `self.get(self.len() - 1)` will panic (underflow) if the vector 
-     is empty. Use the native `self.digits.last().copied()` instead.
-   - `first`: Can be simplified to `self.digits.first().copied()`.
-   - `sum`: Make it idiomatic with iterators: 
-     `self.digits.iter().map(|&d| d as u32).sum()`
-
-2. IDIOMATIC RUST TRAITS TO IMPLEMENT:
-   - `Default`: Instead of just `new()`, implement the `Default` trait.
-   - `From<u64>`: Replace `from_u64` by implementing `From<u64> for Digits`.
-     (Usage: `Digits::from(1234)`)
-   - `From<&Digits> for u64`: Replace `to_u64` by implementing this trait. 
-   - `std::fmt::Display`: Implement this so you can `println!("{}", d)` 
-     instead of needing `{:?}`.
-
-3. NEW FEATURES TO ADD (For Divisibility):
-   - `FromStr`: Implement `std::str::FromStr` to construct `Digits` from a String.
-=============================================================================
-*/
-
-/*
-=============================================================================
- MODULE OBJECTIVES: `Digits` 
- Status: IN PROGRESS
-=============================================================================
-SCOPE: 
-This module is strictly a foundational data structure for representing 
-base-10 digits. It handles bidirectional conversion and basic sequence 
-operations. 
-
-RULE: NO business logic or divisibility checks belong in this file.
-
-THE "DEFINITION OF DONE" CHECKLIST:
-[ ] 1. SAFETY & SPEED: 
-
-[ ] 2. IDIOMATIC TRAITS:
-       - `impl Default for Digits`
-       - `impl From<u64> for Digits`
-       - `impl From<&Digits> for u64`
-       - `impl std::fmt::Display for Digits`
-
-[ ] 3. ITERATION:
-       - `impl IntoIterator for &Digits`
-
-[ ] 4. INNATE PROPERTIES:
-       - `sum() -> u32`
-       - `alternating_sum() -> i32`
-       - `reverse()`
-
-Once these boxes are checked, this file is COMPLETE. 
-=============================================================================
-*/
-
-/*
-=============================================================================
- MODULE OBJECTIVES: `Digits` (Number Theory & Combinatorics)
+ MODULE: `Digits` (Number Theory & Combinatorics Library)
+ Status: IN PROGRESS (Day 2 Objectives Queued)
 =============================================================================
 THE "REASON TO EXIST":
 Standard Rust integers represent scalar values, making it computationally 
 expensive to analyze their structural properties. This struct treats numbers 
 as sequences, enabling fast combinatorial and number-theoretic analysis.
 
-THE FINAL CHECKLIST:
-[ ] 1. SAFETY, SPEED & TRAITS (The Basics): 
+THE "DEFINITION OF DONE" CHECKLIST:
 
-       - Implement `Default`, `From<u64>`, `From<&Digits> for u64`.
-       - Implement `std::fmt::Display`.
+[x] 1. SAFETY, SPEED & BASE LOGIC: 
+       - O(N) Initialization (`push` + `reverse`)
+       - O(N) Conversion (`to_u64` via Horner's Method)
+       - Safe Memory Access (`first`, `last` via Option/copied)
+       - Overflow-safe Summation
 
-[ ] 2. RECREATIONAL MATH PROPERTIES:
+[ ] 2. IDIOMATIC RUST TRAITS (Tomorrow's Goal):
+       - `impl Default for Digits` (to replace `new()`)
+       - `impl From<u64> for Digits` (to replace `from_u64()`)
+       - `impl From<&Digits> for u64` (to replace `to_u64()`)
+       - `impl std::str::FromStr for Digits` (to replace `from_str()`)
+       - `impl std::fmt::Display for Digits` (for clean printing)
+       - `impl IntoIterator for &Digits`
 
+[x] 3. RECREATIONAL MATH PROPERTIES:
+       - `is_palindrome(&self) -> bool`
+       - `digital_root(&self) -> u8`
+       - `is_narcissistic(&self) -> bool`
 
-[ ] 3. COMBINATORICS & FREQUENCY:
+[ ] 4. COMBINATORICS & FREQUENCY (Future Goals):
        - `frequency_map(&self) -> [u8; 10]`
        - `is_anagram_of(&self, other: &Digits) -> bool`
        - `next_permutation(&mut self) -> bool` 
-         (Finds the next largest sequence using the same digits)
-
-Once this is done, you have a highly specialized structural analysis tool.
 =============================================================================
 */
 
