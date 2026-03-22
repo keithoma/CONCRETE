@@ -86,7 +86,7 @@ trait Divisible {
     where 
         Self: Sized 
     {
-        self.divisible_by_with(S::default())
+        self.is_divisible_with(S::default())
     }
 }
 
@@ -106,15 +106,17 @@ impl DivisibilityStrategy for strategy::By3 {
     fn is_satisfied_by(&self, n: u64) -> bool {
         match self {
             Self::DigitSum => {
-                if x < 10 {
-                    crate::digit::3_divides(x)
+                if n < 10 {
+                    crate::digit::three_divides(n)
                 } else {
-                    digit_sum(x).is_divisible_with(Self::DigitSum)
+                    n
+                    .digit_sum()
+                    .is_divisible_with(Self::DigitSum)
                 }
             }
 
             Self::DigitClassCount => {
-                let mut remainder = x;
+                let mut remainder = n;
                 let mut quantity_1_4_7: u64 = 0;
                 let mut quantity_2_5_8: u64 = 0;
 
@@ -142,23 +144,23 @@ impl DivisibilityStrategy for strategy::By3 {
             }
 
             Self::SubtractDoubleLastDigit => {
-                if x < 10 {
-                    crate::digit::divisible_by_3(x)
+                if n < 10 {
+                    crate::digit::divisible_by_3(n)
                 } else {
-                    let new_x: u64 = (x / 10).abs_diff(2 * (x % 10));
-                    new_x.is_divisible_by(Self::SubtractDoubleLastDigit)
+                    let new_n: u64 = (n / 10).abs_diff(2 * (n % 10));
+                    new_n.is_divisible_by(Self::SubtractDoubleLastDigit)
                 }
             }
 
-            Self::ModuloOperator => x % 3 == 0
+            Self::ModuloOperator => n % 3 == 0
         }
     }
 }
 
-impl DivisibilityByMethodTrait for DivisibleBy4Method {
-    fn check(&self, n: u64) -> bool {
+impl DivisibilityStrategy for strategy::By4 {
+    fn is_satisfied_by(&self, n: u64) -> bool {
         match self {
-            DivisibleBy4Method::LastTwoDigits => {
+            Self::LastTwoDigits => {
                 let divisible_last_two_digits: [u64; 25] = [
                     0, 4, 8, 12, 16, 20, 24, 28, 32, 36, 40, 44, 48,
                     52, 56, 60, 64, 68, 72, 76, 80, 84, 88, 92, 96
@@ -168,26 +170,26 @@ impl DivisibilityByMethodTrait for DivisibleBy4Method {
                 divisible_last_two_digits.contains(&last_two_digits)
             }
 
-            DivisibleBy4Method::TensDigitOnesDigit => {
+            Self::TensDigitOnesDigit => {
                 let tens_digit: u64 = (n % 100) / 10;
                 let ones_digit: u64 = n % 10;
-                if crate::digits::divisible_by_2(tens_digit) {
+                if crate::digit::two_divides(tens_digit) {
                     matches!(ones_digit, 0 | 4 | 8)
                 } else {
                     matches!(ones_digit, 2 | 6)
                 }
             }
 
-            DivisibleBy4Method::TwiceTensPlusOnes => {
+            Self::TwiceTensPlusOnes => {
                 if n < 10 {
-                    crate::digits::divisible_by_4(n)
+                    crate::digit::four_divides(n)
                 } else {
                     let intermediate_result: u64 = 2 * ((n % 100) / 10) + (n % 10);
-                    intermediate_result.divisible_by_with(DivisibleBy4Method::TwiceTensPlusOnes)
+                    intermediate_result.is_divisible_by(Self::TwiceTensPlusOnes)
                 }
             }
 
-            DivisibleBy4Method::ModuloOperator => {
+            Self::ModuloOperator => {
                 n % 4 == 0
             }
         }
@@ -196,41 +198,41 @@ impl DivisibilityByMethodTrait for DivisibleBy4Method {
 
 }
 
-impl DivisibilityByMethodTrait for DivisibleBy5Method {
-    fn check(&self, n: u64) -> bool {
+impl DivisibilityStrategy for strategy::By5 {
+    fn is_satisfied_by(&self, n: u64) -> bool {
         match self {
-            DivisibleBy5Method::LastDigit => {
+            Self::LastDigit => {
                 matches!(n % 10, 0 | 5)
             }
 
-            DivisibleBy5Method::ModuloOperator => {
+            Self::ModuloOperator => {
                 n % 5 == 0
             }
         }
     }
 }
 
-impl DivisibilityByMethodTrait for DivisibleBy6Method {
-    fn check(&self, n: u64) -> bool {
+impl DivisibilityStrategy for strategy::By6 {
+    fn is_satisfied_by(&self, n: u64) -> bool {
         match self {
-            DivisibleBy6Method::TwoAndThree => {
-                n.is_divisible_by::<DivisibleBy2Method>() &&
-                n.is_divisible_by::<DivisibleBy3Method>()
+            Self::TwoAndThree => {
+                n.is_divisible_by::<strategy::By2>() &&
+                n.is_divisible_by::<strategy::By3>()
             }
 
-            DivisibleBy6Method::SumOfDigits => {
+            Self::SumOfDigits => {
                 let intermediate: u64 = 4 * (
-                    get_digit(n, 4) + get_digit(n, 3) + get_digit(n, 2)
-                ) + get_digit(n, 1);
+                    n.get_digit(4) + n.get_digit(3) + n.get_digit(2)
+                ) + n.get_digit(1);
 
                 if intermediate < 10 {
-                    crate::digits::divisible_by_6(intermediate)
+                    crate::digit::six_divides(intermediate)
                 } else {
-                    intermediate.divisible_by_with(DivisibleBy6Method::SumOfDigits)
+                    intermediate.is_divisible_by(Self::SumOfDigits)
                 }
             }
 
-            DivisibleBy6Method::ModuloOperator => {
+            Self::ModuloOperator => {
                 n % 6 == 0
             }
         }
@@ -238,9 +240,11 @@ impl DivisibilityByMethodTrait for DivisibleBy6Method {
 }
 
 
-
-
-
+impl Divisible for u64 {
+    fn is_divisible_with(self, method: impl DivisibilityStrategy) -> bool {
+        method.is_satisfied_by(self)
+    }
+}
 
 impl u64 {
     /// Returns the number of digits in base-10.
@@ -285,36 +289,31 @@ impl u64 {
 }
 
 mod digit {
-    pub(super) fn 2_divides(n: u64) -> bool {
+    pub(super) fn two_divides(n: u64) -> bool {
         matches!(n, 0 | 2 | 4 | 6 | 8)
     }
 
-    pub(super) fn 3_divides(n: u64) -> bool {
+    pub(super) fn three_divides(n: u64) -> bool {
         matches!(n, 0 | 3 | 6 | 9)
     }
 
-    pub(super) fn 4_divides(n: u64) -> bool {
+    pub(super) fn four_divides(n: u64) -> bool {
         matches!(n, 0 | 4 | 8)
     }
 
-    pub(super) fn 6_divides(n: u64) -> bool {
+    pub(super) fn six_divides(n: u64) -> bool {
         matches!(n, 0 | 6)
     }
 }
 
 
-impl Divisible for u64 {
-    fn divisible_by_with(self, method: impl DivisibilityByMethodTrait) -> bool {
-        method.check(self)
-    }
-}
 
 fn main() {
-    println!("{:?}", 369.divisible_by_with(DivisibleBy3Method::DigitSum));
-    println!("{:?}", 369.divisible_by_with(DivisibleBy3Method::DigitClassCount));
-    println!("{:?}", 369.divisible_by_with(DivisibleBy3Method::SubtractDoubleLastDigit));
+    println!("{:?}", 369.divisible_by_with(strategy::By3::DigitSum));
+    println!("{:?}", 369.divisible_by_with(strategy::By3::DigitClassCount));
+    println!("{:?}", 369.divisible_by_with(strategy::By3::SubtractDoubleLastDigit));
 
-    println!("{:?}", 101.divisible_by_with(DivisibleBy4Method::LastTwoDigits));
-    println!("{:?}", 101.divisible_by_with(DivisibleBy4Method::TensDigitOnesDigit));
-    println!("{:?}", 101.divisible_by_with(DivisibleBy4Method::TwiceTensPlusOnes));
+    println!("{:?}", 101.divisible_by_with(strategy::By4::LastTwoDigits));
+    println!("{:?}", 101.divisible_by_with(strategy::By4::TensDigitOnesDigit));
+    println!("{:?}", 101.divisible_by_with(strategy::By4::TwiceTensPlusOnes));
 }
