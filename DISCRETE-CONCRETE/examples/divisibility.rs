@@ -27,7 +27,7 @@ enum DivisibleBy5Method {
 
 enum DivisibleBy6Method {
     TwoAndThree,
-    SumOfDigits
+    SumOfDigits,
     ModuloOperator
 }
 
@@ -56,7 +56,7 @@ impl Default for DivisibleBy6Method { fn default() -> Self { Self::TwoAndThree }
 trait Divisible {
     fn divisible_by_with(self, method: impl DivisibilityByMethodTrait) -> bool;
 
-    fn is_divisible_by<M: DivisibilityByMethodTrait + Default>(self) -> bool;
+    fn is_divisible_by<M: DivisibilityByMethodTrait + Default>(self) -> bool
     where Self: Sized 
     {
         self.divisible_by_with(M::default())
@@ -79,7 +79,13 @@ fn digit_sum(n: u64) -> u64 {
     result
 }
 
-fn get_digit(n: u64, i: u64) -> u64 { (n % (10.pow(i - 1))) / 10.pow(i - 1) }
+fn get_digit(n: u64, i: u64) -> u64 {
+    (n % (10.pow(i - 1))) / 10.pow(i - 1)
+}
+
+fn get_digit(n: u64, i: u32) -> u64 { 
+    (n / 10u64.pow(i - 1)) % 10 
+}
 
 mod digits {
     pub(super) fn divisible_by_2(n: u64) -> bool {
