@@ -36,7 +36,8 @@ pub trait Digits {
 
     /// Computes the digit sum.
     fn digit_sum(self) -> u32;
-
+    
+    /* 
     /// Computes the alternating digit sum.
     fn alternating_digit_sum(self) -> i32;
 
@@ -57,6 +58,7 @@ pub trait Digits {
 
     ///
     fn digital_root_recursive(self) -> u8;
+     */
 }
 
 impl Digits for u64 {
