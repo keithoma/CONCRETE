@@ -181,12 +181,17 @@ impl Digits {
         result
     }
 
+    /// Reverses the digits in place.
     fn reverse(&mut self) {
         self.digits.reverse();
     }
 
+    /// Checks if the digits are a palindrome.
     fn is_palindrome(&self) -> bool {
-        self.digits.iter().zip(self.digits.iter().rev()).all(|(x, y)| x == y)
+        self.digits.iter()
+            .take(self.len() / 2)
+            .zip(self.digits.iter().rev())
+            .all(|(x, y)| x == y)
     }
 
 }
