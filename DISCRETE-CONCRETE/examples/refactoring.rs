@@ -1,6 +1,25 @@
 #![warn(clippy::std_instead_of_core)]
 #![warn(clippy::std_instead_of_alloc)]
 
+/// An iterator that yields digits from right to left (10^0, 10^1, ...).
+pub struct DigitIter {
+    number: u64,
+}
+
+impl Iterator for DigitIter {
+    type Item = u8; // The type we yield
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.number == 0 {
+            None // Stop iterating
+        } else {
+            let digit = (self.number % 10) as u8;
+            self.number /= 10;
+            Some(digit)
+        }
+    }
+}
+
 /// Mathematical operations related to digits.
 pub trait Digits {
     /// Default function to count the number of digits.
