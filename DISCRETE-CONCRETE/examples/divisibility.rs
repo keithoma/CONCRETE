@@ -47,8 +47,20 @@ enum DivisibleBy10Method {
     ModuloOperator
 }
 
+impl Default for DivisibleBy2Method { fn default() -> Self { Self::LastDigitEven } }
+impl Default for DivisibleBy3Method { fn default() -> Self { Self::DigitSum } }
+impl Default for DivisibleBy4Method { fn default() -> Self { Self::LastTwoDigits } }
+impl Default for DivisibleBy5Method { fn default() -> Self { Self::LastDigit } }
+impl Default for DivisibleBy6Method { fn default() -> Self { Self::TwoAndThree } }
+
 trait Divisible {
     fn divisible_by_with(self, method: impl DivisibilityByMethodTrait) -> bool;
+
+    fn is_divisible_by<M: DivisibilityByMethodTrait + Default>(self) -> bool;
+    where Self: Sized 
+    {
+        self.divisible_by_with(M::default())
+    }
 }
 
 trait DivisibilityByMethodTrait {
@@ -67,6 +79,8 @@ fn digit_sum(n: u64) -> u64 {
     result
 }
 
+fn get_digit(n: u64, i: u64) -> u64 { (n % (10.pow(i - 1))) / 10.pow(i - 1) }
+
 mod digits {
     pub(super) fn divisible_by_2(n: u64) -> bool {
         matches!(n, 0 | 2 | 4 | 6 | 8)
@@ -78,6 +92,10 @@ mod digits {
 
     pub(super) fn divisible_by_4(n: u64) -> bool {
         matches!(n, 0 | 4 | 8)
+    }
+
+    pub(super) fn divisible_by_6(n: u64) -> bool {
+        matches!(n, 0 | 6)
     }
 }
 
@@ -210,8 +228,25 @@ impl DivisibilityByMethodTrait for DivisibleBy5Method {
 impl DivisibilityByMethodTrait for DivisibleBy6Method {
     fn check(&self, n: u64) -> bool {
         match self {
-            DivisibleBy6Method::TwoAndThree {
-                n.divisible
+            DivisibleBy6Method::TwoAndThree => {
+                n.is_divisible_by::<DivisibleBy2Method>() &&
+                n.is_divisible_by::<DivisibleBy3Method>()
+            }
+
+            DivisibleBy6Method::SumOfDigits => {
+                let intermediate: u64 = 4 * (
+                    get_digit(n, 4) + get_digit(n, 3) + get_digit(n, 2)
+                ) + get_digit(n, 1);
+
+                if intermediate < 10 {
+                    crate::digits::divisible_by_6(intermediate)
+                } else {
+                    intermediate.divisible_by_with(DivisibleBy6Method::SumOfDigits)
+                }
+            }
+
+            DivisibleBy6Method::ModuloOperator => {
+                n % 6 == 0
             }
         }
     }
