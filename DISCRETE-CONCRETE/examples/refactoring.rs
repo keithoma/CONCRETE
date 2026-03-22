@@ -3,7 +3,7 @@
 
 /// Mathematical operations related to digits.
 pub trait Digits {
-    // Default function to count the number of digits.
+    /// Default function to count the number of digits.
     fn digit_length(self) -> u32;
 
     /// Counts the number of digits.
@@ -14,6 +14,9 @@ pub trait Digits {
 
     /// Returns the digit at the index.
     fn get(self, i: u32) -> Option<u8>;
+
+    /// Computes the digit sum.
+    fn digit_sum(self) -> u32;
 }
 
 impl Digits for u64 {
@@ -37,20 +40,22 @@ impl Digits for u64 {
     fn digit_length_logarithmic(self) -> u32 {
         // ilog10() panics if the number is 0.
         if self == 0 { return 1; }
-        
         self.ilog10() + 1
     }
 
     fn get(self, i: u32) -> Option<u8> {
-        if i > self.digit_length() { return None; }
+        if i >= self.digit_length() { return None; }
+        Some(((self / 10_u64.pow(i)) % 10) as u8)
+    }
 
+    fn digit_sum(self) -> u32 {
         let mut n: u64 = self;
-        let mut j: u32 = 1;
-        while j < i {
+        let mut result: u64 = 0;
+        while n > 0 {
+            result += n % 10;
             n /= 10;
-            j += 1;
         }
-        Some((n % 10) as u8)
+        result as u32
     }
 }
 
@@ -83,10 +88,16 @@ mod tests {
     }
 
     #[test]
-    fn  test_get() {
+    fn test_get() {
         let n: u64 = 123456789;
-        assert_eq!(n.get(1), Some(9));
-        assert_eq!(n.get(9), Some(1));
-        assert_eq!(n.get(20), None);
+        assert_eq!(n.get(1), Some(8));
+        assert_eq!(n.get(8), Some(1));
+        assert_eq!(n.get(9), None);
+    }
+
+    #[test]
+    fn test_digit_sum() {
+        let n: u64 = 12345;
+        assert_eq!(n.digit_sum(), 15);
     }
 }
