@@ -4,14 +4,11 @@ trait Primality {
 }
 
 trait PrimeGeneration {
-    fn primes_up_to(n: u64) -> Result<Vec<u64>, String>;
+    fn primes_up_to(n: u64) -> Vec<u64>;
 }
 
 /// Primality test by trivial division.
 struct TrialDivision;
-
-/// Primality test by Sieve of Eratosthenes.
-struct SieveOfEratosthenes;
 
 impl Primality for TrialDivision {
     fn is_prime(n: u64) -> bool {
@@ -36,17 +33,20 @@ impl Primality for TrialDivision {
 }
 
 impl PrimeGeneration for TrialDivision {
-    fn primes_up_to(n: u64) -> Result<Vec<u64>, String> {
+    fn primes_up_to(n: u64) -> Vec<u64> {
         let primes = (2..=n)
             .filter(TrialDivision::is_prime)
-            .collect()::<Vec<u64>>();
+            .collect::<Vec<u64>>();
         
-        Ok(primes)
+        primes
     }
 }
 
+/// Primality test by Sieve of Eratosthenes.
+struct SieveOfEratosthenes;
+
 impl PrimeGeneration for SieveOfEratosthenes {
-    fn primes_up_to(n: u64) -> Result<Vec<u64>, String> {
+    fn primes_up_to(n: u64) -> Vec<u64> {
         // We start with the entire natural number line from 2 to n.
         let mut integer_line: Vec<u64> = (2..=n).collect();
 
@@ -67,7 +67,7 @@ impl PrimeGeneration for SieveOfEratosthenes {
             i += 1;
         }
 
-        Ok(integer_line)
+        integer_line
     }
 }
 
