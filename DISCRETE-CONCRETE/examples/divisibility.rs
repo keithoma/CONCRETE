@@ -1,8 +1,3 @@
-// TODO: unify divisibility checks into one function `divisible_by_with(self, n: u64, method: D)`
-// - Use a trait like `DivMethodTrait` where each per-divisor enum (DivisibleBy2Method, DivisibleBy3Method, etc.) implements `check(&self, n: u64) -> bool`
-// - This lets `divisible_by_with` accept any method enum generically without creating one huge enum
-// - Keeps enums small, modular, and extensible, while allowing a single unified API
-
 enum DivisibleBy2Method {
     LastDigitEven,
     ModuloOperator
@@ -42,7 +37,6 @@ mod digits {
     }
 }
 
-
 impl DivisibilityByMethodTrait for DivisibleBy2Method {
     fn check(&self, x: u64) -> bool {
         match self {
@@ -62,12 +56,54 @@ impl DivisibilityByMethodTrait for DivisibleBy3Method {
     fn check(&self, x: u64) -> bool {
         match self {
             DivisibleBy3Method::DigitSum => {
-                if self < 10 {
-                    matches!(self, 0 | 3 | 6 | 9) // since I have the same code below, this should become helpers
+                if x < 10 {
+                    matches!(x, 0 | 3 | 6 | 9) // since I have the same code below, this should become helpers
                 } else {
-                    digit_sum(self).divisible_by_3_with(DivisibleBy3Method::DigitSum)
+                    digit_sum(x).divisible_by_3_with(DivisibleBy3Method::DigitSum)
                 }
             }
+
+            DivisibleBy3Method::DigitClassCount => {
+                let mut y = x;
+                let mut quantity_1_4_7: u64 = 0;
+                let mut quantity_2_5_8: u64 = 0;
+
+                while y > 0 {
+                    let digit: u64 = y % 10;
+                    if matches!(digit, 1 | 4 | 7) {
+                        quantity_1_4_7 += 1;
+                    } else if matches!(digit, 2 | 5 | 8) {
+                        quantity_2_5_8 += 1;
+                    }
+                    y /= 10;
+                }
+
+                let difference: u64 = if quantity_1_4_7 >= quantity_2_5_8 {
+                    quantity_1_4_7 - quantity_2_5_8
+                } else {
+                    quantity_2_5_8 - quantity_1_4_7
+                }
+
+                if difference < 10 {
+                    is_divisible_by_3_digit(difference)
+                } else {
+                    difference.divisible_by_with(DivisibleBy3Method::DigitClassCount)
+                }
+            }
+
+            DivisibleBy3Method::SubtractDoubleLastDigit => {
+                if x < 10 {
+                    is_divisible_by_3_digit(x)
+                } else {
+                    let new_x: u64 = x - 2 * (x % 10);
+                    divisible_by_with(3, DivisibleBy3Method::SubtractDoubleLastDigit)
+                }
+            }
+
+            DivisibleBy3Method::ModuloOperator => {
+                x % 3 == 0
+            }
+
         }
     }
 }
