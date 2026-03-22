@@ -69,6 +69,10 @@ mod digits {
     pub(super) fn divisible_by_3(n: u64) -> bool {
         matches!(n, 0 | 3 | 6 | 9)
     }
+
+    pub(super) fn divisible_by_4(n: u64) -> bool {
+        matches!(n, 0 | 4 | 8)
+    }
 }
 
 impl DivisibilityByMethodTrait for DivisibleBy2Method {
