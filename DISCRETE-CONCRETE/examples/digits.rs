@@ -37,7 +37,22 @@ THE "DEFINITION OF DONE" CHECKLIST:
 */
 
 pub trait Digits {
-    // we will refactor
+    fn digit_length(self) -> u64;
+}
+
+impl Digits for u64 {
+    fn digit_length(&self) -> u64 {
+        if self == 0 { return 1 }
+
+        let mut n: u64 = self;
+        let mut i: u64 = 0;
+        while n > 0 {
+            n /= 10;
+            i += 1;
+        }
+
+        i
+    }
 }
 
 
