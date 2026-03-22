@@ -113,7 +113,7 @@ impl DivisibilityStrategy for strategy::By3 {
                 }
             }
 
-            DivisibleBy3Method::DigitClassCount => {
+            Self::DigitClassCount => {
                 let mut remainder = x;
                 let mut quantity_1_4_7: u64 = 0;
                 let mut quantity_2_5_8: u64 = 0;
@@ -135,126 +135,22 @@ impl DivisibilityStrategy for strategy::By3 {
                 };
 
                 if difference < 10 {
-                    crate::digits::divisible_by_3(difference)
+                    crate::digit::divisible_by_3(difference)
                 } else {
-                    difference.divisible_by_with(DivisibleBy3Method::DigitClassCount)
+                    difference.is_divisible_by(Self::DigitClassCount)
                 }
             }
 
-            DivisibleBy3Method::SubtractDoubleLastDigit => {
+            Self::SubtractDoubleLastDigit => {
                 if x < 10 {
-                    crate::digits::divisible_by_3(x)
+                    crate::digit::divisible_by_3(x)
                 } else {
                     let new_x: u64 = (x / 10).abs_diff(2 * (x % 10));
-                    new_x.divisible_by_with(DivisibleBy3Method::SubtractDoubleLastDigit)
+                    new_x.is_divisible_by(Self::SubtractDoubleLastDigit)
                 }
             }
 
-            DivisibleBy3Method::ModuloOperator => {
-                x % 3 == 0
-            }
-
-        }
-    }
-}
-
-
-
-
-
-
-
-
-
-
-fn digit_sum(n: u64) -> u64 {
-    let mut n = n;
-    let mut result: u64 = 0;
-
-    while n > 0 {
-        result += n % 10;
-        n /= 10;
-    }
-
-    result
-}
-
-fn get_digit(n: u64, i: u32) -> u64 { 
-    (n / 10u64.pow(i - 1)) % 10 
-}
-
-mod digit {
-    pub(super) fn 2_divides(n: u64) -> bool {
-        matches!(n, 0 | 2 | 4 | 6 | 8)
-    }
-
-    pub(super) fn 3_divides(n: u64) -> bool {
-        matches!(n, 0 | 3 | 6 | 9)
-    }
-
-    pub(super) fn 4_divides(n: u64) -> bool {
-        matches!(n, 0 | 4 | 8)
-    }
-
-    pub(super) fn 6_divides(n: u64) -> bool {
-        matches!(n, 0 | 6)
-    }
-}
-
-
-
-impl DivisibilityByMethodTrait for DivisibleBy3Method {
-    fn check(&self, x: u64) -> bool {
-        match self {
-            DivisibleBy3Method::DigitSum => {
-                if x < 10 {
-                    crate::digits::divisible_by_3(x)
-                } else {
-                    digit_sum(x).divisible_by_with(DivisibleBy3Method::DigitSum)
-                }
-            }
-
-            DivisibleBy3Method::DigitClassCount => {
-                let mut remainder = x;
-                let mut quantity_1_4_7: u64 = 0;
-                let mut quantity_2_5_8: u64 = 0;
-
-                while remainder > 0 {
-                    let digit: u64 = remainder % 10;
-                    if matches!(digit, 1 | 4 | 7) {
-                        quantity_1_4_7 += 1;
-                    } else if matches!(digit, 2 | 5 | 8) {
-                        quantity_2_5_8 += 1;
-                    }
-                    remainder /= 10;
-                }
-
-                let difference: u64 = if quantity_1_4_7 >= quantity_2_5_8 {
-                    quantity_1_4_7 - quantity_2_5_8
-                } else {
-                    quantity_2_5_8 - quantity_1_4_7
-                };
-
-                if difference < 10 {
-                    crate::digits::divisible_by_3(difference)
-                } else {
-                    difference.divisible_by_with(DivisibleBy3Method::DigitClassCount)
-                }
-            }
-
-            DivisibleBy3Method::SubtractDoubleLastDigit => {
-                if x < 10 {
-                    crate::digits::divisible_by_3(x)
-                } else {
-                    let new_x: u64 = (x / 10).abs_diff(2 * (x % 10));
-                    new_x.divisible_by_with(DivisibleBy3Method::SubtractDoubleLastDigit)
-                }
-            }
-
-            DivisibleBy3Method::ModuloOperator => {
-                x % 3 == 0
-            }
-
+            Self::ModuloOperator => x % 3 == 0
         }
     }
 }
@@ -340,6 +236,72 @@ impl DivisibilityByMethodTrait for DivisibleBy6Method {
         }
     }
 }
+
+
+
+
+
+
+impl u64 {
+    /// Returns the number of digits in base-10.
+    fn digit_count(self) -> u32 {
+        if self == 0 {
+            return 1;
+        }
+        self.ilog10() + 1
+    }
+
+    fn get_digit(self, i: u32) -> u64 {
+        (self / 10u64.pow(i - 1)) % 10 
+    }
+
+    fn to_digits(self) -> Vec<u64> {
+        if self == 0 {
+            return vec![0];
+        }
+
+        let mut digits = Vec::with_capacity(self.digit_count() as usize);
+        let mut n = self;
+
+        while n > 0 {
+            digits.push(n % 10);
+            n /= 10;
+        }
+
+        digits
+    }
+
+    fn digit_sum(self) -> u64 {
+        let mut n = self;
+        let mut result: u64 = 0;
+
+        while n > 0 {
+            result += n % 10;
+            n /= 10;
+        }
+
+        result
+    }
+}
+
+mod digit {
+    pub(super) fn 2_divides(n: u64) -> bool {
+        matches!(n, 0 | 2 | 4 | 6 | 8)
+    }
+
+    pub(super) fn 3_divides(n: u64) -> bool {
+        matches!(n, 0 | 3 | 6 | 9)
+    }
+
+    pub(super) fn 4_divides(n: u64) -> bool {
+        matches!(n, 0 | 4 | 8)
+    }
+
+    pub(super) fn 6_divides(n: u64) -> bool {
+        matches!(n, 0 | 6)
+    }
+}
+
 
 impl Divisible for u64 {
     fn divisible_by_with(self, method: impl DivisibilityByMethodTrait) -> bool {
