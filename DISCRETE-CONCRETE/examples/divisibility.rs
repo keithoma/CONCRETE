@@ -1,3 +1,6 @@
+// to-do: use turbo fish to get one unifying function
+// let check = 369.is_divisible_by::<Three>();
+
 enum DivisibleBy2Method {
     LastDigitEven,
     ModuloOperator
@@ -23,6 +26,8 @@ enum DivisibleBy5Method {
 }
 
 enum DivisibleBy6Method {
+    TwoAndThree,
+    SumOfDigits
     ModuloOperator
 }
 
@@ -197,6 +202,16 @@ impl DivisibilityByMethodTrait for DivisibleBy5Method {
 
             DivisibleBy5Method::ModuloOperator => {
                 n % 5 == 0
+            }
+        }
+    }
+}
+
+impl DivisibilityByMethodTrait for DivisibleBy6Method {
+    fn check(&self, n: u64) -> bool {
+        match self {
+            DivisibleBy6Method::TwoAndThree {
+                n.divisible
             }
         }
     }
