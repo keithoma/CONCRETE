@@ -31,6 +31,13 @@ impl Digits {
         }
     }
 
+    fn is_empty(&self) -> bool {
+        match &self {
+            Some(Digits) => true,
+            None => false,
+        }
+    }
+
     /// Returns the length of the `Digits` instance.
     fn len(&self) -> usize {
         self.digits.len()
@@ -39,6 +46,10 @@ impl Digits {
     /// Returns the value at the index if it exists otherwise she returns None.
     fn get(&self, i: usize) -> Option<u8> {
         self.digits.get(i).copied()
+    }
+
+    fn first(&self) -> Option<u8> {
+        self.get(0)
     }
 
     /// Returns the last digit.
@@ -55,13 +66,23 @@ impl Digits {
         result
     }
 
+    fn reverse(&mut self) {
+        self.digits.reverse();
+    }
+
 }
 
 fn main() {
-    let d = Digits::from_u64(123456);
+    let mut d = Digits::from_u64(123456);
+    let mut n = Digits::new();
+    println!("{:?}", d.is_empty());
+    println!("{:?}", n.is_empty());
     println!("{:?}", d.digits);
     println!("{:?}", d.len());
     println!("{:?}", d.get(3));
     println!("{:?}", d.sum());
+    println!("{:?}", d.first());
     println!("{:?}", d.last());
+    d.reverse();
+    println!("{:?}", d.digits);
 }
