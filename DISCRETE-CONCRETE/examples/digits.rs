@@ -21,18 +21,26 @@ impl Digits {
         };
 
         let mut n = n;
-        let mut digits = Vec::new();
+        let mut digits_vector = Vec::new();
         while n > 0 {
-            digits.insert(0, (n % 10) as u8);
+            digits_vector.insert(0, (n % 10) as u8);
             n /= 10;
         }
         Self {
-            digits: digits
+            digits: digits_vector
         }
     }
+
+    /// Returns the length of the `Digits` instance.
+    fn len(&self) -> usize {
+        self.digits.len()
+    }
+
+
 }
 
 fn main() {
     let d = Digits::from_u64(123456);
     println!("{:?}", d.digits);
+    println!("{:?}", d.len());
 }
