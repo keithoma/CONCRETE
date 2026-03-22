@@ -1,18 +1,10 @@
 /// Represents the digits of a u64-integer.
+#[derive(Debug)]
 struct Digits {
     digits: Vec<u8>,
 }
 
 impl Digits {
-    /// Returns the number of digits.
-    fn digit_count(n: u64) -> u64 {
-        if n == 0 {
-            1
-        } else {
-            self.ilog10() + 1
-        }
-    }
-
     /// Constructs a new empty Digits instance.
     fn new() -> Self {
         Self {
@@ -22,7 +14,11 @@ impl Digits {
 
     /// Constructs and populates new Digits instance with the digits from `n`.
     fn from_u64(n: u64) -> Self {
-        if n == 0 { return vec![0] }
+        if n == 0 {
+            return Self {
+                digits: vec![0]
+            }
+        };
 
         let mut n = n;
         let mut digits = Vec::new();
@@ -30,11 +26,13 @@ impl Digits {
             digits.push((n % 10) as u8);
             n /= 10;
         }
-        digits
+        Self {
+            digits: digits
+        }
     }
 }
 
 fn main() {
     let d = Digits::from_u64(123456);
-    println!("{:?}", d::digits)
+    println!("{:?}", d.digits);
 }
