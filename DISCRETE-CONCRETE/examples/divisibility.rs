@@ -137,7 +137,7 @@ impl DivisibilityStrategy for strategy::By3 {
                 };
 
                 if difference < 10 {
-                    crate::digit::divisible_by_3(difference)
+                    crate::digit::three_divides(difference)
                 } else {
                     difference.is_divisible_by(Self::DigitClassCount)
                 }
@@ -145,7 +145,7 @@ impl DivisibilityStrategy for strategy::By3 {
 
             Self::SubtractDoubleLastDigit => {
                 if n < 10 {
-                    crate::digit::divisible_by_3(n)
+                    crate::digit::three_divides(n)
                 } else {
                     let new_n: u64 = (n / 10).abs_diff(2 * (n % 10));
                     new_n.is_divisible_by(Self::SubtractDoubleLastDigit)
@@ -217,10 +217,10 @@ impl DivisibilityStrategy for strategy::By6 {
         match self {
             Self::TwoAndThree => {
                 n.is_divisible_by::<strategy::By2>() &&
-                n.is_divisible_by::<strategy::By3>()
+                n.is_divisible_by::<strategy::By2>()
             }
 
-            Self::SumOfDigits => {
+            Self::WeightedSumOfDigits => {
                 let intermediate: u64 = 4 * (
                     n.get_digit(4) + n.get_digit(3) + n.get_digit(2)
                 ) + n.get_digit(1);
@@ -228,7 +228,7 @@ impl DivisibilityStrategy for strategy::By6 {
                 if intermediate < 10 {
                     crate::digit::six_divides(intermediate)
                 } else {
-                    intermediate.is_divisible_by(Self::SumOfDigits)
+                    intermediate.is_divisible_by(Self::WeightedSumOfDigits)
                 }
             }
 
@@ -309,11 +309,11 @@ mod digit {
 
 
 fn main() {
-    println!("{:?}", 369.divisible_by_with(strategy::By3::DigitSum));
-    println!("{:?}", 369.divisible_by_with(strategy::By3::DigitClassCount));
-    println!("{:?}", 369.divisible_by_with(strategy::By3::SubtractDoubleLastDigit));
+    println!("{:?}", 369.is_divisible_with(strategy::By3::DigitSum));
+    println!("{:?}", 369.is_divisible_with(strategy::By3::DigitClassCount));
+    println!("{:?}", 369.is_divisible_with(strategy::By3::SubtractDoubleLastDigit));
 
-    println!("{:?}", 101.divisible_by_with(strategy::By4::LastTwoDigits));
-    println!("{:?}", 101.divisible_by_with(strategy::By4::TensDigitOnesDigit));
-    println!("{:?}", 101.divisible_by_with(strategy::By4::TwiceTensPlusOnes));
+    println!("{:?}", 101.is_divisible_with(strategy::By4::LastTwoDigits));
+    println!("{:?}", 101.is_divisible_with(strategy::By4::TensDigitOnesDigit));
+    println!("{:?}", 101.is_divisible_with(strategy::By4::TwiceTensPlusOnes));
 }
