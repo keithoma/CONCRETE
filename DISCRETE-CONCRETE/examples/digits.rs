@@ -32,10 +32,7 @@ impl Digits {
     }
 
     fn is_empty(&self) -> bool {
-        match &self {
-            Some(Digits) => true,
-            None => false,
-        }
+        self.digits.is_empty()
     }
 
     /// Returns the length of the `Digits` instance.
