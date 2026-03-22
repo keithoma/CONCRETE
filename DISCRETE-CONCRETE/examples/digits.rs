@@ -36,6 +36,10 @@ impl Digits {
         self.digits.len()
     }
 
+    fn get(&self, i: usize) -> Option<u8> {
+        self.digits.get(i).copied()
+    }
+
 
 }
 
