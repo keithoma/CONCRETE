@@ -13,6 +13,7 @@ enum DivisibleBy3Method {
 enum DivisibleBy4Method {
     LastTwoDigits,
     TensDigitOnesDigit,
+    TwiceTensPlusOnes,
     ModuloOperator
 }
 
@@ -41,7 +42,7 @@ enum DivisibleBy10Method {
 }
 
 trait Divisible {
-    fn divisible_by_with(self, method: impl DivMethodTrait) -> bool;
+    fn divisible_by_with(self, method: impl DivisibilityByMethodTrait) -> bool;
 }
 
 trait DivisibilityByMethodTrait {
@@ -128,7 +129,7 @@ impl DivisibilityByMethodTrait for DivisibleBy3Method {
                 if x < 10 {
                     crate::digits::divisible_by_3(x)
                 } else {
-                    let new_x: u64 = x - 2 * (x % 10);
+                    let new_x: u64 = (x / 10) - 2 * (x % 10);
                     new_x.divisible_by_with(DivisibleBy3Method::SubtractDoubleLastDigit)
                 }
             }
@@ -142,13 +143,13 @@ impl DivisibilityByMethodTrait for DivisibleBy3Method {
 }
 
 impl DivisibilityByMethodTrait for DivisibleBy4Method {
-    fn check(&self, n: u64) {
+    fn check(&self, n: u64) -> bool {
         match self {
             DivisibleBy4Method::LastTwoDigits => {
-                let divisible_last_two_digits: [u64, 25] = [
+                let divisible_last_two_digits: [u64; 25] = [
                     0, 4, 8, 12, 16, 20, 24, 28, 32, 36, 40, 44, 48,
                     52, 56, 60, 64, 68, 72, 76, 80, 84, 88, 92, 96
-                ]
+                ];
 
                 let last_two_digits: u64 = n % 100;
                 divisible_last_two_digits.contains(&last_two_digits)
@@ -157,11 +158,24 @@ impl DivisibilityByMethodTrait for DivisibleBy4Method {
             DivisibleBy4Method::TensDigitOnesDigit => {
                 let tens_digit: u64 = (n % 100) / 10;
                 let ones_digit: u64 = n % 10;
-                if crate::digits::divisible_by_3(tens_digit) {
+                if crate::digits::divisible_by_2(tens_digit) {
                     matches!(ones_digit, 0 | 4 | 8)
                 } else {
                     matches!(ones_digit, 2 | 6)
                 }
+            }
+
+            DivisibilityBy4Method::TwiceTensPlusOnes => {
+                if x < 10 {
+                    crate::digits::divisible_by_4(n)
+                } else {
+                    let intermediate_result: u64 = 2 * ((n % 100) / 10) + (n % 10);
+                    intermediate_result.divisible_by_with(Di)
+                }
+            }
+
+            DivisibleBy4Method::ModuloOperator => {
+                n % 4 == 0
             }
         }
 
