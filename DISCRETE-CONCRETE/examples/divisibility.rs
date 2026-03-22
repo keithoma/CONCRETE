@@ -10,6 +10,11 @@ enum DivisibleBy3Method {
     ModuloOperator
 }
 
+// should be
+// trait Divisible {
+//     fn divisible_by(self, n: u64) -> bool;
+// }
+
 trait Divisible {
     fn divisible_by_2(self) -> bool;
     fn divisible_by_2_with(self, method: DivisibleBy2Method) -> bool;
@@ -24,6 +29,12 @@ trait Divisible {
     // fn divisible_by_8(self) -> bool;
     fn divisible_by_9(self) -> bool;
     fn divisible_by_10(self) -> bool;
+}
+
+mod digits {
+    pub(super) fn is_divisible_by_3_digit(n: u64) -> bool {
+        matches!(n, 0 | 3 | 6 | 9)
+    }
 }
 
 fn digit_sum(n: u64) -> u64 {
@@ -56,16 +67,16 @@ impl Divisible for u64 {
     }
 
     fn divisible_by_3(self) -> bool {
-
+        self.divisible_by_3_with(DivisibleBy3Method::DigitSum)
     }
 
-    fn divisible_by_3_with(self, method: DivisibleBy3Method) {
+    fn divisible_by_3_with(self, method: DivisibleBy3Method) -> bool {
         match method {
             DivisibleBy3Method::DigitSum => {
                 if self < 10 {
-                    matches!(self, 0 | 3 | 6 | 9);
+                    matches!(self, 0 | 3 | 6 | 9) // since I have the same code below, this should become helpers
                 } else {
-                    digit_sum(self).divisible_by_3_with(DigitSum)
+                    digit_sum(self).divisible_by_3_with(DivisibleBy3Method::DigitSum)
                 }
             }
 
@@ -117,7 +128,7 @@ impl Divisible for u64 {
 
     fn divisible_by_9(self) -> bool {
         if self < 10 {
-            self == 9;
+            self == 9
         } else {
             digit_sum(self).divisible_by_9()
         }
