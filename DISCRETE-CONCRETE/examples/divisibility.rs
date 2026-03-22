@@ -1,3 +1,8 @@
+// TODO: unify divisibility checks into one function `divisible_by_with(self, n: u64, method: D)`
+// - Use a trait like `DivMethodTrait` where each per-divisor enum (DivisibleBy2Method, DivisibleBy3Method, etc.) implements `check(&self, n: u64) -> bool`
+// - This lets `divisible_by_with` accept any method enum generically without creating one huge enum
+// - Keeps enums small, modular, and extensible, while allowing a single unified API
+
 enum DivisibleBy2Method {
     LastDigitEven,
     ModuloOperator
