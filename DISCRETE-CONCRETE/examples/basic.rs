@@ -96,11 +96,11 @@ impl PrimeGeneration for BooleanSieve {
         integer_line[0] = false;
         integer_line[1] = false;
 
-        let mut i: u64 = 2;
+        let mut i: usize = 2;
 
         while i <= n / i {
             if integer_line[i] {
-                let mut multiple = 2 * i;
+                let mut multiple = i * i; // we only have to start at the square power
                 while multiple <= n {
                     integer_line[multiple] = false;
                     multiple += i;
@@ -113,7 +113,14 @@ impl PrimeGeneration for BooleanSieve {
         integer_line
             .iter()
             .enumerate()
-            .filter_map(|(i, &prime))
+            .filter_map(|(i, &prime)| {
+                if prime {
+                    Some(i as u64)
+                } else {
+                    None
+                }
+            })
+            .collect()
     }
 }
 
@@ -149,7 +156,9 @@ fn main() {
     // println!("{}", TrivialDivision::is_prime(310000001));
 
 
-    println!("{:?}", TrialDivision::primes_up_to(100));
+    // println!("{:?}", TrialDivision::primes_up_to(100));
+
+    println!("{:?}", BooleanSieve::primes_up_to(10000))
 
 
     // 2, 3, 5, 7, 11, 13, 17, 23, 29, 31
