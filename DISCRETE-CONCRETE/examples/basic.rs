@@ -4,8 +4,33 @@ trait Primality {
 }
 
 trait PrimeGeneration {
+    /// Returns a vector with prime numbers up to and including `n`.
     fn primes_up_to(n: u64) -> Vec<u64>;
 }
+
+trait PrimalityFromGeneration: PrimeGeneration {
+    /// Returns `true` if `n` is prime and `false` otherwise. Uses
+    /// `primes_up_to(n)` from `PrimeGeneration` trait.
+    fn is_prime(n: u64) -> bool {
+        n > 1 && Self::primes_up_to(n).last() == Some(&n)
+    }
+}
+
+trait PrimeGenerationFromPrimality: Primality {
+    /// Returns a vector with prime numbers up to and including `n`. Uses
+    /// `is_prime(n)` from `Primality` trait.
+    fn primes_up_to(n: u64) -> Vec<u64> {
+        let primes = (2..=n)
+            .filter(TrialDivision::is_prime)
+            .collect::<Vec<u64>>();
+        
+        primes
+    }
+}
+
+impl<T: PrimeGeneration> PrimalityFromGeneration for T {}
+
+impl<T: Primality> PrimeGenerationFromPrimality for T {}
 
 /// Primality test by trivial division.
 struct TrialDivision;
@@ -13,32 +38,15 @@ struct TrialDivision;
 impl Primality for TrialDivision {
     fn is_prime(n: u64) -> bool {
         // 0 and 1 are not primes by convention.
-        if n <= 1 {
-            return false;
-        }
+        if n <= 1 { return false; }
 
         for i in 2..n {
             // We only need to check divisibility to the square root of n
             // rounded down. We are also avoiding float numbers here.
-            if i > n / i {
-                break;
-            }
-
-            if n % i == 0 {
-                return false;
-            }
+            if i > n / i { break; }
+            if n % i == 0 { return false; }
         }
         true
-    }
-}
-
-impl PrimeGeneration for TrialDivision {
-    fn primes_up_to(n: u64) -> Vec<u64> {
-        let primes = (2..=n)
-            .filter(TrialDivision::is_prime)
-            .collect::<Vec<u64>>();
-        
-        primes
     }
 }
 
@@ -55,9 +63,7 @@ impl PrimeGeneration for FilteringSieve {
             let x = integer_line[i];
 
             // We only need to check up to the floor of the square root of n.
-            if x > n / x {
-                break;
-            }
+            if x > n / x { break; }
 
             // Remove all multiples of x. We only need to check from the square
             // of x.
@@ -68,18 +74,6 @@ impl PrimeGeneration for FilteringSieve {
         }
 
         integer_line
-    }
-}
-
-impl Primality for FilteringSieve {
-    fn is_prime(n: u64) -> bool {
-        // 0 and 1 are not primes by convention.
-        if n <= 1 {
-            return false;
-        }
-
-        // If the last remaining integer is `n`, then it is prime.
-        FilteringSieve::primes_up_to(n).last() == Some(&n) 
     }
 }
 
@@ -121,30 +115,6 @@ impl PrimeGeneration for BooleanSieve {
                 }
             })
             .collect()
-    }
-}
-
-
-// impl PrimeGeneration for SieveOfEratosthenes {
-//    fn primes_up_to(n: u64) -> Result<Vec<u64>, String> {
-//    }
-//}
-
-
-
-trait PrimeFactorizationAlgorithm {
-    fn prime_factorization(a: u64) -> Result<Vec<(u64, u32)>, String>;
-}
-
-trait GCDAlgorithm {
-    fn gcd(a: u64, b: u64) -> u64;
-}
-
-struct Euclidean;
-
-impl GCDAlgorithm for Euclidean {
-    fn gcd(mut a: u64, mut b: u64) -> u64 {
-        a
     }
 }
 
