@@ -23,7 +23,7 @@ impl Digits {
         let mut n = n;
         let mut digits = Vec::new();
         while n > 0 {
-            digits.push((n % 10) as u8);
+            digits.insert(0, (n % 10) as u8);
             n /= 10;
         }
         Self {
