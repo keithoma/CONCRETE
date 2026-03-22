@@ -43,9 +43,9 @@ impl PrimeGeneration for TrialDivision {
 }
 
 /// Primality test by Sieve of Eratosthenes.
-struct SieveOfEratosthenes;
+struct FilteringSieve;
 
-impl PrimeGeneration for SieveOfEratosthenes {
+impl PrimeGeneration for FilteringSieve {
     fn primes_up_to(n: u64) -> Vec<u64> {
         // We start with the entire natural number line from 2 to n.
         let mut integer_line: Vec<u64> = (2..=n).collect();
@@ -71,7 +71,7 @@ impl PrimeGeneration for SieveOfEratosthenes {
     }
 }
 
-impl Primality for SieveOfEratosthenes {
+impl Primality for FilteringSieve {
     fn is_prime(n: u64) -> bool {
         // 0 and 1 are not primes by convention.
         if n <= 1 {
@@ -79,11 +79,43 @@ impl Primality for SieveOfEratosthenes {
         }
 
         // If the last remaining integer is `n`, then it is prime.
-        SieveOfEratosthenes::primes_up_to(n).last() == Some(&n) 
+        FilteringSieve::primes_up_to(n).last() == Some(&n) 
     }
 }
 
+struct BooleanSieve;
 
+impl PrimeGeneration for BooleanSieve {
+    fn primes_up_to(n: u64) -> Vec<u64> {
+        if n < 2 {
+            return Vec::new();
+        }
+
+        let n = n as usize;
+        let mut integer_line = vec![true; n + 1];
+        integer_line[0] = false;
+        integer_line[1] = false;
+
+        let mut i: u64 = 2;
+
+        while i <= n / i {
+            if integer_line[i] {
+                let mut multiple = 2 * i;
+                while multiple <= n {
+                    integer_line[multiple] = false;
+                    multiple += i;
+                }
+            }
+            i += 1;
+
+        }
+
+        integer_line
+            .iter()
+            .enumerate()
+            .filter_map(|(i, &prime))
+    }
+}
 
 
 // impl PrimeGeneration for SieveOfEratosthenes {
