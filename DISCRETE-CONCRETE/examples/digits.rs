@@ -36,6 +36,12 @@ THE "DEFINITION OF DONE" CHECKLIST:
 =============================================================================
 */
 
+pub trait Digits {
+    // we will refactor
+}
+
+
+
 /// Represents the digits of a u64-integer.
 #[derive(Debug)]
 struct Digits {
