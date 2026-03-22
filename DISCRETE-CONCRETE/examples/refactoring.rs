@@ -17,6 +17,27 @@ pub trait Digits {
 
     /// Computes the digit sum.
     fn digit_sum(self) -> u32;
+
+    /// Computes the alternating digit sum.
+    fn alternating_digit_sum(self) -> i32;
+
+    /// Returns an integer with its digits reversed.
+    fn reverse(self) -> u64;
+
+    ///
+    fn is_palindrome(self) -> bool;
+
+    ///
+    fn is_narcissistic(self) -> bool;
+
+    ///
+    fn digital_root(self) -> u8;
+
+    ///
+    fn digital_root_modulo(self) -> u8;
+
+    ///
+    fn digital_root_recursive(self) -> u8;
 }
 
 impl Digits for u64 {
