@@ -30,6 +30,42 @@
 =============================================================================
 */
 
+/*
+=============================================================================
+ MODULE OBJECTIVES: `Digits` 
+ Status: IN PROGRESS
+=============================================================================
+SCOPE: 
+This module is strictly a foundational data structure for representing 
+base-10 digits. It handles bidirectional conversion and basic sequence 
+operations. 
+
+RULE: NO business logic or divisibility checks belong in this file.
+
+THE "DEFINITION OF DONE" CHECKLIST:
+[ ] 1. SAFETY & SPEED: 
+       - Refactor initialization to use `push()` + `reverse()` (Avoid O(N^2)).
+       - Refactor `to_u64()` to use Horner's Method (no `pow()`).
+       - Remove panics in `last()` and `first()` by relying on `Vec` methods.
+
+[ ] 2. IDIOMATIC TRAITS:
+       - `impl Default for Digits`
+       - `impl From<u64> for Digits`
+       - `impl From<&Digits> for u64`
+       - `impl std::fmt::Display for Digits`
+
+[ ] 3. ITERATION:
+       - `impl IntoIterator for &Digits`
+
+[ ] 4. INNATE PROPERTIES:
+       - `sum() -> u32`
+       - `alternating_sum() -> i32`
+       - `reverse()`
+
+Once these boxes are checked, this file is COMPLETE. 
+=============================================================================
+*/
+
 /// Represents the digits of a u64-integer.
 #[derive(Debug)]
 struct Digits {
