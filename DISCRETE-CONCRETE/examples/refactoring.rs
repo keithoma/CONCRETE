@@ -24,16 +24,14 @@ impl Digits for u64 {
         self.digit_length_logarithmic()
     }
 
-    fn digit_length_iterative(self) -> u32 {
+    fn digit_length_iterative(mut self) -> u32 {
         if self == 0 { return 1 }
 
-        let mut n: u64 = self;
         let mut i: u32 = 0;
-        while n > 0 {
-            n /= 10;
+        while self > 0 {
+            self /= 10;
             i += 1;
         }
-
         i
     }
 
@@ -48,14 +46,13 @@ impl Digits for u64 {
         Some(((self / 10_u64.pow(i)) % 10) as u8)
     }
 
-    fn digit_sum(self) -> u32 {
-        let mut n: u64 = self;
-        let mut result: u64 = 0;
-        while n > 0 {
-            result += n % 10;
-            n /= 10;
+    fn digit_sum(mut self) -> u32 {
+        let mut result: u32 = 0;
+        while self > 0 {
+            result += (self % 10) as u32;
+            self /= 10;
         }
-        result as u32
+        result
     }
 }
 
