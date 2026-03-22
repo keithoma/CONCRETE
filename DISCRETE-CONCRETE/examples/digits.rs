@@ -126,13 +126,11 @@ impl Digits {
     }
 
     fn to_u64(&self) -> u64 {
-        let mut u: u64 = 0;
-        let mut i: u32 = self.len() as u32;
-        for &d in &self.digits {
-            u += (d as u64) * 10u64.pow(i - 1);
-            i -= 1;
+        let mut result: u64 = 0;
+        for &digit in &self.digits {
+            result = result * 10 + (digit as u64);
         }
-        u
+        result
     }
 
     /// Checks if the digits are empty or not.
@@ -162,11 +160,7 @@ impl Digits {
 
     /// Returns the digit sum.
     fn sum(&self) -> u64 {
-        let mut result: u64 = 0;
-        for d in &self.digits {
-            result += *d;
-        }
-        result
+        self.digits.iter().map(|&d| d as u64).sum()
     }
 
     /// Returns the alternating sum.
@@ -209,6 +203,10 @@ impl Digits {
         }
     }
 
+    fn is_narcissistic(&self) -> bool {
+        let exponent: u32 = self.len() as u32;
+        self.to_u64() == self.digits.iter().map(|&d| (d as u64).pow(exponent)).sum()
+    }
 }
 
 fn main() {
@@ -230,4 +228,7 @@ fn main() {
     let mut d2 = Digits::from_u64(123454321);
     println!("{:?}", d2.is_palindrome());
     println!("{:?}", d2.digital_root());
+
+    let mut d3 = Digits::from_u64(548834);
+    println!("is narcisstic: {:?}", d3.is_narcissistic());
 }
