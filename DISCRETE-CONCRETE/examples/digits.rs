@@ -74,6 +74,17 @@ impl Digits {
         result
     }
 
+    /// Returns the alternating sum.
+    fn alternating_sum(&self) -> i32 {
+        let mut result: i32 = 0;
+        let mut sign: bool = true;
+        for &d in self.digits.iter().rev() {
+            result += (2 * (sign as i32) - 1) * (d as i32);
+            sign = if sign { false } else { true };
+        }
+        result
+    }
+
     fn reverse(&mut self) {
         self.digits.reverse();
     }
@@ -81,9 +92,10 @@ impl Digits {
 }
 
 fn main() {
-    let mut d = Digits::from_u64(123456);
+    let mut d = Digits::from_u64(1234);
     let mut n = Digits::new();
     println!("{:?}", d.to_u64());
+    println!("Alternating sum: {:?}", d.alternating_sum());
     println!("{:?}", d.is_empty());
     println!("{:?}", n.is_empty());
     println!("{:?}", d.digits);
