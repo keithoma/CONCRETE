@@ -1,3 +1,35 @@
+/*
+=============================================================================
+ CODE REVIEW & IMPROVEMENT NOTES FOR `Digits`
+=============================================================================
+
+1. OPTIMIZATIONS & BUG FIXES:
+   - `from_u64`: Avoid `digits_vector.insert(0, ...)`. It shifts the entire 
+     array every time (O(n^2)). Instead, use `push(...)` and then call 
+     `digits_vector.reverse()` after the loop.
+   - `to_u64`: Avoid `10u64.pow()`. Use Horner's method to accumulate the 
+     number: `let mut u = 0; for &d in &self.digits { u = u * 10 + (d as u64); }`
+   - `last`: `self.get(self.len() - 1)` will panic (underflow) if the vector 
+     is empty. Use the native `self.digits.last().copied()` instead.
+   - `first`: Can be simplified to `self.digits.first().copied()`.
+   - `sum`: Make it idiomatic with iterators: 
+     `self.digits.iter().map(|&d| d as u32).sum()`
+
+2. IDIOMATIC RUST TRAITS TO IMPLEMENT:
+   - `Default`: Instead of just `new()`, implement the `Default` trait.
+   - `From<u64>`: Replace `from_u64` by implementing `From<u64> for Digits`.
+     (Usage: `Digits::from(1234)`)
+   - `From<&Digits> for u64`: Replace `to_u64` by implementing this trait. 
+   - `std::fmt::Display`: Implement this so you can `println!("{}", d)` 
+     instead of needing `{:?}`.
+
+3. NEW FEATURES TO ADD (For Divisibility):
+   - `is_divisible_by_3(&self) -> bool` (using `self.sum() % 3 == 0`)
+   - `is_divisible_by_11(&self) -> bool` (using `self.alternating_sum() % 11 == 0`)
+   - `FromStr`: Implement `std::str::FromStr` to construct `Digits` from a String.
+=============================================================================
+*/
+
 /// Represents the digits of a u64-integer.
 #[derive(Debug)]
 struct Digits {
@@ -10,7 +42,7 @@ impl Digits {
         Self {
             digits: Vec::new(),
         }
-    }
+    }1
 
     /// Constructs and populates new Digits instance with the digits from `n`.
     fn from_u64(n: u64) -> Self {
@@ -80,7 +112,7 @@ impl Digits {
         let mut sign: bool = true;
         for &d in self.digits.iter().rev() {
             result += (2 * (sign as i32) - 1) * (d as i32);
-            sign = if sign { false } else { true };
+            sign = !sign;
         }
         result
     }
