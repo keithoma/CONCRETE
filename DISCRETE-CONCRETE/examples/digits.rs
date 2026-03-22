@@ -41,6 +41,12 @@ impl Digits {
         self.digits.get(i).copied()
     }
 
+    /// Returns the last digit.
+    fn last(&self) -> Option<u8> {
+        self.get(self.len() -1)
+    }
+
+    /// Returns the digit sum.
     fn sum(&self) -> u32 {
         let mut result: u32 = 0;
         for d in &self.digits {
@@ -57,4 +63,5 @@ fn main() {
     println!("{:?}", d.len());
     println!("{:?}", d.get(3));
     println!("{:?}", d.sum());
+    println!("{:?}", d.last());
 }
