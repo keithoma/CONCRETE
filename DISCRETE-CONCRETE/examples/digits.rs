@@ -69,7 +69,7 @@ as sequences, enabling fast combinatorial and number-theoretic analysis.
 
 THE FINAL CHECKLIST:
 [ ] 1. SAFETY, SPEED & TRAITS (The Basics): 
-       - Refactor `to_u64()` (Horner's Method).
+
        - Implement `Default`, `From<u64>`, `From<&Digits> for u64`.
        - Implement `std::fmt::Display`.
 
@@ -120,7 +120,7 @@ impl Digits {
         }
     }
 
-    fn from_String(s: str) -> Self {
+    fn from_str(s: &str) -> Self {
         Self {
             digits: s.chars()
                 .filter_map(|c| c.to_digit(10))
@@ -236,9 +236,9 @@ fn main() {
     let mut d3 = Digits::from_u64(548834);
     println!("is narcisstic: {:?}", d3.is_narcissistic());
 
-    let mut d4 = Digits::from_String("2132131");
+    let mut d4 = Digits::from_str("2132131");
     println!("{:?}", d4);
 
-    let mut d5 = Digits::from_String("a2132131");
+    let mut d5 = Digits::from_str("adsa\nasdasda2132131");
     println!("{:?}", d5);
 }
