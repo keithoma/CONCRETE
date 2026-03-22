@@ -4,9 +4,6 @@
 =============================================================================
 
 1. OPTIMIZATIONS & BUG FIXES:
-   - `from_u64`: Avoid `digits_vector.insert(0, ...)`. It shifts the entire 
-     array every time (O(n^2)). Instead, use `push(...)` and then call 
-     `digits_vector.reverse()` after the loop.
    - `to_u64`: Avoid `10u64.pow()`. Use Horner's method to accumulate the 
      number: `let mut u = 0; for &d in &self.digits { u = u * 10 + (d as u64); }`
    - `last`: `self.get(self.len() - 1)` will panic (underflow) if the vector 
@@ -44,7 +41,6 @@ RULE: NO business logic or divisibility checks belong in this file.
 
 THE "DEFINITION OF DONE" CHECKLIST:
 [ ] 1. SAFETY & SPEED: 
-       - Refactor initialization to use `push()` + `reverse()` (Avoid O(N^2)).
        - Refactor `to_u64()` to use Horner's Method (no `pow()`).
        - Remove panics in `last()` and `first()` by relying on `Vec` methods.
 
@@ -108,7 +104,7 @@ impl Digits {
         Self {
             digits: Vec::new(),
         }
-    }1
+    }
 
     /// Constructs and populates new Digits instance with the digits from `n`.
     fn from_u64(n: u64) -> Self {
@@ -121,9 +117,10 @@ impl Digits {
         let mut n = n;
         let mut digits_vector = Vec::new();
         while n > 0 {
-            digits_vector.push((n % 10) as u8).reverse();
+            digits_vector.push((n % 10) as u8);
             n /= 10;
         }
+        digits_vector.reverse();
         Self {
             digits: digits_vector
         }
@@ -154,13 +151,14 @@ impl Digits {
         self.digits.get(i).copied()
     }
 
+    /// Returns the first digit.
     fn first(&self) -> Option<u8> {
-        self.get(0)
+        self.digits.first().copied()
     }
 
     /// Returns the last digit.
     fn last(&self) -> Option<u8> {
-        self.get(self.len() -1)
+        self.digits.last().copied()
     }
 
     /// Returns the digit sum.
@@ -185,6 +183,10 @@ impl Digits {
 
     fn reverse(&mut self) {
         self.digits.reverse();
+    }
+
+    fn is_palindrome(&self) -> bool {
+        self.digits.iter().zip(self.digits.iter().rev()).all(|(x, y)| x == y)
     }
 
 }
