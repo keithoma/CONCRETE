@@ -20,16 +20,13 @@ trait PrimeGenerationFromPrimality: Primality {
     /// Returns a vector with prime numbers up to and including `n`. Uses
     /// `is_prime(n)` from `Primality` trait.
     fn primes_up_to(n: u64) -> Vec<u64> {
-        let primes = (2..=n)
-            .filter(TrialDivision::is_prime)
-            .collect::<Vec<u64>>();
-        
-        primes
+        (2..=n)
+            .filter(|&x| Self::is_prime(x))
+            .collect::<Vec<u64>>()
     }
 }
 
 impl<T: PrimeGeneration> PrimalityFromGeneration for T {}
-
 impl<T: Primality> PrimeGenerationFromPrimality for T {}
 
 /// Primality test by trivial division.
@@ -86,17 +83,17 @@ impl PrimeGeneration for BooleanSieve {
         }
 
         let n = n as usize;
-        let mut integer_line = vec![true; n + 1];
-        integer_line[0] = false;
-        integer_line[1] = false;
+        let mut marked_primes = vec![true; n + 1];
+        marked_primes[0] = false;
+        marked_primes[1] = false;
 
         let mut i: usize = 2;
 
         while i <= n / i {
-            if integer_line[i] {
+            if marked_primes[i] {
                 let mut multiple = i * i; // we only have to start at the square power
                 while multiple <= n {
-                    integer_line[multiple] = false;
+                    marked_primes[multiple] = false;
                     multiple += i;
                 }
             }
@@ -104,7 +101,7 @@ impl PrimeGeneration for BooleanSieve {
 
         }
 
-        integer_line
+        marked_primes
             .iter()
             .enumerate()
             .filter_map(|(i, &prime)| {
@@ -128,7 +125,9 @@ fn main() {
 
     // println!("{:?}", TrialDivision::primes_up_to(100));
 
-    println!("{:?}", BooleanSieve::primes_up_to(10000))
+    println!("{:?}", <TrialDivision as PrimeGenerationFromPrimality>::primes_up_to(37));
+    println!("{:?}", FilteringSieve::primes_up_to(37));
+    println!("{:?}", BooleanSieve::primes_up_to(37));
 
 
     // 2, 3, 5, 7, 11, 13, 17, 23, 29, 31
