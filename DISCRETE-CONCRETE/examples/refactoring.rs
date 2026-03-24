@@ -2,6 +2,7 @@
 #![warn(clippy::std_instead_of_alloc)]
 
 /// An iterator that yields digits from right to left (10^0, 10^1, ...).
+#[derive(Debug)]
 pub struct DigitIter {
     number: u64,
 }
@@ -99,7 +100,17 @@ impl Digits for u64 {
 }
 
 fn main() {
+    const LONG_DIGITS: DigitIter = DigitIter { number: 0123456789 };
+    const SHORT_DIGITS: DigitIter = DigitIter { number: 321 };
 
+    let iter_map: Vec<u8> = LONG_DIGITS.map(|x| x + 1).collect();
+    assert_eq!(iter_map, vec![10, 9, 8, 7, 6, 5, 4, 3, 2]);
+
+    let iter_filter: Vec<u8> = LONG_DIGITS.filter(|&x| x >= 8).collect();
+    assert_eq!(iter_filter, vec![9, 8]);
+
+    let iter_enumerate: Vec<(usize, u8)> = SHORT_DIGITS.enumerate().collect();
+    assert_eq!(iter_enumerate, vec![(0, 1), (1, 2), (2, 3)]);
 }
 
 #[cfg(test)]
@@ -107,7 +118,6 @@ mod tests {
     // This imports the Digits trait and anything else from the main file 
     // into this isolated testing module.
     use super::*; 
-
     #[test]
     fn test_iterative_length() {
         let n: u64 = 12345;
