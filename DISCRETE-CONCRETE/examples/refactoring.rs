@@ -67,7 +67,7 @@ pub trait Digits {
     fn digit_length(self) -> usize;
 
     /// Returns the digit at the index.
-    fn get(self, i: u32) -> Option<u8>;
+    fn get(self, i: usize) -> Option<u8>;
 
     /// Computes the digit sum.
     fn digit_sum(self) -> u8;
@@ -75,10 +75,10 @@ pub trait Digits {
     /// Computes the alternating digit sum.
     fn alternating_digit_sum(self) -> i8;
 
-    /*
     /// Returns an integer with its digits reversed.
     fn reverse(self) -> u64;
 
+    /*
     ///
     fn is_palindrome(self) -> bool;
 
@@ -106,7 +106,7 @@ impl Digits for u64 {
         (self.ilog10() + 1) as usize
     }
 
-    fn get(self, i: u32) -> Option<u8> {
+    fn get(self, i: usize) -> Option<u8> {
         // Attempt to calculate 10^i. If it overflows, the index is definitely too high.
         let divisor = 10_u64.checked_pow(i)?;
         
@@ -132,7 +132,6 @@ impl Digits for u64 {
             })
             .sum()
     }
-
 
     fn reverse(self) -> u64 {
         self.digits().fold(0u64, |acc, d| acc * 10 + d as u64)
