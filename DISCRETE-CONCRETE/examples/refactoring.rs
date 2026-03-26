@@ -86,10 +86,11 @@ pub trait Digits {
     ///
     fn is_narcissistic(self) -> bool;
 
-    /*
+
     ///
     fn digital_root(self) -> u8;
 
+    /*
     ///
     fn digital_root_modulo(self) -> u8;
 
@@ -148,6 +149,27 @@ impl Digits for u64 {
         let digits = self.digits();
         let n = digits.len() as u32;
         digits.map(|x| (x as u64).pow(n)).sum()::<u64> == self
+    }
+
+    fn digital_root(self) -> u8 {
+        digital_root_modulo(self)
+    }
+
+    fn digital_root_modulo(self) -> u8 {
+        if self == 0 {
+            0
+        } else {
+            // The formula: 1 + (n - 1) % 9
+            (1 + (self - 1) % 9) as u8
+        }
+    }
+
+    fn digital_root_recursive(self) -> u8 {
+        if self < 10 {
+            self as u8
+        } else {
+            (self.digit_sum() as u64).digital_root()
+        }
     }
 }
 
