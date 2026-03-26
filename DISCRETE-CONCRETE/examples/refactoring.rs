@@ -82,10 +82,11 @@ pub trait Digits {
     ///
     fn is_palindrome(self) -> bool;
 
-    /*
+
     ///
     fn is_narcissistic(self) -> bool;
 
+    /*
     ///
     fn digital_root(self) -> u8;
 
@@ -108,15 +109,12 @@ impl Digits for u64 {
     }
 
     fn get(self, i: usize) -> Option<u8> {
-        // Attempt to calculate 10^i. If it overflows, the index is definitely too high.
-        let divisor = 10_u64.checked_pow(i)?;
-        
-        // If the number is smaller than the divisor, the index is out of bounds.
-        if self < divisor {
-            return None;
+        let digits = self.digits();
+        if i < digits.len() {
+            Some(digits.digits[19 - i])
+        } else {
+            None
         }
-
-        Some(((self / divisor) % 10) as u8)
     }
 
     fn digit_sum(self) -> u8 {
@@ -144,6 +142,12 @@ impl Digits for u64 {
             if f != b { return false; }
         }
         true
+    }
+
+    fn is_narcissistic(self) -> bool {
+        let digits = self.digits();
+        let n = digits.len() as u32;
+        digits.map(|x| (x as u64).pow(n)).sum()::<u64> == self
     }
 }
 
