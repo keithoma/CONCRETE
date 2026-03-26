@@ -72,10 +72,10 @@ pub trait Digits {
     /// Computes the digit sum.
     fn digit_sum(self) -> u8;
     
-    /*
     /// Computes the alternating digit sum.
-    fn alternating_digit_sum(self) -> i32;
+    fn alternating_digit_sum(self) -> i8;
 
+    /*
     /// Returns an integer with its digits reversed.
     fn reverse(self) -> u64;
 
@@ -122,18 +122,21 @@ impl Digits for u64 {
         self.digits().sum()
     }
 
-    /*
-    fn alternating_digit_sum(self) -> i32 {
+    fn alternating_digit_sum(self) -> i8 {
         self.digits()
-            .reverse()
+            .rev()
             .enumerate()
-            .map(|(i, val)| {
-                let sign = if i % 2 == 0 { 1 } else { -1 };
-                (val as i32) * sign
+            .map(|(i, d)| {
+                let digit = d as i8;
+                if i % 2 == 0 { digit } else { -digit }
             })
             .sum()
     }
-    */
+
+
+    fn reverse(self) -> u64 {
+        self.digits().fold(0u64, |acc, d| acc * 10 + d as u64)
+    }
 }
 
 fn main() {
