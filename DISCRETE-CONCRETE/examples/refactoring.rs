@@ -63,14 +63,14 @@ pub trait Digits {
     ///
     fn digits(self) -> DigitIter;
 
-    /// Default function to count the number of digits.
+    ///
     fn digit_length(self) -> usize;
 
     /// Returns the digit at the index.
     fn get(self, i: u32) -> Option<u8>;
 
     /// Computes the digit sum.
-    fn digit_sum(self) -> u32;
+    fn digit_sum(self) -> u8;
     
     /*
     /// Computes the alternating digit sum.
@@ -103,7 +103,7 @@ impl Digits for u64 {
     
     fn digit_length(self) -> usize {
         if self == 0 { return 1; }
-        self.ilog10() + 1
+        (self.ilog10() + 1) as usize
     }
 
     fn get(self, i: u32) -> Option<u8> {
@@ -118,8 +118,8 @@ impl Digits for u64 {
         Some(((self / divisor) % 10) as u8)
     }
 
-    fn digit_sum(self) -> u32 {
-        self.digits().map(|x| x as u32).sum()
+    fn digit_sum(self) -> u8 {
+        self.digits().sum()
     }
 
     /*
@@ -192,28 +192,6 @@ mod tests {
     }
 
     #[test]
-    fn test_iterative_length() {
-        let actual: u32 = ZERO.digit_length_iterative();
-        let expected: u32 = 1;
-        assert_eq!(actual, expected);
-
-        let actual: u32 = LONG_DIGITS.digit_length_iterative();
-        let expected: u32 = 9;
-        assert_eq!(actual, expected);
-    }
-
-    #[test]
-    fn test_logarithmic_length() {
-        let actual: u32 = ZERO.digit_length_logarithmic();
-        let expected: u32 = 1;
-        assert_eq!(actual, expected);
-
-        let actual: u32 = LONG_DIGITS.digit_length_logarithmic();
-        let expected: u32 = 9;
-        assert_eq!(actual, expected);
-    }
-
-    #[test]
     fn test_get() {
         let actual: Option<u8> = LONG_DIGITS.get(0);
         let expected: Option<u8> = Some(9);
@@ -222,8 +200,9 @@ mod tests {
 
     #[test]
     fn test_digit_sum() {
-        let n: u64 = 12345;
-        assert_eq!(n.digit_sum(), 15);
+        let actual: u8 = ZERO.digit_sum();
+        let expected: u8 = 0;
+        assert_eq!(actual, expected);
     }
 
 
