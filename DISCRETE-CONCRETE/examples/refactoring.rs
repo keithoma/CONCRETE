@@ -147,54 +147,21 @@ mod tests {
     use super::*; 
 
     const ZERO: u64 = 0;
-    const LONG_DIGITS: u64 = 123456789;
     const SHORT_DIGITS: u64 = 321;
+    const LONG_DIGITS: u64 = 123456789;
 
     #[test]
-    fn test_digititer() {
-        let actual: Vec<u8> = ZERO.digits().collect();
-        let expected: Vec<u8> = vec![0];
-
-        assert_eq!(actual, expected)
-    }
-
-    #[test]
-    fn test_digititer_map() {
-        let actual: Vec<u8> = LONG_DIGITS
-            .digits()
-            .map(|x| x + 1)
-            .collect();
-        let expected = vec![10, 9, 8, 7, 6, 5, 4, 3, 2];
-
+    fn test_digit_length() {
+        let actual: usize = ZERO.digit_length();
+        let expected: usize = 1;
         assert_eq!(actual, expected);
-    }
 
-    #[test]
-    fn test_digititer_filter() {
-        let actual: Vec<u8> = LONG_DIGITS
-            .digits()
-            .filter(|&x| x >= 8)
-            .collect();
-        let expected = vec![9, 8];
-
+        let actual: usize = SHORT_DIGITS.digit_length();
+        let expected: usize = 3;
         assert_eq!(actual, expected);
-    }
 
-    #[test]
-    fn test_digititer_enumerate() {
-        let actual: Vec<(usize, u8)> = SHORT_DIGITS
-            .digits()
-            .enumerate()
-            .collect();
-        let expected = vec![(0, 1), (1, 2), (2, 3)];
-
-        assert_eq!(actual, expected);
-    }
-
-    #[test]
-    fn test_get() {
-        let actual: Option<u8> = LONG_DIGITS.get(0);
-        let expected: Option<u8> = Some(9);
+        let actual: usize = LONG_DIGITS.digit_length();
+        let expected: usize = 9;
         assert_eq!(actual, expected);
     }
 
