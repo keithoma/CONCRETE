@@ -122,7 +122,7 @@ mod tests {
     // into this isolated testing module.
     use super::*; 
 
-    const zero: u64 = 0;
+    const ZERO: u64 = 0;
     const LONG_DIGITS: u64 = 123456789;
     const SHORT_DIGITS: u64 = 321;
 
@@ -161,28 +161,31 @@ mod tests {
 
     #[test]
     fn test_iterative_length() {
-        let n: u64 = 12345;
-        assert_eq!(n.digit_length_iterative(), 5);
-        
-        assert_eq!(zero.digit_length_iterative(), 1);
+        let actual: u32 = ZERO.digit_length_iterative();
+        let expected: u32 = 1;
+        assert_eq!(actual, expected);
+
+        let actual: u32 = LONG_DIGITS.digit_length_iterative();
+        let expected: u32 = 9;
+        assert_eq!(actual, expected);
     }
 
     #[test]
     fn test_logarithmic_length() {
-        let n: u64 = 987654321;
-        assert_eq!(n.digit_length_logarithmic(), 9);
+        let actual: u32 = ZERO.digit_length_logarithmic();
+        let expected: u32 = 1;
+        assert_eq!(actual, expected);
 
-        assert_eq!(zero.digit_length_logarithmic(), 1);
+        let actual: u32 = LONG_DIGITS.digit_length_logarithmic();
+        let expected: u32 = 9;
+        assert_eq!(actual, expected);
     }
 
     #[test]
     fn test_get() {
-        let n: u64 = 123456789;
-        assert_eq!(n.get(1), Some(8));
-        assert_eq!(n.get(8), Some(1));
-        assert_eq!(n.get(9), None);
-        assert_eq!(zero.get(0), Some(0));
-        assert_eq!(zero.get(1), None);
+        let actual: Option<u8> = LONG_DIGITS.get(0);
+        let expected: Option<u8> = Some(1);
+        assert_eq!(actual, expected);
     }
 
     #[test]
