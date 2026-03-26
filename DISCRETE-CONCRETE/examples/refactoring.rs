@@ -3,9 +3,9 @@
 
 /// An iterator that yields digits from right to left (10^0, 10^1, ...).
 pub struct DigitIter {
-    digits: [u8; 20];
-    front: usize;
-    back: usize;
+    digits: [u8; 20],
+    front: usize,
+    back: usize,
 }
 
 impl DigitIter {
@@ -22,7 +22,7 @@ impl DigitIter {
             n /= 10;
             count += 1;
         }
-        Self { digits, front: 20 - count, length: 20}
+        Self { digits, front: 20 - count, back: 20}
     }
 }
 
@@ -52,19 +52,19 @@ impl DoubleEndedIterator for DigitIter {
     }
 }
 
+impl ExactSizeIterator for DigitIter {
+    fn len(&self) -> usize {
+        self.back - self.front
+    }
+}
+
 /// Mathematical operations related to digits.
 pub trait Digits {
     ///
     fn digits(self) -> DigitIter;
 
     /// Default function to count the number of digits.
-    fn digit_length(self) -> u32;
-
-    /// Counts the number of digits.
-    fn digit_length_iterative(self) -> u32;
-
-    /// Counts the number of digits.
-    fn digit_length_logarithmic(self) -> u32;
+    fn digit_length(self) -> usize;
 
     /// Returns the digit at the index.
     fn get(self, i: u32) -> Option<u8>;
@@ -98,20 +98,10 @@ pub trait Digits {
 
 impl Digits for u64 {
     fn digits(self) -> DigitIter {
-        DigitIter { number: self }
+        DigitIter::new(self)
     }
     
-    fn digit_length(self) -> u32 {
-        self.digit_length_logarithmic()
-    }
-
-    fn digit_length_iterative(self) -> u32 {
-        if self == 0 { return 1 }
-        self.digits().count() as u32
-    }
-
-    fn digit_length_logarithmic(self) -> u32 {
-        // ilog10() panics if the number is 0.
+    fn digit_length(self) -> usize {
         if self == 0 { return 1; }
         self.ilog10() + 1
     }
