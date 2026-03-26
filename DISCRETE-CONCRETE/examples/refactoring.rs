@@ -78,10 +78,11 @@ pub trait Digits {
     /// Returns an integer with its digits reversed.
     fn reverse(self) -> u64;
 
-    /*
+
     ///
     fn is_palindrome(self) -> bool;
 
+    /*
     ///
     fn is_narcissistic(self) -> bool;
 
@@ -135,6 +136,14 @@ impl Digits for u64 {
 
     fn reverse(self) -> u64 {
         self.digits().fold(0u64, |acc, d| acc * 10 + d as u64)
+    }
+
+    fn is_palindrome(self) -> bool {
+        let mut digits = self.digits();
+        while let (Some(f), Some(b)) = (digits.next(), digits.next_back()) {
+            if f != b { return false; }
+        }
+        true
     }
 }
 
