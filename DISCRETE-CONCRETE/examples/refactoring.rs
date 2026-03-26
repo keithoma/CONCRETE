@@ -42,9 +42,7 @@ pub trait Digits {
     
 
     /// Computes the alternating digit sum.
-    fn alternating_digit_sum(self) -> i32; {
-        self.digits().map(|x| x as u32).sum()
-    }
+    fn alternating_digit_sum(self) -> i32;
 
     /* 
     /// Returns an integer with its digits reversed.
@@ -103,23 +101,14 @@ impl Digits for u64 {
         self.digits().map(|x| x as u32).sum()
     }
 
+    // this implementation is wrong
     fn alternating_digit_sum(self) -> i32; {
         self.digits().map(|x| x as u32).sum()
     }
 }
 
 fn main() {
-    const LONG_DIGITS: DigitIter = DigitIter { number: 0123456789 };
-    const SHORT_DIGITS: DigitIter = DigitIter { number: 321 };
 
-    let iter_map: Vec<u8> = LONG_DIGITS.map(|x| x + 1).collect();
-    assert_eq!(iter_map, vec![10, 9, 8, 7, 6, 5, 4, 3, 2]);
-
-    let iter_filter: Vec<u8> = LONG_DIGITS.filter(|&x| x >= 8).collect();
-    assert_eq!(iter_filter, vec![9, 8]);
-
-    let iter_enumerate: Vec<(usize, u8)> = SHORT_DIGITS.enumerate().collect();
-    assert_eq!(iter_enumerate, vec![(0, 1), (1, 2), (2, 3)]);
 }
 
 #[cfg(test)]
@@ -129,6 +118,20 @@ mod tests {
     use super::*; 
 
     const zero: u64 = 0;
+    const LONG_DIGITS: DigitIter = DigitIter { number: 0123456789 };
+    const SHORT_DIGITS: DigitIter = DigitIter { number: 321 };
+
+    #[test]
+    fn test_digititer() {
+        let iter_map: Vec<u8> = LONG_DIGITS.map(|x| x + 1).collect();
+        assert_eq!(iter_map, vec![10, 9, 8, 7, 6, 5, 4, 3, 2]);
+
+        let iter_filter: Vec<u8> = LONG_DIGITS.filter(|&x| x >= 8).collect();
+        assert_eq!(iter_filter, vec![9, 8]);
+
+        let iter_enumerate: Vec<(usize, u8)> = SHORT_DIGITS.enumerate().collect();
+        assert_eq!(iter_enumerate, vec![(0, 1), (1, 2), (2, 3)]);
+    }
 
     #[test]
     fn test_iterative_length() {
