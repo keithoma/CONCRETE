@@ -22,6 +22,9 @@ impl Iterator for DigitIter {
 
 /// Mathematical operations related to digits.
 pub trait Digits {
+    ///
+    fn digits(self) -> DigitIter;
+
     /// Default function to count the number of digits.
     fn digit_length(self) -> u32;
 
@@ -37,10 +40,11 @@ pub trait Digits {
     /// Computes the digit sum.
     fn digit_sum(self) -> u32;
     
-    /* 
+
     /// Computes the alternating digit sum.
     fn alternating_digit_sum(self) -> i32;
 
+    /* 
     /// Returns an integer with its digits reversed.
     fn reverse(self) -> u64;
 
@@ -62,19 +66,17 @@ pub trait Digits {
 }
 
 impl Digits for u64 {
+    fn digits(self) -> DigitIter {
+        DigitIter { number: self }
+    }
+    
     fn digit_length(self) -> u32 {
         self.digit_length_logarithmic()
     }
 
     fn digit_length_iterative(mut self) -> u32 {
         if self == 0 { return 1 }
-
-        let mut i: u32 = 0;
-        while self > 0 {
-            self /= 10;
-            i += 1;
-        }
-        i
+        self.digits().count() as u32
     }
 
     fn digit_length_logarithmic(self) -> u32 {
@@ -84,17 +86,19 @@ impl Digits for u64 {
     }
 
     fn get(self, i: u32) -> Option<u8> {
-        if i >= self.digit_length() { return None; }
-        Some(((self / 10_u64.pow(i)) % 10) as u8)
+        // Attempt to calculate 10^i. If it overflows, the index is definitely too high.
+        let divisor = 10_u64.checked_pow(i)?;
+        
+        // If the number is smaller than the divisor, the index is out of bounds.
+        if self < divisor {
+            return None;
+        }
+
+        Some(((self / divisor) % 10) as u8)
     }
 
     fn digit_sum(mut self) -> u32 {
-        let mut result: u32 = 0;
-        while self > 0 {
-            result += (self % 10) as u32;
-            self /= 10;
-        }
-        result
+        self.digits().map(|x| x as u32).sum()
     }
 }
 
@@ -108,12 +112,13 @@ mod tests {
     // into this isolated testing module.
     use super::*; 
 
+    const zero: u64 = 0;
+
     #[test]
     fn test_iterative_length() {
         let n: u64 = 12345;
         assert_eq!(n.digit_length_iterative(), 5);
         
-        let zero: u64 = 0;
         assert_eq!(zero.digit_length_iterative(), 1);
     }
 
@@ -122,7 +127,6 @@ mod tests {
         let n: u64 = 987654321;
         assert_eq!(n.digit_length_logarithmic(), 9);
 
-        let zero: u64 = 0;
         assert_eq!(zero.digit_length_logarithmic(), 1);
     }
 
@@ -132,6 +136,8 @@ mod tests {
         assert_eq!(n.get(1), Some(8));
         assert_eq!(n.get(8), Some(1));
         assert_eq!(n.get(9), None);
+        assert_eq!(zero.get(0), Some(0));
+        assert_eq!(zero.get(1), None);
     }
 
     #[test]
