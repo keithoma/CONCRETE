@@ -102,8 +102,8 @@ impl Digits for u64 {
     }
 
     // this implementation is wrong
-    fn alternating_digit_sum(self) -> i32; {
-        self.digits().map(|x| x as u32).sum()
+    fn alternating_digit_sum(self) -> i32 {
+        self.digits().map(|x| x as i32).sum()
     }
 }
 
@@ -118,24 +118,40 @@ mod tests {
     use super::*; 
 
     const zero: u64 = 0;
-    const LONG_DIGITS: DigitIter = DigitIter { number: 0123456789 };
-    const SHORT_DIGITS: DigitIter = DigitIter { number: 321 };
+    const LONG_DIGITS: u64 = 123456789;
+    const SHORT_DIGITS: u64 = 321;
 
     #[test]
-    fn test_digititer() {
-        assert_eq!(
-            vec![10, 9, 8, 7, 6, 5, 4, 3, 2],
-            LONG_DIGITS
-                .digits()
-                .map(|x| x + 1)
-                .collect::<Vec<_>>() // Note: explicit collect type is often clearer
-        );
+    fn test_digititer_map() {
+        let actual: Vec<u8> = LONG_DIGITS
+            .digits()
+            .map(|x| x + 1)
+            .collect();
+        let expected = vec![10, 9, 8, 7, 6, 5, 4, 3, 2];
 
-        let iter_filter: Vec<u8> = LONG_DIGITS.filter(|&x| x >= 8).collect();
-        assert_eq!(iter_filter, vec![9, 8]);
+        assert_eq!(actual, expected);
+    }
 
-        let iter_enumerate: Vec<(usize, u8)> = SHORT_DIGITS.enumerate().collect();
-        assert_eq!(iter_enumerate, vec![(0, 1), (1, 2), (2, 3)]);
+    #[test]
+    fn test_digititer_filter() {
+        let actual: Vec<u8> = LONG_DIGITS
+            .digits()
+            .filter(|&x| x >= 8)
+            .collect();
+        let expected = vec![9, 8];
+
+        assert_eq!(actual, expected);
+    }
+
+    #[test]
+    fn test_digititer_enumerate() {
+        let actual: Vec<(usize, u8)> = SHORT_DIGITS
+            .digits()
+            .enumerate()
+            .collect();
+        let expected = vec![(0, 1), (1, 2), (2, 3)];
+
+        assert_eq!(actual, expected);
     }
 
     #[test]
