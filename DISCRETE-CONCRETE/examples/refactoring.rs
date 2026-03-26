@@ -123,8 +123,13 @@ mod tests {
 
     #[test]
     fn test_digititer() {
-        let iter_map: Vec<u8> = LONG_DIGITS.map(|x| x + 1).collect();
-        assert_eq!(iter_map, vec![10, 9, 8, 7, 6, 5, 4, 3, 2]);
+        assert_eq!(
+            vec![10, 9, 8, 7, 6, 5, 4, 3, 2],
+            LONG_DIGITS
+                .digits()
+                .map(|x| x + 1)
+                .collect::<Vec<_>>() // Note: explicit collect type is often clearer
+        );
 
         let iter_filter: Vec<u8> = LONG_DIGITS.filter(|&x| x >= 8).collect();
         assert_eq!(iter_filter, vec![9, 8]);
