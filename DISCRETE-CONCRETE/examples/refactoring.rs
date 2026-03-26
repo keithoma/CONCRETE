@@ -101,9 +101,14 @@ impl Digits for u64 {
         self.digits().map(|x| x as u32).sum()
     }
 
-    // this implementation is wrong
     fn alternating_digit_sum(self) -> i32 {
-        self.digits().map(|x| x as i32).sum()
+        self.digits()
+            .enumerate()
+            .map(|(i, val)| {
+                let sign = if i % 2 == 0 { 1 } else { -1 };
+                (val as i32) * sign
+            })
+            .sum()
     }
 }
 
@@ -184,5 +189,12 @@ mod tests {
     fn test_digit_sum() {
         let n: u64 = 12345;
         assert_eq!(n.digit_sum(), 15);
+    }
+
+    #[test]
+    fn test_alternating_digit_sum() {
+        let actual: i32 = SHORT_DIGITS.alternating_digit_sum();
+        let expected: i32 = 4;
+        assert_eq!(actual, expected);
     }
 }
