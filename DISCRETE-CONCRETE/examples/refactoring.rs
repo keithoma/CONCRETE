@@ -1,3 +1,4 @@
+#![no_std]
 #![warn(clippy::std_instead_of_core)]
 #![warn(clippy::std_instead_of_alloc)]
 
@@ -60,7 +61,30 @@ impl ExactSizeIterator for DigitIter {
 
 /// Mathematical operations related to digits.
 pub trait Digits {
+    /// Returns an [`[DigitIter]`] iterator over the digits of the number from most-significant to least-significant.
     ///
+    /// The iterator yields each digit as a `u8`. For `0`, it yields a single `0`.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use your_crate_name::Digits;
+    ///
+    /// let mut digits = 123u64.digits();
+    /// assert_eq!(digits.next(), Some(1));
+    /// assert_eq!(digits.next(), Some(2));
+    /// assert_eq!(digits.next(), Some(3));
+    /// assert_eq!(digits.next(), None);
+    /// ```
+    ///
+    /// Since it is a `DoubleEndedIterator`, you can also go backwards:
+    ///
+    /// ```
+    /// use your_crate_name::Digits;
+    ///
+    /// let mut digits = 123u64.digits();
+    /// assert_eq!(digits.next_back(), Some(3));
+    /// ```
     fn digits(self) -> DigitIter;
 
     ///
@@ -90,13 +114,11 @@ pub trait Digits {
     ///
     fn digital_root(self) -> u8;
 
-    /*
     ///
     fn digital_root_modulo(self) -> u8;
 
     ///
     fn digital_root_recursive(self) -> u8;
-     */
 }
 
 impl Digits for u64 {
