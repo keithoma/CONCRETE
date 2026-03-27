@@ -317,16 +317,30 @@ pub trait Digits {
     /// This operation is $O(1)$. It uses the constant-time modulo 9 congruence formula.
     ///
     /// # Examples
-    ///
     /// ```
-    /// use your_crate_name::Digits;
+    /// use discrete::Digits;
+    /// assert_eq!(0u64.digital_root(), 0);
     /// assert_eq!(12345u64.digital_root(), 6);
+    /// assert_eq!(u64::MAX.digital_root(), 1); // 91 -> 10 -> 1
     /// ```
     fn digital_root(self) -> u8;
 
     /// Returns the digital root using the congruence formula: $1 + ((n - 1) \pmod 9)$.
     ///
     /// This is the $O(1)$ implementation used by [`Self::digital_root`].
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use discrete::Digits;
+    ///
+    /// assert_eq!(0u64.digital_root_modulo(), 0);
+    /// assert_eq!(7u64.digital_root_modulo(), 7);
+    /// assert_eq!(12345u64.digital_root_modulo(), 6);
+    ///
+    /// // u64::MAX is 18,446,744,073,709,551,615 (Sum 91 -> 1+9=10 -> 1+0=1)
+    /// assert_eq!(u64::MAX.digital_root_modulo(), 1);
+    /// ```
     fn digital_root_modulo(self) -> u8;
 
     /// Returns the digital root by actually performing the iterative summation.
@@ -337,6 +351,18 @@ pub trait Digits {
     /// # Performance
     ///
     /// This operation is $O(n^2)$ in the worst case (where $n$ is the number of digits).
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use discrete::Digits;
+    ///
+    /// assert_eq!(0u64.digital_root_recursive(), 0);
+    /// assert_eq!(12345u64.digital_root_recursive(), 6);
+    ///
+    /// // u64::MAX recursively sums 91 -> 10 -> 1
+    /// assert_eq!(u64::MAX.digital_root_recursive(), 1);
+    /// ```
     fn digital_root_recursive(self) -> u8;
 }
 
@@ -397,12 +423,12 @@ impl Digits for u64 {
     fn is_narcissistic(self) -> bool {
         let digits = self.digits();
         let n = digits.len() as u32;
-        digits.map(|x| (x as u64).pow(n)).sum()::<u64> == self
+        digits.map(|x| (x as u64).pow(n)).sum::<u64>() == self
     }
 
     #[inline]
     fn digital_root(self) -> u8 {
-        digital_root_modulo(self)
+        self.digital_root_modulo()
     }
 
     #[inline]
@@ -420,7 +446,7 @@ impl Digits for u64 {
         if self < 10 {
             self as u8
         } else {
-            (self.digit_sum() as u64).digital_root()
+            (self.digit_sum() as u64).digital_root_modulo()
         }
     }
 }
