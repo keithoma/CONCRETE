@@ -1,11 +1,11 @@
 /// An iterator that yields digits from a [`u64`].
 pub struct DigitIter {
-    /// The index past the last digit to be yielded (least significant).
-    back: usize,
     /// Internal buffer storing up to 20 digits (enough for [`u64::MAX`]).
     digits: [u8; 20],
     /// The index of the first digit to be yielded (most significant).
     front: usize,
+    /// The index past the last digit to be yielded (least significant).
+    back: usize,
 }
 
 impl DigitIter {
@@ -52,10 +52,10 @@ impl DigitIter {
             }
         }
 
-        Self { 
-            back: 20,
+        Self {
             digits,
-            front
+            front,
+            back: 20,
         }
     }
 }
