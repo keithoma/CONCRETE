@@ -61,7 +61,8 @@ impl ExactSizeIterator for DigitIter {
 
 /// Mathematical operations related to digits.
 pub trait Digits {
-    /// Returns an [`[DigitIter]`] iterator over the digits of the number from most-significant to least-significant.
+    /// Returns an [`DigitIter`] iterator over the digits of the number from
+    /// most-significant to least-significant.
     ///
     /// The iterator yields each digit as a `u8`. For `0`, it yields a single `0`.
     ///
@@ -87,7 +88,27 @@ pub trait Digits {
     /// ```
     fn digits(self) -> DigitIter;
 
+    /// Returns the number of digits in the integer in base 10.
     ///
+    /// This method treats `0` as having a length of `1`. For any other 
+    /// positive integer, it returns the number of decimal digits required 
+    /// to represent it.
+    ///
+    /// # Performance
+    ///
+    /// This operation is $O(1)$. It uses a hardware-accelerated integer 
+    /// logarithm (`ilog10`) to determine the length without iteration.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use your_crate_name::Digits;
+    ///
+    /// assert_eq!(0u64.digit_length(), 1);
+    /// assert_eq!(7u64.digit_length(), 1);
+    /// assert_eq!(123u64.digit_length(), 3);
+    /// assert_eq!(u64::MAX.digit_length(), 20);
+    /// ```
     fn digit_length(self) -> usize;
 
     /// Returns the digit at the index.
@@ -111,13 +132,37 @@ pub trait Digits {
     fn is_narcissistic(self) -> bool;
 
 
+    /// Returns the digital root of the number in base 10.
     ///
+    /// The digital root is the value obtained by an iterative process of summing digits
+    /// until a single-digit number is reached. For example, the digital root of 12,345 is 6,
+    /// because $1+2+3+4+5 = 15$, and $1+5 = 6$.
+    ///
+    /// # Performance
+    ///
+    /// This operation is $O(1)$. It uses the constant-time modulo 9 congruence formula.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use your_crate_name::Digits;
+    /// assert_eq!(12345u64.digital_root(), 6);
+    /// ```
     fn digital_root(self) -> u8;
 
+    /// Returns the digital root using the congruence formula: $1 + ((n - 1) \pmod 9)$.
     ///
+    /// This is the $O(1)$ implementation used by [`Self::digital_root`].
     fn digital_root_modulo(self) -> u8;
 
+    /// Returns the digital root by actually performing the iterative summation.
     ///
+    /// Unlike [`Self::digital_root_modulo`], this method follows the literal 
+    /// definition of summing digits recursively until a single digit remains.
+    ///
+    /// # Performance
+    ///
+    /// This operation is $O(n^2)$ in the worst case (where $n$ is the number of digits).
     fn digital_root_recursive(self) -> u8;
 }
 
