@@ -61,7 +61,7 @@ impl ExactSizeIterator for DigitIter {
 
 /// Mathematical operations related to digits.
 pub trait Digits {
-    /// Returns an [`DigitIter`] iterator over the digits of the number from
+    /// Returns a [`DigitIter`] over the digits of the number from
     /// most-significant to least-significant.
     ///
     /// The iterator yields each digit as a `u8`. For `0`, it yields a single `0`.
@@ -69,7 +69,7 @@ pub trait Digits {
     /// # Examples
     ///
     /// ```
-    /// use your_crate_name::Digits;
+    /// use discrete::Digits;
     ///
     /// let mut digits = 123u64.digits();
     /// assert_eq!(digits.next(), Some(1));
@@ -77,38 +77,35 @@ pub trait Digits {
     /// assert_eq!(digits.next(), Some(3));
     /// assert_eq!(digits.next(), None);
     ///
+    /// // Edge cases: Smallest and Largest
     /// assert_eq!(0u64.digits().next(), Some(0));
-    ///
+    /// 
     /// // u64::MAX is 18,446,744,073,709,551,615
-    /// assert_eq1(u64::MAX.digits().next(), Some(1));
+    /// assert_eq!(u64::MAX.digits().next(), Some(1));
     /// ```
     ///
-    /// Since it is a `DoubleEndedIterator`, you can also go backwards:
+    /// Since it is a [`DoubleEndedIterator`], you can also iterate from the ones-place:
     ///
     /// ```
-    /// use your_crate_name::Digits;
+    /// use discrete::Digits;
     ///
     /// let mut digits = 123u64.digits();
     /// assert_eq!(digits.next_back(), Some(3));
+    /// assert_eq!(digits.next_back(), Some(2));
     ///
-    /// assert_eq!(0.next_back(), Some(0));
-    /// // u64::MAX is 18,446,744,073,709,551,615
+    /// assert_eq!(0u64.digits().next_back(), Some(0));
     /// assert_eq!(u64::MAX.digits().next_back(), Some(5));
     /// ```
     ///
-    /// It also has implemented the len() method:
+    /// It implements [`ExactSizeIterator`], allowing you to query the remaining length:
     ///
     /// ```
-    /// use your_crate_name::Digits;
+    /// use discrete::Digits;
     ///
-    /// let mut digits = 123u64.digits();
-    /// assert_eq!(digits.digits.len(), 3);
-    ///
-    /// assert_eq!(0.digits.len(), 1);
-    /// // u64::MAX is 18,446,744,073,709,551,615
+    /// assert_eq!(123u64.digits().len(), 3);
+    /// assert_eq!(0u64.digits().len(), 1);
     /// assert_eq!(u64::MAX.digits().len(), 20);
     /// ```
-    #[inline]
     fn digits(self) -> DigitIter;
 
     /// Returns the number of digits in the integer in base 10.
@@ -168,7 +165,6 @@ pub trait Digits {
     /// assert_eq!(u64::MAX.get(19), Some(1)); // The leading '1'
     /// assert_eq!(u64::MAX.get(20), None);
     /// ```
-    #[inline]
     fn get(self, i: usize) -> Option<u8>;
 
     /// Returns the sum of the digits in base 10.
@@ -186,7 +182,6 @@ pub trait Digits {
     /// assert_eq!(12345u64.digit_sum(), 15);
     /// assert_eq!(u64::MAX.digit_sum(), 91);
     /// ```
-    #[inline]
     fn digit_sum(self) -> u8;
     
     /// Returns the alternating digit sum in base 10.
@@ -216,7 +211,6 @@ pub trait Digits {
     /// // For u64::MAX, the alternating sum is -7.
     /// assert_eq!(u64::MAX.alternating_digit_sum(), -7);
     /// ```
-    #[inline]
     fn alternating_digit_sum(self) -> i8;
 
     /// Returns the integer formed by reversing the decimal digits.
@@ -242,8 +236,18 @@ pub trait Digits {
     /// assert_eq!(123u64.reverse(), 321);
     /// assert_eq!(100u64.reverse(), 1);
     /// assert_eq!(0u64.reverse(), 0);
+    ///
+    /// // The largest u64 that can be safely reversed is 15611557093704464481
+    /// // (The reverse of 184467440737095511651 is too large, but this fits):
+    /// assert_eq!(10000000000000000001u64.reverse(), 10000000000000000001);
     /// ```
-    #[inline]
+    ///
+    /// To demonstrate the overflow panic with `u64::MAX`:
+    /// ```should_panic
+    /// use discrete::Digits;
+    /// // This will panic because 516...181 > u64::MAX
+    /// let _ = u64::MAX.reverse();
+    /// ```
     fn reverse(self) -> u64;
 
 
@@ -269,7 +273,6 @@ pub trait Digits {
     /// assert!(!10u64.is_palindrome());
     /// assert!(!u64::MAX.is_palindrome());
     /// ```
-    #[inline]
     fn is_palindrome(self) -> bool;
 
 
@@ -301,7 +304,6 @@ pub trait Digits {
     /// // u64::MAX is not narcissistic
     /// assert!(!u64::MAX.is_narcissistic());
     /// ```
-    #[inline]
     fn is_narcissistic(self) -> bool;
 
     /// Returns the digital root of the number in base 10.
@@ -339,15 +341,18 @@ pub trait Digits {
 }
 
 impl Digits for u64 {
+    #[inline]
     fn digits(self) -> DigitIter {
         DigitIter::new(self)
     }
     
+    #[inline]
     fn digit_length(self) -> usize {
         if self == 0 { return 1; }
         (self.ilog10() + 1) as usize
     }
 
+    #[inline]
     fn get(self, i: usize) -> Option<u8> {
         let digits = self.digits();
         if i < digits.len() {
@@ -357,10 +362,12 @@ impl Digits for u64 {
         }
     }
 
+    #[inline]
     fn digit_sum(self) -> u8 {
         self.digits().sum()
     }
 
+    #[inline]
     fn alternating_digit_sum(self) -> i8 {
         self.digits()
             .rev()
@@ -372,10 +379,12 @@ impl Digits for u64 {
             .sum()
     }
 
+    #[inline]
     fn reverse(self) -> u64 {
         self.digits().fold(0u64, |acc, d| acc * 10 + d as u64)
     }
 
+    #[inline]
     fn is_palindrome(self) -> bool {
         let mut digits = self.digits();
         while let (Some(f), Some(b)) = (digits.next(), digits.next_back()) {
@@ -384,16 +393,19 @@ impl Digits for u64 {
         true
     }
 
+    #[inline]
     fn is_narcissistic(self) -> bool {
         let digits = self.digits();
         let n = digits.len() as u32;
         digits.map(|x| (x as u64).pow(n)).sum()::<u64> == self
     }
 
+    #[inline]
     fn digital_root(self) -> u8 {
         digital_root_modulo(self)
     }
 
+    #[inline]
     fn digital_root_modulo(self) -> u8 {
         if self == 0 {
             0
@@ -403,6 +415,7 @@ impl Digits for u64 {
         }
     }
 
+    #[inline]
     fn digital_root_recursive(self) -> u8 {
         if self < 10 {
             self as u8
