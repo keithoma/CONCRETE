@@ -111,20 +111,142 @@ pub trait Digits {
     /// ```
     fn digit_length(self) -> usize;
 
-    /// Returns the digit at the index.
+    /// Returns the digit at the given power of 10 index.
+    ///
+    /// This method treats the integer as a sequence of digits where index `0` 
+    /// corresponds to the ones place ($10^0$), index `1` to the tens place ($10^1$), 
+    /// and so on.
+    ///
+    /// Returns `None` if the index `i` is greater than or equal to the 
+    /// number of digits.
+    ///
+    /// # Performance
+    ///
+    /// This operation is $O(1)$. It performs a constant-time array lookup 
+    /// without re-calculating powers or performing division.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use discrete::Digits;
+    ///
+    /// let n = 12345u64;
+    /// assert_eq!(n.get(0), Some(5)); // Ones place (10^0)
+    /// assert_eq!(n.get(1), Some(4)); // Tens place (10^1)
+    /// assert_eq!(n.get(4), Some(1)); // Ten-thousands place (10^4)
+    /// assert_eq!(n.get(5), None);    // Out of bounds
+    ///
+    /// // Zero is the only number with a digit at index 0 that is 0.
+    /// assert_eq!(0u64.get(0), Some(0));
+    /// assert_eq!(0u64.get(1), None);
+    ///
+    /// // u64::MAX is 18,446,744,073,709,551,615
+    /// assert_eq!(u64::MAX.get(0), Some(5));  // The last '5'
+    /// assert_eq!(u64::MAX.get(19), Some(1)); // The leading '1'
+    /// assert_eq!(u64::MAX.get(20), None);
+    /// ```
+    #[inline]
     fn get(self, i: usize) -> Option<u8>;
 
-    /// Computes the digit sum.
+    /// Returns the sum of the digits in base 10.
+    ///
+    /// # Performance
+    ///
+    /// This operation is $O(n)$, where $n$ is the number of digits.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use discrete::Digits;
+    ///
+    /// assert_eq!(0u64.digit_sum(), 0);
+    /// assert_eq!(12345u64.digit_sum(), 15);
+    /// assert_eq!(u64::MAX.digit_sum(), 91);
+    /// ```
+    #[inline]
     fn digit_sum(self) -> u8;
     
-    /// Computes the alternating digit sum.
+    /// Returns the alternating digit sum in base 10.
+    ///
+    /// The sum is calculated starting from the least-significant digit (index 0) 
+    /// with a positive sign, then subtracting the next digit, and so on: 
+    /// $d_0 - d_1 + d_2 - d_3 \dots$
+    ///
+    /// # Performance
+    ///
+    /// This operation is $O(n)$, where $n$ is the number of digits.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use discrete::Digits;
+    ///
+    /// // 123 -> 3 - 2 + 1 = 2
+    /// assert_eq!(123u64.alternating_digit_sum(), 2);
+    ///
+    /// // 1234 -> 4 - 3 + 2 - 1 = 2
+    /// assert_eq!(1234u64.alternating_digit_sum(), 2);
+    ///
+    /// // 0 -> 0
+    /// assert_eq!(0u64.alternating_digit_sum(), 0);
+    ///
+    /// // For u64::MAX, the alternating sum is -7.
+    /// assert_eq!(u64::MAX.alternating_digit_sum(), -7);
+    /// ```
+    #[inline]
     fn alternating_digit_sum(self) -> i8;
 
-    /// Returns an integer with its digits reversed.
+    /// Returns the integer formed by reversing the decimal digits.
+    ///
+    /// The reversal is performed in base 10. Note that leading zeros in the 
+    /// reversed result are omitted (e.g., `100` reversed is `1`).
+    ///
+    /// # Panics
+    ///
+    /// This method will panic in debug builds if the reversed value exceeds 
+    /// [`u64::MAX`]. In release builds, it will perform two's complement wrapping.
+    ///
+    /// # Performance
+    ///
+    /// This operation is $O(n)$, where $n$ is the number of digits. It uses
+    /// a single-pass accumulation (Horner's method) over the [`DigitIter`].
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use discrete::Digits;
+    ///
+    /// assert_eq!(123u64.reverse(), 321);
+    /// assert_eq!(100u64.reverse(), 1);
+    /// assert_eq!(0u64.reverse(), 0);
+    /// ```
+    #[inline]
     fn reverse(self) -> u64;
 
 
+    /// Checks if the number is a palindrome in base 10.
     ///
+    /// A palindrome is a number that remains the same when its digits are reversed.
+    /// Single-digit numbers are always palindromes.
+    ///
+    /// # Performance
+    ///
+    /// This operation is $O(n)$ in the worst case, where $n$ is the number of digits.
+    /// It uses a double-ended iterator to compare digits from both ends 
+    /// simultaneously, exiting as soon as a mismatch is found.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use discrete::Digits;
+    ///
+    /// assert!(123321u64.is_palindrome());
+    /// assert!(1234321u64.is_palindrome());
+    /// assert!(0u64.is_palindrome());
+    /// assert!(!10u64.is_palindrome());
+    /// assert!(!u64::MAX.is_palindrome());
+    /// ```
+    #[inline]
     fn is_palindrome(self) -> bool;
 
 
