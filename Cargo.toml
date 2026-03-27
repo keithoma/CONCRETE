@@ -16,47 +16,78 @@ repository = "https://github.com/keithoma/CONCRETE"
 [workspace.lints.rust]
 unsafe_code = "forbid"
 missing_docs = "warn"
-non_snake_case = "warn"
-unused_imports = "warn"
-unused_variables = "warn"
-explicit_outlives_requirements = "warn"
+# Enforce that every single item is documented
+missing_copy_implementations = "warn"
+missing_debug_implementations = "warn"
+# Cleanliness
 unused_qualifications = "warn"
-# Add this: prevents accidentally leaving print macros in a no_std lib
-forbidden_lint_groups = "deny"
+explicit_outlives_requirements = "warn"
+# This prevents you from using #[allow] to hide your sins without a reason
+unfulfilled_lint_expectations = "warn"
 
 [workspace.lints.clippy]
-# Start with these broad groups at a lower priority
+# Base aggressive groups
 pedantic = { level = "warn", priority = -1 }
 nursery = { level = "warn", priority = -1 }
 
-# --- 1. THE "NO_STD" GUARDIANS ---
+# --- 1. THE "NO-PANIC" ENFORCERS ---
+# No unwrap, no expect, no indexing [i], no unreachable!
+unwrap_used = "deny"
+expect_used = "deny"
+indexing_slicing = "deny"
+panic = "deny"
+todo = "warn"
+unimplemented = "warn"
+unreachable = "deny"
+
+# --- 2. THE MATH RADICAL ---
+# Treats standard operators as dangerous.
+arithmetic_side_effects = "deny"
+integer_division = "deny"
+# Requires you to prove casts are safe (e.g. try_from instead of 'as')
+cast_possible_truncation = "deny"
+cast_possible_wrap = "deny"
+cast_precision_loss = "deny"
+cast_sign_loss = "deny"
+# Floating point pedantry
+float_cmp = "deny"
+float_cmp_const = "deny"
+float_arithmetic = "deny"
+
+# --- 3. HARDCORE MEMORY & NO_STD ---
 std_instead_of_core = "deny"
 std_instead_of_alloc = "deny"
-alloc_instead_of_core = "warn"
+alloc_instead_of_core = "deny"
+# Disallow allocating on the heap unless absolutely necessary
+# (Remove if your lib uses Box/Vec heavily)
+# default_numeric_fallback = "warn" 
 
-# --- 2. MATH & PRECISION (Vital for your lib) ---
-# Warns if you use '+' or '-' where it might overflow. 
-# Use .wrapping_add() or .saturating_add() to be explicit.
-arithmetic_side_effects = "warn" 
-# Prevents using 'as' for lossy casts (e.g., u64 as u32)
-cast_possible_truncation = "warn"
-cast_possible_wrap = "warn"
-cast_precision_loss = "warn"
-cast_lossless = "warn"
-# Ensures float comparisons are handled safely
-float_cmp = "warn"
-float_cmp_const = "warn"
+# --- 4. API & DOCUMENTATION RIGOR ---
+missing_errors_doc = "deny"
+missing_panics_doc = "deny"
+# Every struct and enum must be "Future Proofed"
+exhaustive_enums = "deny"
+exhaustive_structs = "deny"
+# Ensures your public API doesn't expose internal types
+mod_module_files = "warn"
+# Makes sure you aren't leaking private types in public signatures
+# (implicitly handled by rustc but clippy is louder)
 
-# --- 3. API CLEANLINESS ---
-missing_errors_doc = "warn"
-missing_panics_doc = "warn" # Crucial: Tell users if a math function can panic
-must_use_candidate = "warn"
-# Ensures you don't leave internal types in public APIs
-exhaustive_enums = "warn"
-exhaustive_structs = "warn"
+# --- 5. THE "CLEAN CODE" EXTREMIST ---
+# No shadow variables (forces unique names for everything)
+shadow_reuse = "deny"
+shadow_same = "deny"
+shadow_unrelated = "deny"
+# No "else" after a return (keeps logic flat)
+else_if_without_else = "warn"
+# Forces you to name every single argument in a closure
+# (preventing the use of '_')
+# (Can be very annoying, use with caution)
+# closure_use_of_visible_id = "warn"
 
-# --- 4. THE "ANTI-CHAOS" MEASURES (The Fix) ---
-# Explicitly disable the restriction lints that cause loops
+# --- 6. NECESSARY TRUCES (Avoid Loops) ---
 implicit_return = "allow"
+# Pattern type mismatch can be overly pedantic regarding references
 pattern_type_mismatch = "allow"
+# Blankets can be triggered by these settings
 blanket_clippy_restriction_lints = "allow"

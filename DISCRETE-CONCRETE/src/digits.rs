@@ -32,20 +32,31 @@ impl DigitIter {
     #[must_use]
     pub const fn new(mut n: u64) -> Self {
         let mut digits = [0u8; 20];
-        let mut front: usize = 19;
-        let back: usize = 20;
+        let mut front: usize = 20;
 
-        if n != 0 {
-            let mut count = 0;
+        if n == 0 {
+            front = 19;
+        } else {
+            // High-integrity loop: cursor starts at 20 and can only 
+            // decrement at most 20 times for a u64, so it never underflows.
             while n > 0 {
-                digits[19 - count] = (n % 10) as u8;
+                front = front.saturating_sub(1);
+                
+                // Using .get_mut() satisfies clippy::indexing_slicing 
+                // without needing unstable attributes or #[allow].
+                if let Some(slot) = digits.get_mut(front) {
+                    *slot = (n % 10) as u8;
+                }
+                
                 n /= 10;
-                count = count.saturating_add(1);
             }
-            front = front.saturating_sub(count);
         }
 
-        Self { back, digits, front }
+        Self { 
+            back: 20,
+            digits,
+            front
+        }
     }
 }
 
