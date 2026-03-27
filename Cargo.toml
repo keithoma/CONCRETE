@@ -1,24 +1,35 @@
 [workspace]
+resolver = "2"
 members = [
     "DISCRETE-CONCRETE",
     "RATIONAL-CONCRETE",
     "RNG-CONCRETE",
 ]
-resolver = "2"
 
 [workspace.package]
 version = "0.1.0"
 edition = "2024"
 authors = ["Kei Thoma"]
 license = "MIT"
-repository = "https://github.com/user/CONCRETE"
+repository = "https://github.com/keithoma/CONCRETE"
 
 [workspace.lints.rust]
-# unsafe_code = "forbid"
-# missing_docs = "warn"
-non_snake_case = "allow"
-unused_imports = "allow"
-unused_variables = "allow" # Good for when you're halfway through writing math
+unsafe_code = "forbid"
+missing_docs = "warn"
+# We turn these to warn/deny to keep the "Standard Library" feel clean
+non_snake_case = "warn"
+unused_imports = "warn"
+unused_variables = "warn" 
+# Essential for a library:
+explicit_outlives_requirements = "warn"
+unused_qualifications = "warn"
 
 [workspace.lints.clippy]
-# pedantic = "warn"
+pedantic = { level = "warn", priority = -1 }
+# Specific pedantic lints that are vital for no_std math libs:
+std_instead_of_core = "deny"
+std_instead_of_alloc = "deny"
+alloc_instead_of_core = "warn"
+cast_lossless = "warn"
+missing_errors_doc = "warn"
+must_use_candidate = "warn"

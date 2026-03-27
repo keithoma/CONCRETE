@@ -1,14 +1,12 @@
-pub fn add(left: u64, right: u64) -> u64 {
-    left + right
-}
+#![no_std]
+//! # Discrete Concrete
+//!
+//! A library for discrete mathematical operations, focusing on integer 
+//! properties, digit manipulation, and number theory.
 
-#[cfg(test)]
-mod tests {
-    use super::*;
+pub mod digits;
 
-    #[test]
-    fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
-    }
-}
+// Re-export for convenience: 
+// Allows users to do `use discrete_concrete::Digits;` 
+// instead of `use discrete_concrete::digits::Digits;`
+pub use digits::{DigitIter, Digits};

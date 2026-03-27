@@ -1,29 +1,55 @@
-#![no_std]
-#![warn(clippy::std_instead_of_core)]
-#![warn(clippy::std_instead_of_alloc)]
-
-/// An iterator that yields digits from right to left (10^0, 10^1, ...).
+/// An iterator that yields digits from a [`u64`].
 pub struct DigitIter {
-    digits: [u8; 20],
-    front: usize,
+    /// The index past the last digit to be yielded (least significant).
     back: usize,
+    /// Internal buffer storing up to 20 digits (enough for [`u64::MAX`]).
+    digits: [u8; 20],
+    /// The index of the first digit to be yielded (most significant).
+    front: usize,
 }
 
 impl DigitIter {
-    pub fn new(mut n: u64) -> Self {
+    /// Creates a new [`DigitIter`] from a 64-bit unsigned integer.
+    ///
+    /// This constructor decomposes the integer into its base-10 digits and 
+    /// stores them in a fixed-size internal buffer. The iterator is 
+    /// initialized to yield digits from the most-significant to the 
+    /// least-significant.
+    ///
+    /// # Arguments
+    ///
+    /// * `n` - The `u64` integer to be decomposed into digits.
+    ///
+    /// # Implementation
+    ///
+    /// The digits are stored in a `[u8; 20]` array, which is the exact 
+    /// capacity required to hold the maximum value of a [`u64`] 
+    /// ($18,446,744,073,709,551,615$). 
+    ///
+    /// * For `n = 0`, the iterator yields a single `0`.
+    /// * For `n > 0`, leading zeros are not stored.
+    #[inline]
+    #[must_use]
+    pub const fn new(mut n: u64) -> Self {
+        #[expect(
+            clippy::unseparated_literal_suffix, 
+            reason = "0u8 is more readable than 0_u8 for single-digit constants in this context"
+        )]
         let mut digits = [0u8; 20];
+        let mut front: usize = 19;
+        let back: usize = 20;
 
-        if n == 0 {
-            return Self { digits, front: 19, back: 20}
+        if n != 0 {
+            let mut count = 0;
+            while n > 0 {
+                digits[19_usize.saturating_sub(count)] = (n % 10) as u8;
+                n /= 10;
+                count = count.saturating_add(1);
+            }
+            front = front.saturating_sub(count);
         }
 
-        let mut count = 0;
-        while n > 0 {
-            digits[19 - count] = (n % 10) as u8;
-            n /= 10;
-            count += 1;
-        }
-        Self { digits, front: 20 - count, back: 20 }
+        Self {back, digits, front}
     }
 }
 
@@ -449,10 +475,6 @@ impl Digits for u64 {
             (self.digit_sum() as u64).digital_root_modulo()
         }
     }
-}
-
-fn main() {
-
 }
 
 #[cfg(test)]

@@ -1,15 +1,14 @@
 [package]
-name = "DISCRETE-CONCRETE"
+name = "discrete-concrete"
 version.workspace = true
-edition.workspace = true
 authors.workspace = true
+edition.workspace = true
 license.workspace = true
 repository.workspace = true
-
-[lib]
-name = "RNGCONCRETE"
-
-[dependencies]
+description = "Discrete mathematics module for the CONCRETE suite."
 
 [lints]
 workspace = true
+
+[dependencies]
+# Currently empty, as we are strictly no_std and dependency-free
