@@ -23,7 +23,7 @@ impl DigitIter {
             n /= 10;
             count += 1;
         }
-        Self { digits, front: 20 - count, back: 20}
+        Self { digits, front: 20 - count, back: 20 }
     }
 }
 
