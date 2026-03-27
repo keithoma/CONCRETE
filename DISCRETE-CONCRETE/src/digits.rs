@@ -31,10 +31,6 @@ impl DigitIter {
     #[inline]
     #[must_use]
     pub const fn new(mut n: u64) -> Self {
-        #[expect(
-            clippy::unseparated_literal_suffix, 
-            reason = "0u8 is more readable than 0_u8 for single-digit constants in this context"
-        )]
         let mut digits = [0u8; 20];
         let mut front: usize = 19;
         let back: usize = 20;
@@ -42,14 +38,14 @@ impl DigitIter {
         if n != 0 {
             let mut count = 0;
             while n > 0 {
-                digits[19_usize.saturating_sub(count)] = (n % 10) as u8;
+                digits[19 - count] = (n % 10) as u8;
                 n /= 10;
                 count = count.saturating_add(1);
             }
             front = front.saturating_sub(count);
         }
 
-        Self {back, digits, front}
+        Self { back, digits, front }
     }
 }
 

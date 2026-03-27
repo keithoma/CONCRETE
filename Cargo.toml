@@ -16,20 +16,47 @@ repository = "https://github.com/keithoma/CONCRETE"
 [workspace.lints.rust]
 unsafe_code = "forbid"
 missing_docs = "warn"
-# We turn these to warn/deny to keep the "Standard Library" feel clean
 non_snake_case = "warn"
 unused_imports = "warn"
-unused_variables = "warn" 
-# Essential for a library:
+unused_variables = "warn"
 explicit_outlives_requirements = "warn"
 unused_qualifications = "warn"
+# Add this: prevents accidentally leaving print macros in a no_std lib
+forbidden_lint_groups = "deny"
 
 [workspace.lints.clippy]
+# Start with these broad groups at a lower priority
 pedantic = { level = "warn", priority = -1 }
-# Specific pedantic lints that are vital for no_std math libs:
+nursery = { level = "warn", priority = -1 }
+
+# --- 1. THE "NO_STD" GUARDIANS ---
 std_instead_of_core = "deny"
 std_instead_of_alloc = "deny"
 alloc_instead_of_core = "warn"
+
+# --- 2. MATH & PRECISION (Vital for your lib) ---
+# Warns if you use '+' or '-' where it might overflow. 
+# Use .wrapping_add() or .saturating_add() to be explicit.
+arithmetic_side_effects = "warn" 
+# Prevents using 'as' for lossy casts (e.g., u64 as u32)
+cast_possible_truncation = "warn"
+cast_possible_wrap = "warn"
+cast_precision_loss = "warn"
 cast_lossless = "warn"
+# Ensures float comparisons are handled safely
+float_cmp = "warn"
+float_cmp_const = "warn"
+
+# --- 3. API CLEANLINESS ---
 missing_errors_doc = "warn"
+missing_panics_doc = "warn" # Crucial: Tell users if a math function can panic
 must_use_candidate = "warn"
+# Ensures you don't leave internal types in public APIs
+exhaustive_enums = "warn"
+exhaustive_structs = "warn"
+
+# --- 4. THE "ANTI-CHAOS" MEASURES (The Fix) ---
+# Explicitly disable the restriction lints that cause loops
+implicit_return = "allow"
+pattern_type_mismatch = "allow"
+blanket_clippy_restriction_lints = "allow"
