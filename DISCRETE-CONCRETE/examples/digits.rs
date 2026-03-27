@@ -76,6 +76,11 @@ pub trait Digits {
     /// assert_eq!(digits.next(), Some(2));
     /// assert_eq!(digits.next(), Some(3));
     /// assert_eq!(digits.next(), None);
+    ///
+    /// assert_eq!(0u64.digits().next(), Some(0));
+    ///
+    /// // u64::MAX is 18,446,744,073,709,551,615
+    /// assert_eq1(u64::MAX.digits().next(), Some(1));
     /// ```
     ///
     /// Since it is a `DoubleEndedIterator`, you can also go backwards:
@@ -85,7 +90,25 @@ pub trait Digits {
     ///
     /// let mut digits = 123u64.digits();
     /// assert_eq!(digits.next_back(), Some(3));
+    ///
+    /// assert_eq!(0.next_back(), Some(0));
+    /// // u64::MAX is 18,446,744,073,709,551,615
+    /// assert_eq!(u64::MAX.digits().next_back(), Some(5));
     /// ```
+    ///
+    /// It also has implemented the len() method:
+    ///
+    /// ```
+    /// use your_crate_name::Digits;
+    ///
+    /// let mut digits = 123u64.digits();
+    /// assert_eq!(digits.digits.len(), 3);
+    ///
+    /// assert_eq!(0.digits.len(), 1);
+    /// // u64::MAX is 18,446,744,073,709,551,615
+    /// assert_eq!(u64::MAX.digits().len(), 20);
+    /// ```
+    #[inline]
     fn digits(self) -> DigitIter;
 
     /// Returns the number of digits in the integer in base 10.
@@ -250,9 +273,36 @@ pub trait Digits {
     fn is_palindrome(self) -> bool;
 
 
+    /// Returns `true` if the number is narcissistic in base 10.
     ///
+    /// A narcissistic number is a number that is the sum of its own digits 
+    /// each raised to the power of the number of digits. 
+    /// Mathematically: $n = \sum_{i=0}^{k-1} d_i^k$, where $k$ is the number of digits.
+    ///
+    /// # Performance
+    ///
+    /// This operation is $O(n)$, where $n$ is the number of digits. It involves 
+    /// calculating $k$ powers ($d^k$).
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use discrete::Digits;
+    ///
+    /// // 153: 1^3 + 5^3 + 3^3 = 1 + 125 + 27 = 153
+    /// assert!(153u64.is_narcissistic());
+    ///
+    /// // 9474: 9^4 + 4^4 + 7^4 + 4^4 = 6561 + 256 + 2401 + 256 = 9474
+    /// assert!(9474u64.is_narcissistic());
+    ///
+    /// // 0 is technically narcissistic (0^1 = 0)
+    /// assert!(0u64.is_narcissistic());
+    ///
+    /// // u64::MAX is not narcissistic
+    /// assert!(!u64::MAX.is_narcissistic());
+    /// ```
+    #[inline]
     fn is_narcissistic(self) -> bool;
-
 
     /// Returns the digital root of the number in base 10.
     ///
