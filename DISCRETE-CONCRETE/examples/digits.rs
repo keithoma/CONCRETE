@@ -1,195 +1,286 @@
-/*
-=============================================================================
- MODULE: `Digits` (Number Theory & Combinatorics Library)
- Status: IN PROGRESS (Day 2 Objectives Queued)
-=============================================================================
-THE "REASON TO EXIST":
-Standard Rust integers represent scalar values, making it computationally 
-expensive to analyze their structural properties. This struct treats numbers 
-as sequences, enabling fast combinatorial and number-theoretic analysis.
+#![no_std]
+#![warn(clippy::std_instead_of_core)]
+#![warn(clippy::std_instead_of_alloc)]
 
-THE "DEFINITION OF DONE" CHECKLIST:
-
-[x] 1. SAFETY, SPEED & BASE LOGIC: 
-       - O(N) Initialization (`push` + `reverse`)
-       - O(N) Conversion (`to_u64` via Horner's Method)
-       - Safe Memory Access (`first`, `last` via Option/copied)
-       - Overflow-safe Summation
-
-[ ] 2. IDIOMATIC RUST TRAITS (Tomorrow's Goal):
-       - `impl Default for Digits` (to replace `new()`)
-       - `impl From<u64> for Digits` (to replace `from_u64()`)
-       - `impl From<&Digits> for u64` (to replace `to_u64()`)
-       - `impl std::str::FromStr for Digits` (to replace `from_str()`)
-       - `impl std::fmt::Display for Digits` (for clean printing)
-       - `impl IntoIterator for &Digits`
-
-[x] 3. RECREATIONAL MATH PROPERTIES:
-       - `is_palindrome(&self) -> bool`
-       - `digital_root(&self) -> u8`
-       - `is_narcissistic(&self) -> bool`
-
-[ ] 4. COMBINATORICS & FREQUENCY (Future Goals):
-       - `frequency_map(&self) -> [u8; 10]`
-       - `is_anagram_of(&self, other: &Digits) -> bool`
-       - `next_permutation(&mut self) -> bool` 
-=============================================================================
-*/
-
-
-/// Represents the digits of a u64-integer.
-#[derive(Debug)]
-struct Digits {
-    digits: Vec<u8>,
+/// An iterator that yields digits from right to left (10^0, 10^1, ...).
+pub struct DigitIter {
+    digits: [u8; 20],
+    front: usize,
+    back: usize,
 }
 
-impl Digits {
-    /// Constructs a new empty Digits instance.
-    fn new() -> Self {
-        Self {
-            digits: Vec::new(),
-        }
-    }
+impl DigitIter {
+    pub fn new(mut n: u64) -> Self {
+        let mut digits = [0u8; 20];
 
-    /// Constructs and populates new Digits instance with the digits from `n`.
-    fn from_u64(n: u64) -> Self {
         if n == 0 {
-            return Self {
-                digits: vec![0]
-            }
-        };
+            return Self { digits, front: 19, back: 20}
+        }
 
-        let mut n = n;
-        let mut digits_vector = Vec::new();
+        let mut count = 0;
         while n > 0 {
-            digits_vector.push((n % 10) as u8);
+            digits[19 - count] = (n % 10) as u8;
             n /= 10;
+            count += 1;
         }
-        digits_vector.reverse();
-        Self {
-            digits: digits_vector
-        }
+        Self { digits, front: 20 - count, back: 20}
     }
+}
 
-    fn from_str(s: &str) -> Self {
-        Self {
-            digits: s.chars()
-                .filter_map(|c| c.to_digit(10))
-                .map(|d| d as u8)
-                .collect()
-        }
-    }
+impl Iterator for DigitIter {
+    type Item = u8; // The type we yield
 
-    fn to_u64(&self) -> u64 {
-        let mut result: u64 = 0;
-        for &digit in &self.digits {
-            result = result * 10 + (digit as u64);
-        }
-        result
-    }
-
-    /// Checks if the digits are empty or not.
-    fn is_empty(&self) -> bool {
-        self.digits.is_empty()
-    }
-
-    /// Returns the length of the `Digits` instance.
-    fn len(&self) -> usize {
-        self.digits.len()
-    }
-
-    /// Returns the value at the index if it exists otherwise she returns None.
-    fn get(&self, i: usize) -> Option<u8> {
-        self.digits.get(i).copied()
-    }
-
-    /// Returns the first digit.
-    fn first(&self) -> Option<u8> {
-        self.digits.first().copied()
-    }
-
-    /// Returns the last digit.
-    fn last(&self) -> Option<u8> {
-        self.digits.last().copied()
-    }
-
-    /// Returns the digit sum.
-    fn sum(&self) -> u64 {
-        self.digits.iter().map(|&d| d as u64).sum()
-    }
-
-    /// Returns the alternating sum.
-    fn alternating_sum(&self) -> i32 {
-        let mut result: i32 = 0;
-        let mut sign: bool = true;
-        for &d in self.digits.iter().rev() {
-            result += (2 * (sign as i32) - 1) * (d as i32);
-            sign = !sign;
-        }
-        result
-    }
-
-    /// Reverses the digits in place.
-    fn reverse(&mut self) {
-        self.digits.reverse();
-    }
-
-    /// Checks if the digits are a palindrome.
-    fn is_palindrome(&self) -> bool {
-        self.digits.iter()
-            .take(self.len() / 2)
-            .zip(self.digits.iter().rev())
-            .all(|(x, y)| x == y)
-    }
-
-    // Computes the digital root using the modular trick.
-    fn digital_root(&self) -> u8 {
-        let s = self.sum();
-        if s == 0 { 0 } else { (1 + (s - 1) % 9) as u8 }
-    }
-
-    // Computes the digital root recursively.
-    fn digital_root_recursive(&self) -> u8 {
-        let result: u64 = self.sum();
-        if result < 10 {
-            result as u8
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.front < self.back {
+            let digit = self.digits[self.front];
+            self.front += 1;
+            Some(digit)
         } else {
-            Self::from_u64(result).digital_root()
+            None
+        }
+    }
+}
+
+impl DoubleEndedIterator for DigitIter {
+    fn next_back(&mut self) -> Option<Self::Item> {
+        if self.front < self.back {
+            self.back -= 1;
+            let digit = self.digits[self.back];
+            Some(digit)
+        } else {
+            None
+        }
+    }
+}
+
+impl ExactSizeIterator for DigitIter {
+    fn len(&self) -> usize {
+        self.back - self.front
+    }
+}
+
+/// Mathematical operations related to digits.
+pub trait Digits {
+    /// Returns an [`DigitIter`] iterator over the digits of the number from
+    /// most-significant to least-significant.
+    ///
+    /// The iterator yields each digit as a `u8`. For `0`, it yields a single `0`.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use your_crate_name::Digits;
+    ///
+    /// let mut digits = 123u64.digits();
+    /// assert_eq!(digits.next(), Some(1));
+    /// assert_eq!(digits.next(), Some(2));
+    /// assert_eq!(digits.next(), Some(3));
+    /// assert_eq!(digits.next(), None);
+    /// ```
+    ///
+    /// Since it is a `DoubleEndedIterator`, you can also go backwards:
+    ///
+    /// ```
+    /// use your_crate_name::Digits;
+    ///
+    /// let mut digits = 123u64.digits();
+    /// assert_eq!(digits.next_back(), Some(3));
+    /// ```
+    fn digits(self) -> DigitIter;
+
+    /// Returns the number of digits in the integer in base 10.
+    ///
+    /// This method treats `0` as having a length of `1`. For any other 
+    /// positive integer, it returns the number of decimal digits required 
+    /// to represent it.
+    ///
+    /// # Performance
+    ///
+    /// This operation is $O(1)$. It uses a hardware-accelerated integer 
+    /// logarithm (`ilog10`) to determine the length without iteration.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use your_crate_name::Digits;
+    ///
+    /// assert_eq!(0u64.digit_length(), 1);
+    /// assert_eq!(7u64.digit_length(), 1);
+    /// assert_eq!(123u64.digit_length(), 3);
+    /// assert_eq!(u64::MAX.digit_length(), 20);
+    /// ```
+    fn digit_length(self) -> usize;
+
+    /// Returns the digit at the index.
+    fn get(self, i: usize) -> Option<u8>;
+
+    /// Computes the digit sum.
+    fn digit_sum(self) -> u8;
+    
+    /// Computes the alternating digit sum.
+    fn alternating_digit_sum(self) -> i8;
+
+    /// Returns an integer with its digits reversed.
+    fn reverse(self) -> u64;
+
+
+    ///
+    fn is_palindrome(self) -> bool;
+
+
+    ///
+    fn is_narcissistic(self) -> bool;
+
+
+    /// Returns the digital root of the number in base 10.
+    ///
+    /// The digital root is the value obtained by an iterative process of summing digits
+    /// until a single-digit number is reached. For example, the digital root of 12,345 is 6,
+    /// because $1+2+3+4+5 = 15$, and $1+5 = 6$.
+    ///
+    /// # Performance
+    ///
+    /// This operation is $O(1)$. It uses the constant-time modulo 9 congruence formula.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use your_crate_name::Digits;
+    /// assert_eq!(12345u64.digital_root(), 6);
+    /// ```
+    fn digital_root(self) -> u8;
+
+    /// Returns the digital root using the congruence formula: $1 + ((n - 1) \pmod 9)$.
+    ///
+    /// This is the $O(1)$ implementation used by [`Self::digital_root`].
+    fn digital_root_modulo(self) -> u8;
+
+    /// Returns the digital root by actually performing the iterative summation.
+    ///
+    /// Unlike [`Self::digital_root_modulo`], this method follows the literal 
+    /// definition of summing digits recursively until a single digit remains.
+    ///
+    /// # Performance
+    ///
+    /// This operation is $O(n^2)$ in the worst case (where $n$ is the number of digits).
+    fn digital_root_recursive(self) -> u8;
+}
+
+impl Digits for u64 {
+    fn digits(self) -> DigitIter {
+        DigitIter::new(self)
+    }
+    
+    fn digit_length(self) -> usize {
+        if self == 0 { return 1; }
+        (self.ilog10() + 1) as usize
+    }
+
+    fn get(self, i: usize) -> Option<u8> {
+        let digits = self.digits();
+        if i < digits.len() {
+            Some(digits.digits[19 - i])
+        } else {
+            None
         }
     }
 
-    fn is_narcissistic(&self) -> bool {
-        let exponent: u32 = self.len() as u32;
-        self.to_u64() == self.digits.iter().map(|&d| (d as u64).pow(exponent)).sum()
+    fn digit_sum(self) -> u8 {
+        self.digits().sum()
+    }
+
+    fn alternating_digit_sum(self) -> i8 {
+        self.digits()
+            .rev()
+            .enumerate()
+            .map(|(i, d)| {
+                let digit = d as i8;
+                if i % 2 == 0 { digit } else { -digit }
+            })
+            .sum()
+    }
+
+    fn reverse(self) -> u64 {
+        self.digits().fold(0u64, |acc, d| acc * 10 + d as u64)
+    }
+
+    fn is_palindrome(self) -> bool {
+        let mut digits = self.digits();
+        while let (Some(f), Some(b)) = (digits.next(), digits.next_back()) {
+            if f != b { return false; }
+        }
+        true
+    }
+
+    fn is_narcissistic(self) -> bool {
+        let digits = self.digits();
+        let n = digits.len() as u32;
+        digits.map(|x| (x as u64).pow(n)).sum()::<u64> == self
+    }
+
+    fn digital_root(self) -> u8 {
+        digital_root_modulo(self)
+    }
+
+    fn digital_root_modulo(self) -> u8 {
+        if self == 0 {
+            0
+        } else {
+            // The formula: 1 + (n - 1) % 9
+            (1 + (self - 1) % 9) as u8
+        }
+    }
+
+    fn digital_root_recursive(self) -> u8 {
+        if self < 10 {
+            self as u8
+        } else {
+            (self.digit_sum() as u64).digital_root()
+        }
     }
 }
 
 fn main() {
-    let mut d = Digits::from_u64(1234);
-    let mut n = Digits::new();
-    println!("{:?}", d.to_u64());
-    println!("Alternating sum: {:?}", d.alternating_sum());
-    println!("{:?}", d.is_empty());
-    println!("{:?}", n.is_empty());
-    println!("{:?}", d.digits);
-    println!("{:?}", d.len());
-    println!("{:?}", d.get(3));
-    println!("{:?}", d.sum());
-    println!("{:?}", d.first());
-    println!("{:?}", d.last());
-    d.reverse();
-    println!("{:?}", d.digits);
 
-    let mut d2 = Digits::from_u64(123454321);
-    println!("{:?}", d2.is_palindrome());
-    println!("{:?}", d2.digital_root());
+}
 
-    let mut d3 = Digits::from_u64(548834);
-    println!("is narcisstic: {:?}", d3.is_narcissistic());
+#[cfg(test)]
+mod tests {
+    // This imports the Digits trait and anything else from the main file 
+    // into this isolated testing module.
+    use super::*; 
 
-    let mut d4 = Digits::from_str("2132131");
-    println!("{:?}", d4);
+    const ZERO: u64 = 0;
+    const SHORT_DIGITS: u64 = 321;
+    const LONG_DIGITS: u64 = 123456789;
 
-    let mut d5 = Digits::from_str("adsa\nasdasda2132131");
-    println!("{:?}", d5);
+    #[test]
+    fn test_digit_length() {
+        let actual: usize = ZERO.digit_length();
+        let expected: usize = 1;
+        assert_eq!(actual, expected);
+
+        let actual: usize = SHORT_DIGITS.digit_length();
+        let expected: usize = 3;
+        assert_eq!(actual, expected);
+
+        let actual: usize = LONG_DIGITS.digit_length();
+        let expected: usize = 9;
+        assert_eq!(actual, expected);
+    }
+
+    #[test]
+    fn test_digit_sum() {
+        let actual: u8 = ZERO.digit_sum();
+        let expected: u8 = 0;
+        assert_eq!(actual, expected);
+    }
+
+
+    // #[test]
+    // fn test_alternating_digit_sum() {
+    //     let actual: i32 = SHORT_DIGITS.alternating_digit_sum();
+    //     let expected: i32 = 4;
+    //     assert_eq!(actual, expected);
+    // }
 }
