@@ -7,6 +7,12 @@ use core::ops::Mul;
 use core::ops::Div;
 use core::ops::Rem;
 
+use core::ops::AddAssign;
+use core::ops::SubAssign;
+use core::ops::MulAssign;
+use core::ops::DivAssign;
+use core::ops::RemAssign;
+
 /// Integer
 pub trait Integer: Sized + Copy + PartialEq + Eq + PartialOrd + Ord 
 where 
@@ -15,7 +21,12 @@ where
         Sub<Output = Self> + 
         Mul<Output = Self> + 
         Div<Output = Self> + 
-        Rem<Output = Self>
+        Rem<Output = Self> +
+        AddAssign +
+        SubAssign +
+        MulAssign +
+        DivAssign +
+        RemAssign
 {
     /// The additive identity (0)
     const ZERO: Self;
@@ -39,6 +50,10 @@ where
     /// Returns the greatest common divisor of self and other.
     #[must_use]
     fn gcd(self, other: Self) -> Self;
+
+    /// docstring
+    #[must_use]
+    fn lcm(self, other: Self) -> Self;
 }
 
 macro_rules! impl_integer {
@@ -103,6 +118,11 @@ macro_rules! impl_integer {
                 }
 
                 a << common_zeros
+            }
+
+            // TODO this also shouldn't be here
+            fn lcm(self, other: Self) -> Self {
+                (self * other).abs() / self.gcd(other)
             }
         }
     }
