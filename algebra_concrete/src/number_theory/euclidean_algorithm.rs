@@ -77,7 +77,8 @@ mod tests {
                 assert_eq!(
                     result, 
                     expected, 
-                    "{name} implementation failed for inputs ({a}, {b})"
+                    "{name} failed for gcd({a}, {b}). \
+                    Expected {expected}, got {result}"
                 );
             }
         }
