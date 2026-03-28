@@ -1,5 +1,5 @@
 [package]
-name = "algebra-concrete"
+name = "algebra_concrete"
 version.workspace = true
 edition.workspace = true
 authors.workspace = true
@@ -8,7 +8,6 @@ repository.workspace = true
 
 [dependencies]
 # This is where you'd add core-compatible crates if you ever allow them.
-# For now, it's empty because you are a purist.
 
 [lints]
 workspace = true

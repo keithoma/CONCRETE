@@ -1,6 +1,6 @@
 pub struct Rational {
-    numerator: i64,
-    denominator: i64,
+    numerator: u64,
+    denominator: u64,
 }
 
 impl Rational {

@@ -79,7 +79,7 @@ macro_rules! impl_unsigned_gcd {
             ///
             /// This function uses Stein's Algorithm (Binary GCD). It replaces standard Euclidean
             /// division with arithmetic shifts and subtractions, leveraging the `ctz` (count
-            /// trailing zeros) instruction for $O(1)$ power-of-2 extraction.
+            /// trailing zeros) instruction for O(1) power-of-2 extraction.
             ///
             /// * Time Complexity: O(n^2) bit operations, where n is the number of bits.
             /// * Space Complexity: O(1) auxiliary space.
