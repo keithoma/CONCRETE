@@ -381,9 +381,58 @@ macro_rules! impl_unsigned_gcd {
     };
 }
 
+
+macro_rules! impl_signed_gcd {
+    ($t_signed:ty, $t_unsigned:ty, $signed_mod:ident, $unsigned_mod:ident) => {
+        pub mod $signed_mod {
+            use super::GcdStrategy;
+            use super::$unsigned_mod as unsigned;
+
+            pub const fn gcd(a: $t_signed, b: $t_signed) -> $t_unsigned {
+                unsigned::gcd(a.unsigned_abs(), b.unsigned_abs())
+            }
+
+            pub const fn gcd_with_strategy(
+                a: $t_signed, 
+                b: $t_signed, 
+                strategy: GcdStrategy
+            ) -> $t_unsigned {
+                unsigned::gcd_with_strategy(a.unsigned_abs(), b.unsigned_abs(), strategy)
+            }
+
+            pub(crate) const fn stein_iterative(a: $t_signed, b: $t_signed) -> $t_unsigned {
+                unsigned::stein_iterative(a.unsigned_abs(), b.unsigned_abs())
+            }
+
+            pub(crate) const fn stein_recursive(a: $t_signed, b: $t_signed) -> $t_unsigned {
+                unsigned::stein_recursive(a.unsigned_abs(), b.unsigned_abs())
+            }
+
+            pub(crate) const fn euclidean_iterative(a: $t_signed, b: $t_signed) -> $t_unsigned {
+                unsigned::euclidean_iterative(a.unsigned_abs(), b.unsigned_abs())
+            }
+
+            pub(crate) const fn euclidean_subtraction(a: $t_signed, b: $t_signed) -> $t_unsigned {
+                unsigned::euclidean_subtraction(a.unsigned_abs(), b.unsigned_abs())
+
+            }
+            pub(crate) const fn euclidean_recursive(a: $t_signed, b: $t_signed) -> $t_unsigned {
+                unsigned::euclidean_recursive(a.unsigned_abs(), b.unsigned_abs())
+            }
+        }
+    }
+}
+
+
 impl_unsigned_gcd!(u8, gcd_u8);
 impl_unsigned_gcd!(u16, gcd_u16);
 impl_unsigned_gcd!(u32, gcd_u32);
 impl_unsigned_gcd!(u64, gcd_u64);
 impl_unsigned_gcd!(u128, gcd_u128);
 impl_unsigned_gcd!(usize, gcd_usize);
+
+impl_signed_gcd!(i8, u8, gcd_i8, gcd_u8);
+impl_signed_gcd!(i16, u16, gcd_i16, gcd_u16);
+impl_signed_gcd!(i32, u32, gcd_i32, gcd_u32);
+impl_signed_gcd!(i64, u64, gcd_i64, gcd_u64);
+impl_signed_gcd!(i128, u128, gcd_i128, gcd_u128);
