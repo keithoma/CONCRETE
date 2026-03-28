@@ -1,4 +1,8 @@
-use core::ops::{Add, Sub, Mul, Div, Rem, AddAssign, SubAssign, MulAssign, DivAssign, RemAssign};
+use core::ops::{
+    Add, AddAssign, Sub, SubAssign, Mul, MulAssign, Div, DivAssign, Rem, RemAssign,
+    BitAnd, BitAndAssign, BitOr, BitOrAssign, BitXor, BitXorAssign, Not,
+    Shl, ShlAssign, Shr, ShrAssign,
+};
 
 pub trait Natural: 
     Sized + Copy + PartialEq + Eq + PartialOrd + Ord +
@@ -12,7 +16,7 @@ pub trait Natural:
 
 pub trait Signed: Natural {
     fn is_negative(self) -> bool;
-    fn abs(self) -> Self; // TODO: there is an issue if we try to do i8::MIN.abs()
+    fn abs(self) -> Self; 
 }
 
 pub trait RationalOps: Natural {
@@ -20,23 +24,39 @@ pub trait RationalOps: Natural {
     fn lcm(self, other: Self) -> Self;
 }
 
-pub trait BitwiseOps: Natural {
-    // TODO
+pub trait BitwiseOps: Natural +
+    BitAnd<Output = Self> + BitOr<Output = Self> + BitXor<Output = Self> +
+    Not<Output = Self> + 
+    Shl<u32, Output = Self> + Shr<u32, Output = Self> +
+    BitAndAssign + BitOrAssign + BitXorAssign + 
+    ShlAssign<u32> + ShrAssign<u32>
+{
+    fn trailing_zeros(self) -> u32;
 }
 
-macro_rules! impl_integer {
+macro_rules! impl_traits {
     ($t:ty, $mod_name:ident) => {
-        impl Integer for $t {
+        impl Natural for $t {
             const ZERO: Self = 0;
             const ONE: Self = 1;
+        }
 
+        impl Signed for $t {
             fn is_negative(self) -> bool { self < 0 as $t }
             fn abs(self) -> Self { if !self.is_negative() { self } else { Self::ZERO - self } }
+        }
 
+        impl RationalOps for $t {
             // TODO
             fn gcd(self, other: Self) -> Self { self }
             fn lcm(self, other: Self) -> Self { self }
         }
+
+        impl BitwiseOps for $t {
+
+        }
+
+
     }
 }
 
