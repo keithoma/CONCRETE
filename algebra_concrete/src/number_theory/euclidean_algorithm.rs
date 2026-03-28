@@ -4,36 +4,38 @@ const fn euclidean_algorithm_iterative(mut a: u64, mut b: u64) -> u64 {
             a = b;
             b = rem;
         } else {
-            return a;
+            return a; // this should be an error
         }
     }
     a
 }
 
 const fn euclidean_algorithm_subtraction(mut a: u64, mut b: u64) -> u64 {
-    if a == 0 {
-        return b;
-    }
-
-    if b == 0 {
-        return a;
-    }
+    if a == 0 { return b; }
+    if b == 0 { return a; }
 
     while a != b {
-        if a > b && let Some(diff) = a.checked_sub(b) {
-            a = diff;
-        } else if a < b && let Some(diff) = b.checked_sub(a) {
-            b = diff;
+        if a > b {
+            match a.checked_sub(b) {
+                Some(diff) => a = diff,
+                None => break, // this should be an error
+            }
         } else {
-            break;
+            match b.checked_sub(a) {
+                Some(diff) => b = diff,
+                None => break, // this should be an error
+            }
         }
     }
     a
 }
 
 const fn euclidean_algorithm_recursive(a: u64, b: u64) -> u64 {
-    if b != 0 && let Some(rem) = a.checked_rem(b) {
-        euclidean_algorithm_recursive(b, rem)
+    if b != 0 {
+        match a.checked_rem(b) {
+            Some(rem) => euclidean_algorithm_recursive(b, rem),
+            None => a, // this should be an error
+        }
     } else {
         a
     }
@@ -75,7 +77,7 @@ mod tests {
                 assert_eq!(
                     result, 
                     expected, 
-                    "Implementation failed for inputs (`a`, `b`)"
+                    "{name} implementation failed for inputs ({a}, {b})"
                 );
             }
         }
