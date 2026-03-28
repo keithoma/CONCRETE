@@ -17,18 +17,20 @@ macro_rules! test_unsigned_gcd {
 
             type FuncDef = fn($t, $t) -> $t;
             const FUNCTIONS: &[(&str, FuncDef)] = &[
-                ("iterative Stein's algorithm", gcd::crate::stein_iterative),
-                ("recursive Stein's algorithm", stein_recursive),
-                ("Iterative", euclidean_iterative),
-                ("Subtraction", euclidean_subtraction),
-                ("Recursive", euclidean_recursive),
+                ("gcd", implementation::gcd),
+                ("iterative Stein's algorithm", implementation::stein_iterative),
+                ("recursive Stein's algorithm", implementation::stein_recursive),
+                ("Iterative", implementation::euclidean_iterative),
+                ("Subtraction", implementation::euclidean_subtraction),
+                ("Recursive", implementation::euclidean_recursive),
             ];
 
             #[test]
             fn test_all() {
                 for (a, b, expected) in CASES {
                     assert_eq!(
-                        gcd_with_strategy(a, b, GcdStrategy::EuclideanRecursive), expected
+                        implementation::gcd_with_strategy(a, b, GcdStrategy::EuclideanRecursive), 
+                        expected
                     );
                     for (name, func) in FUNCTIONS {
                         // std::println!(
@@ -50,8 +52,8 @@ macro_rules! test_unsigned_gcd {
 macro_rules! test_signed_gcd {
     ($t_signed:ty, $t_unsigned:ty, $signed_mod:ident, $unsigned_mod:ident) => {
         #[cfg(test)]
-        mod $mod_name {
-            use super::super::$mod_name as implementation;
+        mod $signed_mod {
+            use super::super::$signed_mod as implementation;
             use super::super::GcdStrategy;
 
             const MAX: $t_signed = <$t_signed>::MAX;
@@ -63,19 +65,20 @@ macro_rules! test_signed_gcd {
 
             type FuncDef = fn($t_signed, $t_signed) -> $t_unsigned;
             const FUNCTIONS: &[(&str, FuncDef)] = &[
-                ("gcd", gcd),
-                ("iterative Stein's algorithm", stein_iterative),
-                ("recursive Stein's algorithm", stein_recursive),
-                ("iterative Euclidean algorithm", euclidean_iterative),
-                ("Euclidean algorithm with subtraction", euclidean_subtraction),
-                ("recursive Euclidean algorithm", euclidean_recursive),
+                ("gcd", implementation::gcd),
+                ("iterative Stein's algorithm", implementation::stein_iterative),
+                ("recursive Stein's algorithm", implementation::stein_recursive),
+                ("Iterative", implementation::euclidean_iterative),
+                ("Subtraction", implementation::euclidean_subtraction),
+                ("Recursive", implementation::euclidean_recursive),
             ];
 
             #[test]
             fn test_all() {
                 for (a, b, expected) in CASES {
                     assert_eq!(
-                        gcd_with_strategy(a, b, GcdStrategy::EuclideanRecursive), expected
+                        implementation::gcd_with_strategy(a, b, GcdStrategy::EuclideanRecursive), 
+                        expected
                     );
 
                     for (name, func) in FUNCTIONS {
