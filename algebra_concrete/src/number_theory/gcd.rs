@@ -22,39 +22,67 @@ macro_rules! impl_unsigned_gcd {
             use super::GcdStrategy;
             use super::GcdStrategy::*;
 
-            /// Computes the greatest common divisor $\gcd(a, b)$ of two unsigned integers.
+            /// Returns the greatest common divisor (GCD) of two numbers.
             ///
-            /// This implementation defaults to **Stein's algorithm** (Binary GCD), which replaces 
-            /// the computationally expensive remainder operations of the Euclidean algorithm with 
-            /// arithmetic shifts and subtractions. 
+            /// The GCD is the largest positive integer that divides both `a` and `b` without
+            /// a remainder. In ring theory, this is the unique non-negative generator of the
+            /// ideal `aZ + bZ`.
             ///
-            /// ### Formal Definition
-            /// For $a, b \in \mathbb{N}_0$, let $D = \{ d \in \mathbb{N} : d \mid a \land d \mid b \}$ 
-            /// be the set of common divisors. Then:
-            /// $$\gcd(a, b) = \begin{cases} \max(D) & \text{if } (a, b) \neq (0, 0) \\ 0 & \text{if } (a, b) = (0, 0) \end{cases}$$
+            /// # Examples
             ///
-            /// ### Complexity
-            /// * **Time**: $O(n^2)$ bit operations, where $n$ is the number of bits in the operands.
-            /// * **Space**: $O(1)$ auxiliary space.
-            /// * **Performance**: Optimized for hardware architectures where bit-shifting (`>>`, `<<`) 
-            ///   and trailing zero counting (`ctz`) are faster than integer division.
+            /// ```rust
+            /// assert_eq!(gcd(48, 18), 6);
+            /// assert_eq!(gcd(101, 103), 1);
+            /// assert_eq!(gcd(0, 5), 5);
+            /// assert_eq!(gcd(0, 0), 0);
+            /// ```
             ///
-            /// ### Properties
-            /// * **Commutativity**: $\gcd(a, b) = \gcd(b, a)$
-            /// * **Identity**: $\gcd(a, 0) = a$
-            /// * **Idempotence**: $\gcd(a, a) = a$
-            /// * **Constancy**: This is a `const` function and can be evaluated at compile-time.
+            /// # Mathematical Properties
+            ///
+            /// * Commutativity: `gcd(a, b) == gcd(b, a)`
+            /// * Identity: `gcd(a, 0) == a`
+            /// * LCM Relation: `gcd(a, b) * lcm(a, b) == a * b`
+            ///
+            /// # Implementation
+            ///
+            /// This function uses Stein's Algorithm (Binary GCD). It replaces standard Euclidean
+            /// division with arithmetic shifts and subtractions, leveraging the `ctz` (count
+            /// trailing zeros) instruction for $O(1)$ power-of-2 extraction.
+            ///
+            /// * Time Complexity: O(n^2) bit operations, where n is the number of bits.
+            /// * Space Complexity: O(1) auxiliary space.
             pub const fn gcd(a: $t, b: $t) -> $t {
                 stein_iterative(a, b)
             }
 
+            /// Returns the greatest common divisor (GCD) of two numbers using a specific [`GcdStrategy`].
+            ///
+            /// This function provides the same mathematical result as [`gcd`], but allows
+            /// manual selection of the underlying algorithm. This is useful for benchmarking
+            /// or specialized hardware constraints.
+            ///
+            /// # Examples
+            ///
+            /// ```rust
+            /// # use your_crate::{gcd_with_strategy, GcdStrategy};
+            /// let result = gcd_with_strategy(48, 18, GcdStrategy::EuclideanIterative);
+            /// assert_eq!(result, 6);
+            /// ```
+            ///
+            /// # Strategies
+            ///
+            /// * [`GcdStrategy::SteinIterative`]: The default binary GCD algorithm.
+            /// * [`GcdStrategy::EuclideanIterative`]: Standard modulus-based approach.
+            /// * [`GcdStrategy::EuclideanSubtraction`]: The original "Greek" approach (slower for large numbers).
+            ///
+            /// For detailed mathematical properties and complexity analysis, see the [`gcd`] function.
             pub const fn gcd_with_strategy(a: $t, b: $t, strategy: GcdStrategy) -> $t {
                 match strategy {
-                    SteinIterative => stein_iterative(a, b),
-                    SteinRecursive => stein_recursive(a, b),
-                    EuclideanIterative => euclidean_iterative(a, b),
-                    EuclideanSubtraction => euclidean_subtraction(a, b),
-                    EuclideanRecursive => euclidean_recursive(a, b),
+                    GcdStrategy::SteinIterative => stein_iterative(a, b),
+                    GcdStrategy::SteinRecursive => stein_recursive(a, b),
+                    GcdStrategy::EuclideanIterative => euclidean_iterative(a, b),
+                    GcdStrategy::EuclideanSubtraction => euclidean_subtraction(a, b),
+                    GcdStrategy::EuclideanRecursive => euclidean_recursive(a, b),
                 }
             }
 
