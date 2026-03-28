@@ -1,20 +1,27 @@
 use core::ops::{Add, Sub, Mul, Div, Rem, AddAssign, SubAssign, MulAssign, DivAssign, RemAssign};
 
-pub trait Integer: 
+pub trait Natural: 
     Sized + Copy + PartialEq + Eq + PartialOrd + Ord +
     Add<Output = Self> + Sub<Output = Self> + Mul<Output = Self> + 
     Div<Output = Self> + Rem<Output = Self> +
-    AddAssign + SubAssign + MulAssign + DivAssign + RemAssign
+    AddAssign + SubAssign + MulAssign + DivAssign + RemAssign 
 {
     const ZERO: Self;
     const ONE: Self;
+}
 
+pub trait Signed: Natural {
     fn is_negative(self) -> bool;
-    fn abs(self) -> Self;
-    
-    // Placeholder
+    fn abs(self) -> Self; // TODO: there is an issue if we try to do i8::MIN.abs()
+}
+
+pub trait RationalOps: Natural {
     fn gcd(self, other: Self) -> Self;
     fn lcm(self, other: Self) -> Self;
+}
+
+pub trait BitwiseOps: Natural {
+    // TODO
 }
 
 macro_rules! impl_integer {
