@@ -1,10 +1,23 @@
+
+fn steins_algorithm(mut a: u64, mut b: u64) -> u64 {
+    if b == 0 {
+        a
+    } else if a % 2 == 0 && b % 2 == 0 {
+        steins_algorithm(a / 2, b / 2)
+    } else if a % 2 != 0 && b % 2 == 0 {
+        steins_algorithm(a, b / 2)
+    } else {
+        steins_algorithm(a, b)
+    }
+}
+
 const fn euclidean_algorithm_iterative(mut a: u64, mut b: u64) -> u64 {
     while b != 0 {
         if let Some(rem) = a.checked_rem(b) {
             a = b;
             b = rem;
         } else {
-            return a; // this should be an error
+            return a; // should never be reached
         }
     }
     a
@@ -16,14 +29,14 @@ const fn euclidean_algorithm_subtraction(mut a: u64, mut b: u64) -> u64 {
 
     while a != b {
         if a > b {
-            match a.checked_sub(b) {
-                Some(diff) => a = diff,
-                None => break, // this should be an error
+            a = match a.checked_sub(b) {
+                Some(diff) => diff,
+                None => break, // should never be reached
             }
         } else {
-            match b.checked_sub(a) {
-                Some(diff) => b = diff,
-                None => break, // this should be an error
+            b = match b.checked_sub(a) {
+                Some(diff) => diff,
+                None => break, // should never be reached
             }
         }
     }
@@ -34,7 +47,7 @@ const fn euclidean_algorithm_recursive(a: u64, b: u64) -> u64 {
     if b != 0 {
         match a.checked_rem(b) {
             Some(rem) => euclidean_algorithm_recursive(b, rem),
-            None => a, // this should be an error
+            None => a, // should never be reached
         }
     } else {
         a
