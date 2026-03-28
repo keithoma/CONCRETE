@@ -1,16 +1,16 @@
 //! Arithmetic utility for computing the Greatest Common Divisor (GCD).
 //!
-//! This module provides multiple implementations of the GCD algorithm, ranging from classical 
-//! Euclidean methods to hardware-optimized binary (Stein's) algorithms. 
+//! This module provides multiple implementations of the GCD algorithm, ranging from classical
+//! Euclidean methods to hardware-optimized binary (Stein's) algorithms.
 //!
 //! # Main Entry Point
 //!
-//! For most use cases, the [`gcd`] function is the recommended entry point as it defaults 
+//! For most use cases, the [`gcd`] function is the recommended entry point as it defaults
 //! to the most efficient strategy for the underlying integer type.
 //!
 //! # Performance Note
 //!
-//! Different strategies have different performance characteristics based on the input size 
+//! Different strategies have different performance characteristics based on the input size
 //! and CPU architecture (e.g., availability of the `ctz` instruction).
 
 // TODO: ``lcm()``
@@ -20,31 +20,31 @@
 #[non_exhaustive]
 #[derive(Debug, Default, Copy, Clone, PartialEq, Eq)]
 pub enum GcdStrategy {
-    /// Iterative Binary GCD (Stein's Algorithm). 
+    /// Iterative Binary GCD (Stein's Algorithm).
     /// Optimized for modern CPUs using shifts and count-trailing-zeros.
     #[default]
     SteinIterative,
 
-    /// Recursive Binary GCD (Stein's Algorithm). 
+    /// Recursive Binary GCD (Stein's Algorithm).
     /// Uses structural recursion; primarily for educational or verification use.
     SteinRecursive,
 
-    /// Iterative Euclidean Algorithm. 
+    /// Iterative Euclidean Algorithm.
     /// The standard approach using the modulus operator in a loop.
     EuclideanIterative,
 
-    /// Recursive Euclidean Algorithm. 
+    /// Recursive Euclidean Algorithm.
     /// The standard modulus approach using tail recursion.
     EuclideanRecursive,
 
-    /// Classical Euclidean Algorithm via repeated subtraction. 
+    /// Classical Euclidean Algorithm via repeated subtraction.
     /// The original "Greek" method; significantly slower for numbers with large differences.
     EuclideanSubtraction,
 }
 
 /// Internal macro to implement GCD functions for unsigned integer primitives.
 ///
-/// This macro generates a submodule for the specified type, containing both the 
+/// This macro generates a submodule for the specified type, containing both the
 /// default [`gcd`] function and the [`gcd_with_strategy`] variant.
 macro_rules! impl_unsigned_gcd {
     ($t:ty, $mod_name:ident) => {
@@ -180,11 +180,11 @@ macro_rules! impl_unsigned_gcd {
 
             /// Computes the GCD using the recursive Stein's Algorithm (Binary GCD).
             ///
-            /// This implementation follows the binary GCD logic through structural recursion, 
+            /// This implementation follows the binary GCD logic through structural recursion,
             /// identifying common factors of 2 and reducing odd numbers via subtraction.
             ///
             /// # Examples
-            /// 
+            ///
             /// ```rust,ignore
             /// assert_eq!(stein_recursive(48u32, 18u32), 6);
             /// assert_eq!(stein_recursive(7u32, 13u32), 1);
@@ -227,7 +227,7 @@ macro_rules! impl_unsigned_gcd {
 
             /// Computes the GCD using the iterative Euclidean Algorithm.
             ///
-            /// This implementation uses the modulo operator to reduce the numbers until the 
+            /// This implementation uses the modulo operator to reduce the numbers until the
             /// remainder is zero.
             ///
             /// # Examples
@@ -259,7 +259,7 @@ macro_rules! impl_unsigned_gcd {
 
             /// Computes the GCD using the Euclidean Algorithm via repeated subtraction.
             ///
-            /// This is the classical "Greek" approach (anthyphairesis), which avoids division 
+            /// This is the classical "Greek" approach (anthyphairesis), which avoids division
             /// and modulus by repeatedly subtracting the smaller value from the larger.
             ///
             /// # Examples
@@ -300,7 +300,7 @@ macro_rules! impl_unsigned_gcd {
 
             /// Computes the GCD using the recursive Euclidean Algorithm.
             ///
-            /// This implementation reduces the problem size by taking the remainder of `a` 
+            /// This implementation reduces the problem size by taking the remainder of `a`
             /// divided by `b` in each recursive step until the base case of zero is reached.
             ///
             /// # Examples
@@ -332,7 +332,6 @@ macro_rules! impl_unsigned_gcd {
     };
 }
 
-
 macro_rules! impl_signed_gcd {
     ($t_signed:ty, $t_unsigned:ty, $signed_mod:ident, $unsigned_mod:ident) => {
         pub mod $signed_mod {
@@ -346,14 +345,14 @@ macro_rules! impl_signed_gcd {
 
             /// gcd with strategy
             pub const fn gcd_with_strategy(
-                a: $t_signed, 
-                b: $t_signed, 
-                strategy: GcdStrategy
+                a: $t_signed,
+                b: $t_signed,
+                strategy: GcdStrategy,
             ) -> $t_unsigned {
                 unsigned::gcd_with_strategy(a.unsigned_abs(), b.unsigned_abs(), strategy)
             }
         }
-    }
+    };
 }
 
 impl_unsigned_gcd!(u8, gcd_u8);
