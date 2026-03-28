@@ -3,7 +3,9 @@ const fn stein_iterative(mut a: u64, mut b: u64) -> u64 {
     if b == 0 { return a; }
 
     let a_zeros = a.trailing_zeros();
+    a >>= a_zeros;
     let b_zeros = b.trailing_zeros();
+    b >>= b_zeros;
     let common_zeros = if a_zeros < b_zeros { a_zeros } else { b_zeros };
 
     loop {
@@ -33,7 +35,7 @@ const fn stein_recursive(a: u64, b: u64) -> u64 {
                             None => x,
                         }
                     } else {
-                        match b.checked_sub(x) {
+                        match y.checked_sub(x) {
                             Some(diff) => stein_recursive(diff >> 1, x),
                             None => y,
                         }
@@ -44,44 +46,35 @@ const fn stein_recursive(a: u64, b: u64) -> u64 {
     }
 }
 
-const fn euclidean_algorithm_iterative(mut a: u64, mut b: u64) -> u64 {
+const fn euclidean_iterative(mut a: u64, mut b: u64) -> u64 {
     while b != 0 {
         if let Some(rem) = a.checked_rem(b) {
             a = b;
             b = rem;
-        } else {
-            return a; // should never be reached
         }
     }
     a
 }
 
-const fn euclidean_algorithm_subtraction(mut a: u64, mut b: u64) -> u64 {
+const fn euclidean_subtraction(mut a: u64, mut b: u64) -> u64 {
     if a == 0 { return b; }
     if b == 0 { return a; }
 
     while a != b {
-        if a > b {
-            a = match a.checked_sub(b) {
-                Some(diff) => diff,
-                None => break, // should never be reached
-            }
+        if let Some(diff) = a.checked_sub(b) {
+            a = diff;
+        } else if let Some(diff) = b.checked_sub(a) {
+            b = diff;
         } else {
-            b = match b.checked_sub(a) {
-                Some(diff) => diff,
-                None => break, // should never be reached
-            }
+            break; // this should never be reached
         }
     }
     a
 }
 
-const fn euclidean_algorithm_recursive(a: u64, b: u64) -> u64 {
-    if b != 0 {
-        match a.checked_rem(b) {
-            Some(rem) => euclidean_algorithm_recursive(b, rem),
-            None => a, // should never be reached
-        }
+const fn euclidean_recursive(a: u64, b: u64) -> u64 {
+    if b != 0 && let Some(rem) = a.checked_rem(b) {
+        euclidean_recursive(b, rem)
     } else {
         a
     }
@@ -109,9 +102,9 @@ mod tests {
     const FUNCTIONS: &[(&str, FuncDef)] = &[
         ("iterative Stein's algorithm", stein_iterative),
         ("recursive Stein's algorithm", stein_recursive),
-        ("Iterative", euclidean_algorithm_iterative),
-        ("Subtraction", euclidean_algorithm_subtraction),
-        ("Recursive", euclidean_algorithm_recursive),
+        ("Iterative", euclidean_iterative),
+        ("Subtraction", euclidean_subtraction),
+        ("Recursive", euclidean_recursive),
     ];
 
     #[test]
