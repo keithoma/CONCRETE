@@ -2,33 +2,18 @@ const fn stein_iterative(mut a: u64, mut b: u64) -> u64 {
     if a == 0 { return b; }
     if b == 0 { return a; }
 
-    let mut i: u8 = 0;
-    while a & 1 == 0 {
-        a >>= 1;
-        if let Some(sum) = i.checked_add(1) { i = sum; }
-    }
-
-    let mut j: u8 = 0;
-    while b & 1 == 0 {
-        b >>= 1;
-        if let Some(sum) = j.checked_add(1) { j = sum; }
-    }
-
-    let smaller = if i <= j { i } else { j };
+    let a_zeros = a.trailing_zeros();
+    let b_zeros = b.trailing_zeros();
+    let common_zeros = if a_zeros < b_zeros { a_zeros } else { b_zeros };
 
     loop {
-        if let Some(diff) = b.checked_sub(a) {
-            b = diff;
-        } else {
-            (a , b) = (b, a);
-        }
-
-        if b == 0 {
-            return b << smaller;
-        }
-
-        while b & 1 == 0 { b >>= 1; }
+        if a > b { (a, b) = (b, a); }
+        if let Some(diff) = b.checked_sub(a) { b = diff;}
+        if b == 0 { break; }
+        b >>= b.trailing_zeros();
     }
+
+    a << common_zeros
 }
 
 
