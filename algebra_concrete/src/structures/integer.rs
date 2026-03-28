@@ -1,6 +1,3 @@
-// abs()To keep denominators positive and simplify signs.checked_opsTo prevent overflows during cross-multiplication.from_i32A way to create an Integer from a raw number (for constants).
-
-
 use core::cmp;
 use core::ops;
 
@@ -26,6 +23,19 @@ where
     /// The multiplicative identity (1)
     const ONE: Self;
 
+    /// from i32
+    fn from_i32(n: i32) -> Self;
+
+    // TODO
+    // fn from_u64(n: u64) -> Self;
+
+    /// is negative
+    fn is_negative(self) -> bool;
+
+    /// absolute value
+    #[must_use]
+    fn abs(self) -> Self;
+
     /// Returns the greatest common divisor of self and other.
     #[must_use]
     fn gcd(self, other: Self) -> Self;
@@ -37,9 +47,32 @@ macro_rules! impl_integer {
             const ZERO: Self = 0;
             const ONE: Self = 1;
 
+            fn from_i32(n: i32) -> Self {
+                // TODO: Replace lossy 'as' cast with a safer conversion (e.g., TryFrom)
+                // for better error handling in the Math library.
+                #[allow(clippy::cast_possible_truncation, clippy::cast_sign_loss,)] 
+                {
+                    n as $t
+                }
+            }
+
+            fn is_negative(self) -> bool {
+                if self < Self::from_i32(0i32) { true } else { false }
+            }
+
+            fn abs(self) -> Self {
+                if !self.is_negative() {
+                    self
+                } else {
+                    Self::ZERO - self
+                }
+            }
+
+            // TODO
+            // we have actually implemented gcd
             fn gcd(self, other: Self) -> Self {
-                let mut a = self as $t;
-                let mut b = other as $t;
+                let mut a = self.abs();
+                let mut b = other.abs();
 
                 if a == 0 {
                     return b;
