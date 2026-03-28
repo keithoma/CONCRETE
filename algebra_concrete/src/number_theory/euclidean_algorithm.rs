@@ -1,3 +1,7 @@
+pub const fn gcd(a: u64, b: u64) -> u64 {
+    stein_iterative(a, b)
+}
+
 const fn stein_iterative(mut a: u64, mut b: u64) -> u64 {
     if a == 0 { return b; }
     if b == 0 { return a; }
@@ -17,7 +21,6 @@ const fn stein_iterative(mut a: u64, mut b: u64) -> u64 {
 
     a << common_zeros
 }
-
 
 const fn stein_recursive(a: u64, b: u64) -> u64 {
     match (a, b) {
@@ -79,7 +82,6 @@ const fn euclidean_recursive(a: u64, b: u64) -> u64 {
         a
     }
 }
-
 
 #[cfg(test)]
 mod tests {
