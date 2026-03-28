@@ -62,7 +62,7 @@ macro_rules! impl_unsigned_gcd {
             /// # Examples
             ///
             /// ```rust
-            /// # use gcd::gcd;
+            /// # use crate::$mod_name::gcd;
             /// assert_eq!(gcd(48, 18), 6);
             /// assert_eq!(gcd(101, 103), 1);
             /// assert_eq!(gcd(0, 5), 5);
@@ -97,7 +97,7 @@ macro_rules! impl_unsigned_gcd {
             /// # Examples
             ///
             /// ```rust
-            /// # use gcd::{gcd_with_strategy, GcdStrategy};
+            /// # use crate::$mod_name::{gcd_with_strategy, GcdStrategy};
             /// let result = gcd_with_strategy(48, 18, GcdStrategy::EuclideanIterative);
             /// assert_eq!(result, 6);
             /// ```
@@ -133,7 +133,7 @@ macro_rules! impl_unsigned_gcd {
             /// # Examples
             ///
             /// ```rust
-            /// # use crate::stein_iterative;
+            /// # use crate::$mod_name::stein_iterative;
             /// assert_eq!(stein_iterative(48u32, 18u32), 6);
             /// assert_eq!(stein_iterative(0u32, 5u32), 5);
             /// ```
@@ -189,7 +189,7 @@ macro_rules! impl_unsigned_gcd {
             /// # Examples
             ///
             /// ```rust
-            /// # use crate::stein_recursive;
+            /// # use crate::$mod_name::stein_recursive;
             /// assert_eq!(stein_recursive(48u32, 18u32), 6);
             /// assert_eq!(stein_recursive(7u32, 13u32), 1);
             /// ```
@@ -237,7 +237,7 @@ macro_rules! impl_unsigned_gcd {
             /// # Examples
             ///
             /// ```rust
-            /// # use crate::euclidean_iterative;
+            /// # use crate::$mod_name::euclidean_iterative;
             /// assert_eq!(euclidean_iterative(48u32, 18u32), 6);
             /// assert_eq!(euclidean_iterative(101u32, 103u32), 1);
             /// ```
@@ -270,7 +270,7 @@ macro_rules! impl_unsigned_gcd {
             /// # Examples
             ///
             /// ```rust
-            /// # use crate::euclidean_subtraction;
+            /// # use crate::$mod_name::euclidean_subtraction;
             /// assert_eq!(euclidean_subtraction(48u32, 18u32), 6);
             /// assert_eq!(euclidean_subtraction(7u32, 13u32), 1);
             /// ```
@@ -312,7 +312,7 @@ macro_rules! impl_unsigned_gcd {
             /// # Examples
             ///
             /// ```rust
-            /// # use crate::euclidean_recursive;
+            /// # use crate::$mod_name::euclidean_recursive;
             /// assert_eq!(euclidean_recursive(48u32, 18u32), 6);
             /// assert_eq!(euclidean_recursive(101u32, 103u32), 1);
             /// ```
@@ -364,10 +364,13 @@ macro_rules! impl_unsigned_gcd {
                 #[test]
                 fn test_all() {
                     for (a, b, expected) in CASES {
+                        assert_eq!(
+                            gcd_with_strategy(a, b, GcdStrategy::EuclideanRecursive), expected
+                        );
                         for (name, func) in FUNCTIONS {
-                            std::println!(
-                                "Testing {name} implementation for the inputs {a} and {b}."
-                            );
+                            // std::println!(
+                            //     "Testing {name} implementation for the inputs {a} and {b}."
+                            // );
                             let result = func(a, b);
                             assert_eq!(
                                 result, expected,
@@ -418,6 +421,54 @@ macro_rules! impl_signed_gcd {
             }
             pub(crate) const fn euclidean_recursive(a: $t_signed, b: $t_signed) -> $t_unsigned {
                 unsigned::euclidean_recursive(a.unsigned_abs(), b.unsigned_abs())
+            }
+
+            #[cfg(test)]
+            mod tests {
+                extern crate std; // needed for println!() and I don't like it
+
+                use super::*;
+
+                const MAX: $t_signed = <$t_signed>::MAX;
+                const MAX_UNSINGED: $t_unsigned = <$t_unsigned>::MAX;
+                const CASES: [($t_signed, $t_signed, $t_unsigned); 6] = [
+                    (0, 0, 0),
+                    (0, MAX, MAX_UNSINGED),
+                    (MAX, 0, MAX_UNSINGED),
+                    (MAX, MAX, MAX_UNSINGED),
+                    (48, 18, 6),
+                    (17, 7, 1),
+                ];
+
+                type FuncDef = fn($t_signed, $t_signed) -> $t_unsigned;
+                const FUNCTIONS: &[(&str, FuncDef)] = &[
+                    ("gcd", gcd),
+                    ("iterative Stein's algorithm", stein_iterative),
+                    ("recursive Stein's algorithm", stein_recursive),
+                    ("iterative Euclidean algorithm", euclidean_iterative),
+                    ("Euclidean algorithm with subtraction", euclidean_subtraction),
+                    ("recursive Euclidean algorithm", euclidean_recursive),
+                ];
+
+                #[test]
+                fn test_all() {
+                    for (a, b, expected) in CASES {
+                        assert_eq!(
+                            gcd_with_strategy(a, b, GcdStrategy::EuclideanRecursive), expected
+                        );
+
+                        for (name, func) in FUNCTIONS {
+                            // std::println!(
+                            //     "Testing {name} implementation for the inputs {a} and {b}."
+                            // );
+                            let result = func(a, b);
+                            assert_eq!(
+                                result, expected,
+                                "{name} failed for gcd({a}, {b}). Expected {expected}, got {result}"
+                            );
+                        }
+                    }
+                }
             }
         }
     }
