@@ -208,7 +208,7 @@ macro_rules! impl_unsigned_gcd {
                 match (a, b) {
                     (0, y) => y,
                     (x, 0) => x,
-                    (x, y) => match x & 1 == 0, y & 1 == 0 {
+                    (x, y) => match (x & 1 == 0, y & 1 == 0) {
                         (true, true) => stein_recursive(x >> 1, y >> 1) << 1,
                         (true, false) => stein_recursive(x >> 1, y),
                         (false, true) => stein_recursive(x, y >> 1),
