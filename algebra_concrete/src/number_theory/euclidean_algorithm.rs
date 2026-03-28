@@ -1,14 +1,43 @@
+const fn stein_iterative(mut a: u64, mut b: u64) -> u64 {
+    if a == 0 { return b; }
+    if b == 0 { return a; }
+
+    let mut i: u8 = 0;
+    while a & 1 == 0 {
+        a >>= 1;
+        if let Some(sum) = i.checked_add(1) { i = sum; }
+    }
+
+    let mut j: u8 = 0;
+    while b & 1 == 0 {
+        b >>= 1;
+        if let Some(sum) = j.checked_add(1) { j = sum; }
+    }
+
+    let smaller = if i <= j { i } else { j };
+
+    loop {
+        if let Some(diff) = b.checked_sub(a) {
+            b = diff;
+        } else {
+            (a , b) = (b, a);
+        }
+
+        if b == 0 {
+            return b << smaller;
+        }
+
+        while b & 1 == 0 { b >>= 1; }
+    }
+}
+
 
 const fn stein_recursive(a: u64, b: u64) -> u64 {
     match (a, b) {
-        (0, 0) => 0,
         (0, y) => y,
         (x, 0) => x,
         (x, y) => {
-            let x_even = x & 1 == 0;
-            let y_even = y & 1 == 0;
-
-            match (x_even, y_even) {
+            match (x & 1 == 0, y & 1 == 0) {
                 (true, true) => stein_recursive(x >> 1, y >> 1) << 1,
                 (true, false) => stein_recursive(x >> 1, y),
                 (false, true) => stein_recursive(x, y >> 1),
@@ -93,6 +122,7 @@ mod tests {
 
     type FuncDef = fn(u64, u64) -> u64;
     const FUNCTIONS: &[(&str, FuncDef)] = &[
+        ("Stein's Algorithm recursive", stein_recursive),
         ("Iterative", euclidean_algorithm_iterative),
         ("Subtraction", euclidean_algorithm_subtraction),
         ("Recursive", euclidean_algorithm_recursive),
