@@ -1,0 +1,4 @@
+max_width = 100
+# This tells rustfmt to be smarter about empty lines and indents
+hard_tabs = false
+tab_spaces = 4

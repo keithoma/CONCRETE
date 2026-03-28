@@ -1,19 +1,51 @@
+//! Arithmetic utility for computing the Greatest Common Divisor (GCD).
 //!
-//! # To-do
-//! [] implement ``lcm()``
-//! [] implement negative integer handeling
-//! [] implement trait achitecture
+//! This module provides multiple implementations of the GCD algorithm, ranging from classical 
+//! Euclidean methods to hardware-optimized binary (Stein's) algorithms. 
+//!
+//! # Main Entry Point
+//!
+//! For most use cases, the [`gcd`] function is the recommended entry point as it defaults 
+//! to the most efficient strategy for the underlying integer type.
+//!
+//! # Performance Note
+//!
+//! Different strategies have different performance characteristics based on the input size 
+//! and CPU architecture (e.g., availability of the `ctz` instruction).
 
+// TODO: ``lcm()``
+// TODO: negative integer handeling
+// TODO: trait achitecture
+
+/// Strategies available for computing the Greatest Common Divisor.
 #[derive(Debug, Default, Copy, Clone, PartialEq, Eq)]
 pub enum GcdStrategy {
+    /// Iterative Binary GCD (Stein's Algorithm). 
+    /// Optimized for modern CPUs using shifts and count-trailing-zeros.
     #[default]
     SteinIterative,
+
+    /// Recursive Binary GCD (Stein's Algorithm). 
+    /// Uses structural recursion; primarily for educational or verification use.
     SteinRecursive,
+
+    /// Iterative Euclidean Algorithm. 
+    /// The standard approach using the modulus operator in a loop.
     EuclideanIterative,
-    EuclideanSubtraction,
+
+    /// Recursive Euclidean Algorithm. 
+    /// The standard modulus approach using tail recursion.
     EuclideanRecursive,
+
+    /// Classical Euclidean Algorithm via repeated subtraction. 
+    /// The original "Greek" method; significantly slower for numbers with large differences.
+    EuclideanSubtraction,
 }
 
+/// Internal macro to implement GCD functions for unsigned integer primitives.
+///
+/// This macro generates a submodule for the specified type, containing both the 
+/// default [`gcd`] function and the [`gcd_with_strategy`] variant.
 macro_rules! impl_unsigned_gcd {
     ($t:ty, $mod_name:ident) => {
         /// docstring
