@@ -55,7 +55,7 @@ macro_rules! impl_unsigned_gcd {
                 stein_iterative(a, b)
             }
 
-            /// Returns the greatest common divisor (GCD) of two numbers using a specific 
+            /// Returns the greatest common divisor (GCD) of two numbers using a specific
             /// [`GcdStrategy`].
             ///
             /// This function provides the same mathematical result as [`gcd`], but allows
@@ -74,14 +74,14 @@ macro_rules! impl_unsigned_gcd {
             ///
             /// * [`GcdStrategy::SteinIterative`]: Binary GCD. Efficient; uses shifts and `ctz`.
             /// * [`GcdStrategy::SteinRecursive`]: Binary GCD using recursion.
-            /// * [`GcdStrategy::EuclideanIterative`]: Standard modulus-based algorithm using a 
+            /// * [`GcdStrategy::EuclideanIterative`]: Standard modulus-based algorithm using a
             ///   loop.
-            /// * [`GcdStrategy::EuclideanRecursive`]: Standard modulus-based algorithm using 
+            /// * [`GcdStrategy::EuclideanRecursive`]: Standard modulus-based algorithm using
             ///   recursion.
-            /// * [`GcdStrategy::EuclideanSubtraction`]: The original Greek approach using repeated 
+            /// * [`GcdStrategy::EuclideanSubtraction`]: The original Greek approach using repeated
             ///   subtraction. Slower, but demonstrates the fundamental logic of the ideal.
             ///
-            /// For detailed mathematical properties and complexity analysis, see the [`gcd`] 
+            /// For detailed mathematical properties and complexity analysis, see the [`gcd`]
             /// function.
             pub const fn gcd_with_strategy(a: $t, b: $t, strategy: GcdStrategy) -> $t {
                 match strategy {
@@ -93,6 +93,30 @@ macro_rules! impl_unsigned_gcd {
                 }
             }
 
+            /// Computes the GCD using the iterative Stein's Algorithm (Binary GCD).
+            ///
+            /// This implementation is specialized for unsigned integers, avoiding division by
+            /// using arithmetic shifts and subtractions.
+            ///
+            /// # Examples
+            ///
+            /// ```rust
+            /// # use crate::stein_iterative;
+            /// assert_eq!(stein_iterative(48u32, 18u32), 6);
+            /// assert_eq!(stein_iterative(0u32, 5u32), 5);
+            /// ```
+            ///
+            /// # Implementation
+            ///
+            /// The algorithm follows these logical steps:
+            /// 1. Handle identity cases where `a` or `b` is zero.
+            /// 2. Find the common power of 2 by comparing trailing zeros.
+            /// 3. Shift out all powers of 2 to make both numbers odd.
+            /// 4. Iteratively subtract the smaller from the larger and shift until `b` is 0.
+            /// 5. Re-apply the common power of 2 to the result.
+            ///
+            /// * Time Complexity: O(n^2) where n is the number of bits.
+            /// * Space Complexity: O(1) auxiliary.
             pub(crate) const fn stein_iterative(mut a: $t, mut b: $t) -> $t {
                 if a == 0 {
                     return b;
@@ -125,6 +149,29 @@ macro_rules! impl_unsigned_gcd {
                 a << common_zeros
             }
 
+            /// Computes the GCD using the recursive Stein's Algorithm (Binary GCD).
+            ///
+            /// This implementation follows the binary GCD logic through structural recursion, 
+            /// identifying common factors of 2 and reducing odd numbers via subtraction.
+            ///
+            /// # Examples
+            ///
+            /// ```rust
+            /// # use crate::stein_recursive;
+            /// assert_eq!(stein_recursive(48u32, 18u32), 6);
+            /// assert_eq!(stein_recursive(7u32, 13u32), 1);
+            /// ```
+            ///
+            /// # Implementation
+            ///
+            /// The algorithm uses a match-based state machine to handle bitwise reduction:
+            /// 1. Base cases: If either `a` or `b` is 0, the other is the GCD.
+            /// 2. Both even: `gcd(a/2, b/2) * 2`.
+            /// 3. One even, one odd: `gcd(even/2, odd)`.
+            /// 4. Both odd: `gcd(|a-b|/2, min(a,b))`.
+            ///
+            /// * Time Complexity: O(n^2) bit operations where n is the number of bits.
+            /// * Space Complexity: O(n) stack frames due to recursion depth.
             pub(crate) const fn stein_recursive(a: $t, b: $t) -> $t {
                 match (a, b) {
                     (0, y) => y,
@@ -150,6 +197,29 @@ macro_rules! impl_unsigned_gcd {
                 }
             }
 
+            /// Computes the GCD using the iterative Euclidean Algorithm.
+            ///
+            /// This implementation uses the modulo operator to reduce the numbers until the 
+            /// remainder is zero.
+            ///
+            /// # Examples
+            ///
+            /// ```rust
+            /// # use crate::euclidean_iterative;
+            /// assert_eq!(euclidean_iterative(48u32, 18u32), 6);
+            /// assert_eq!(euclidean_iterative(101u32, 103u32), 1);
+            /// ```
+            ///
+            /// # Implementation
+            ///
+            /// The algorithm repeatedly applies the property gcd(a, b) = gcd(b, a % b):
+            /// 1. Loop while the divisor `b` is not zero.
+            /// 2. Compute the remainder of `a` divided by `b`.
+            /// 3. Update `a` with the previous divisor and `b` with the remainder.
+            /// 4. Return `a` once `b` reaches zero.
+            ///
+            /// * Time Complexity: O(n^2) where n is the number of bits.
+            /// * Space Complexity: O(1) auxiliary space.
             pub(crate) const fn euclidean_iterative(mut a: $t, mut b: $t) -> $t {
                 while b != 0 {
                     if let Some(rem) = a.checked_rem(b) {
@@ -160,6 +230,28 @@ macro_rules! impl_unsigned_gcd {
                 a
             }
 
+            /// Computes the GCD using the Euclidean Algorithm via repeated subtraction.
+            ///
+            /// This is the classical "Greek" approach (anthyphairesis), which avoids division 
+            /// and modulus by repeatedly subtracting the smaller value from the larger.
+            ///
+            /// # Examples
+            ///
+            /// ```rust
+            /// # use crate::euclidean_subtraction;
+            /// assert_eq!(euclidean_subtraction(48u32, 18u32), 6);
+            /// assert_eq!(euclidean_subtraction(7u32, 13u32), 1);
+            /// ```
+            ///
+            /// # Implementation
+            ///
+            /// The algorithm proceeds until both numbers are equal:
+            /// 1. Handle identity cases where `a` or `b` is zero.
+            /// 2. While `a` and `b` are not equal, subtract the smaller from the larger.
+            /// 3. Return the remaining value once equality is reached.
+            ///
+            /// * Time Complexity: O(max(a, b)) in the worst case (e.g., gcd(n, 1)).
+            /// * Space Complexity: O(1) auxiliary space.
             pub(crate) const fn euclidean_subtraction(mut a: $t, mut b: $t) -> $t {
                 if a == 0 {
                     return b;
@@ -180,6 +272,28 @@ macro_rules! impl_unsigned_gcd {
                 a
             }
 
+            /// Computes the GCD using the recursive Euclidean Algorithm.
+            ///
+            /// This implementation reduces the problem size by taking the remainder of `a` 
+            /// divided by `b` in each recursive step until the base case of zero is reached.
+            ///
+            /// # Examples
+            ///
+            /// ```rust
+            /// # use crate::euclidean_recursive;
+            /// assert_eq!(euclidean_recursive(48u32, 18u32), 6);
+            /// assert_eq!(euclidean_recursive(101u32, 103u32), 1);
+            /// ```
+            ///
+            /// # Implementation
+            ///
+            /// The algorithm relies on the recurrence gcd(a, b) = gcd(b, a % b):
+            /// 1. Base case: If `b` is 0, then `a` is the GCD.
+            /// 2. Recursive step: Calculate the remainder of `a` / `b`.
+            /// 3. Tail call: Recurse with `b` as the new `a`, and the remainder as the new `b`.
+            ///
+            /// * Time Complexity: O(n^2) where n is the number of bits.
+            /// * Space Complexity: O(n) stack frames (logarithmic relative to the value).
             pub(crate) const fn euclidean_recursive(a: $t, b: $t) -> $t {
                 // Formatting adjusted slightly for macro evaluation
                 if b != 0 {
