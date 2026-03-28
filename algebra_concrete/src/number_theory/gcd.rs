@@ -15,6 +15,7 @@
 
 // TODO: ``lcm()``
 // TODO: trait achitecture
+// TODO: maybe gcd should return the same type as the input
 
 /// Strategies available for computing the Greatest Common Divisor.
 #[non_exhaustive]
