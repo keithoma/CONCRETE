@@ -14,10 +14,10 @@
 //! and CPU architecture (e.g., availability of the `ctz` instruction).
 
 // TODO: ``lcm()``
-// TODO: negative integer handeling
 // TODO: trait achitecture
 
 /// Strategies available for computing the Greatest Common Divisor.
+#[non_exhaustive]
 #[derive(Debug, Default, Copy, Clone, PartialEq, Eq)]
 pub enum GcdStrategy {
     /// Iterative Binary GCD (Stein's Algorithm). 
@@ -146,7 +146,7 @@ macro_rules! impl_unsigned_gcd {
             ///
             /// * Time Complexity: O(n^2) where n is the number of bits.
             /// * Space Complexity: O(1) auxiliary.
-            pub(crate) const fn stein_iterative(mut a: $t, mut b: $t) -> $t {
+            pub const fn stein_iterative(mut a: $t, mut b: $t) -> $t {
                 if a == 0 {
                     return b;
                 }
@@ -200,7 +200,7 @@ macro_rules! impl_unsigned_gcd {
             ///
             /// * Time Complexity: O(n^2) bit operations where n is the number of bits.
             /// * Space Complexity: O(n) stack frames due to recursion depth.
-            pub(crate) const fn stein_recursive(a: $t, b: $t) -> $t {
+            pub const fn stein_recursive(a: $t, b: $t) -> $t {
                 match (a, b) {
                     (0, y) => y,
                     (x, 0) => x,
@@ -247,7 +247,7 @@ macro_rules! impl_unsigned_gcd {
             ///
             /// * Time Complexity: O(n^2) where n is the number of bits.
             /// * Space Complexity: O(1) auxiliary space.
-            pub(crate) const fn euclidean_iterative(mut a: $t, mut b: $t) -> $t {
+            pub const fn euclidean_iterative(mut a: $t, mut b: $t) -> $t {
                 while b != 0 {
                     if let Some(rem) = a.checked_rem(b) {
                         a = b;
@@ -278,7 +278,7 @@ macro_rules! impl_unsigned_gcd {
             ///
             /// * Time Complexity: O(max(a, b)) in the worst case (e.g., gcd(n, 1)).
             /// * Space Complexity: O(1) auxiliary space.
-            pub(crate) const fn euclidean_subtraction(mut a: $t, mut b: $t) -> $t {
+            pub const fn euclidean_subtraction(mut a: $t, mut b: $t) -> $t {
                 if a == 0 {
                     return b;
                 }
@@ -319,7 +319,7 @@ macro_rules! impl_unsigned_gcd {
             ///
             /// * Time Complexity: O(n^2) where n is the number of bits.
             /// * Space Complexity: O(n) stack frames (logarithmic relative to the value).
-            pub(crate) const fn euclidean_recursive(a: $t, b: $t) -> $t {
+            pub const fn euclidean_recursive(a: $t, b: $t) -> $t {
                 // Formatting adjusted slightly for macro evaluation
                 if b != 0 {
                     if let Some(rem) = a.checked_rem(b) {
@@ -339,10 +339,12 @@ macro_rules! impl_signed_gcd {
             use super::GcdStrategy;
             use super::$unsigned_mod as unsigned;
 
+            /// gcd with strategy
             pub const fn gcd(a: $t_signed, b: $t_signed) -> $t_unsigned {
                 unsigned::gcd(a.unsigned_abs(), b.unsigned_abs())
             }
 
+            /// gcd with strategy
             pub const fn gcd_with_strategy(
                 a: $t_signed, 
                 b: $t_signed, 
@@ -350,30 +352,9 @@ macro_rules! impl_signed_gcd {
             ) -> $t_unsigned {
                 unsigned::gcd_with_strategy(a.unsigned_abs(), b.unsigned_abs(), strategy)
             }
-
-            pub(crate) const fn stein_iterative(a: $t_signed, b: $t_signed) -> $t_unsigned {
-                unsigned::stein_iterative(a.unsigned_abs(), b.unsigned_abs())
-            }
-
-            pub(crate) const fn stein_recursive(a: $t_signed, b: $t_signed) -> $t_unsigned {
-                unsigned::stein_recursive(a.unsigned_abs(), b.unsigned_abs())
-            }
-
-            pub(crate) const fn euclidean_iterative(a: $t_signed, b: $t_signed) -> $t_unsigned {
-                unsigned::euclidean_iterative(a.unsigned_abs(), b.unsigned_abs())
-            }
-
-            pub(crate) const fn euclidean_subtraction(a: $t_signed, b: $t_signed) -> $t_unsigned {
-                unsigned::euclidean_subtraction(a.unsigned_abs(), b.unsigned_abs())
-
-            }
-            pub(crate) const fn euclidean_recursive(a: $t_signed, b: $t_signed) -> $t_unsigned {
-                unsigned::euclidean_recursive(a.unsigned_abs(), b.unsigned_abs())
-            }
         }
     }
 }
-
 
 impl_unsigned_gcd!(u8, gcd_u8);
 impl_unsigned_gcd!(u16, gcd_u16);
