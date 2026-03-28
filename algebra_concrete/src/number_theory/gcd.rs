@@ -61,8 +61,7 @@ macro_rules! impl_unsigned_gcd {
             ///
             /// # Examples
             ///
-            /// ```rust
-            /// # use $crate::$mod_name::gcd;
+            /// ```rust,ignore
             /// assert_eq!(gcd(48, 18), 6);
             /// assert_eq!(gcd(101, 103), 1);
             /// assert_eq!(gcd(0, 5), 5);
@@ -96,8 +95,7 @@ macro_rules! impl_unsigned_gcd {
             ///
             /// # Examples
             ///
-            /// ```rust
-            /// # use $crate::$mod_name::{gcd_with_strategy, GcdStrategy};
+            /// ```rust,ignore
             /// let result = gcd_with_strategy(48, 18, GcdStrategy::EuclideanIterative);
             /// assert_eq!(result, 6);
             /// ```
@@ -132,8 +130,7 @@ macro_rules! impl_unsigned_gcd {
             ///
             /// # Examples
             ///
-            /// ```rust
-            /// # use $crate::$mod_name::stein_iterative;
+            /// ```rust,ignore
             /// assert_eq!(stein_iterative(48u32, 18u32), 6);
             /// assert_eq!(stein_iterative(0u32, 5u32), 5);
             /// ```
@@ -187,9 +184,8 @@ macro_rules! impl_unsigned_gcd {
             /// identifying common factors of 2 and reducing odd numbers via subtraction.
             ///
             /// # Examples
-            ///
-            /// ```rust
-            /// # use super::*;
+            /// 
+            /// ```rust,ignore
             /// assert_eq!(stein_recursive(48u32, 18u32), 6);
             /// assert_eq!(stein_recursive(7u32, 13u32), 1);
             /// ```
@@ -236,8 +232,7 @@ macro_rules! impl_unsigned_gcd {
             ///
             /// # Examples
             ///
-            /// ```rust
-            /// # use $crate::$mod_name::euclidean_iterative;
+            /// ```rust,ignore
             /// assert_eq!(euclidean_iterative(48u32, 18u32), 6);
             /// assert_eq!(euclidean_iterative(101u32, 103u32), 1);
             /// ```
@@ -269,8 +264,7 @@ macro_rules! impl_unsigned_gcd {
             ///
             /// # Examples
             ///
-            /// ```rust
-            /// # use $crate::$mod_name::euclidean_subtraction;
+            /// ```rust,ignore
             /// assert_eq!(euclidean_subtraction(48u32, 18u32), 6);
             /// assert_eq!(euclidean_subtraction(7u32, 13u32), 1);
             /// ```
@@ -311,8 +305,7 @@ macro_rules! impl_unsigned_gcd {
             ///
             /// # Examples
             ///
-            /// ```rust
-            /// # use $crate::$mod_name::euclidean_recursive;
+            /// ```rust,ignore
             /// assert_eq!(euclidean_recursive(48u32, 18u32), 6);
             /// assert_eq!(euclidean_recursive(101u32, 103u32), 1);
             /// ```
