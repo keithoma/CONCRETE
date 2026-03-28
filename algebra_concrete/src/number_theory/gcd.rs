@@ -62,7 +62,7 @@ macro_rules! impl_unsigned_gcd {
             /// # Examples
             ///
             /// ```rust
-            /// # use crate::$mod_name::gcd;
+            /// # use $crate::$mod_name::gcd;
             /// assert_eq!(gcd(48, 18), 6);
             /// assert_eq!(gcd(101, 103), 1);
             /// assert_eq!(gcd(0, 5), 5);
@@ -97,7 +97,7 @@ macro_rules! impl_unsigned_gcd {
             /// # Examples
             ///
             /// ```rust
-            /// # use crate::$mod_name::{gcd_with_strategy, GcdStrategy};
+            /// # use $crate::$mod_name::{gcd_with_strategy, GcdStrategy};
             /// let result = gcd_with_strategy(48, 18, GcdStrategy::EuclideanIterative);
             /// assert_eq!(result, 6);
             /// ```
@@ -133,7 +133,7 @@ macro_rules! impl_unsigned_gcd {
             /// # Examples
             ///
             /// ```rust
-            /// # use crate::$mod_name::stein_iterative;
+            /// # use $crate::$mod_name::stein_iterative;
             /// assert_eq!(stein_iterative(48u32, 18u32), 6);
             /// assert_eq!(stein_iterative(0u32, 5u32), 5);
             /// ```
@@ -189,7 +189,7 @@ macro_rules! impl_unsigned_gcd {
             /// # Examples
             ///
             /// ```rust
-            /// # use crate::$mod_name::stein_recursive;
+            /// # use super::*;
             /// assert_eq!(stein_recursive(48u32, 18u32), 6);
             /// assert_eq!(stein_recursive(7u32, 13u32), 1);
             /// ```
@@ -208,7 +208,7 @@ macro_rules! impl_unsigned_gcd {
                 match (a, b) {
                     (0, y) => y,
                     (x, 0) => x,
-                    (x, y) => match (x & (1 as $t) == 0, y & (1 as $t) == 0) {
+                    (x, y) => match x & 1 == 0, y & 1 == 0 {
                         (true, true) => stein_recursive(x >> 1, y >> 1) << 1,
                         (true, false) => stein_recursive(x >> 1, y),
                         (false, true) => stein_recursive(x, y >> 1),
@@ -237,7 +237,7 @@ macro_rules! impl_unsigned_gcd {
             /// # Examples
             ///
             /// ```rust
-            /// # use crate::$mod_name::euclidean_iterative;
+            /// # use $crate::$mod_name::euclidean_iterative;
             /// assert_eq!(euclidean_iterative(48u32, 18u32), 6);
             /// assert_eq!(euclidean_iterative(101u32, 103u32), 1);
             /// ```
@@ -270,7 +270,7 @@ macro_rules! impl_unsigned_gcd {
             /// # Examples
             ///
             /// ```rust
-            /// # use crate::$mod_name::euclidean_subtraction;
+            /// # use $crate::$mod_name::euclidean_subtraction;
             /// assert_eq!(euclidean_subtraction(48u32, 18u32), 6);
             /// assert_eq!(euclidean_subtraction(7u32, 13u32), 1);
             /// ```
@@ -312,7 +312,7 @@ macro_rules! impl_unsigned_gcd {
             /// # Examples
             ///
             /// ```rust
-            /// # use crate::$mod_name::euclidean_recursive;
+            /// # use $crate::$mod_name::euclidean_recursive;
             /// assert_eq!(euclidean_recursive(48u32, 18u32), 6);
             /// assert_eq!(euclidean_recursive(101u32, 103u32), 1);
             /// ```
