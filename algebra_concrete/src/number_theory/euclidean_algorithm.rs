@@ -1,13 +1,32 @@
 
-fn steins_algorithm(mut a: u64, mut b: u64) -> u64 {
-    if b == 0 {
-        a
-    } else if a % 2 == 0 && b % 2 == 0 {
-        steins_algorithm(a / 2, b / 2)
-    } else if a % 2 != 0 && b % 2 == 0 {
-        steins_algorithm(a, b / 2)
-    } else {
-        steins_algorithm(a, b)
+const fn stein_recursive(a: u64, b: u64) -> u64 {
+    match (a, b) {
+        (0, 0) => 0,
+        (0, y) => y,
+        (x, 0) => x,
+        (x, y) => {
+            let x_even = x & 1 == 0;
+            let y_even = y & 1 == 0;
+
+            match (x_even, y_even) {
+                (true, true) => stein_recursive(x >> 1, y >> 1) << 1,
+                (true, false) => stein_recursive(x >> 1, y),
+                (false, true) => stein_recursive(x, y >> 1),
+                (false, false) => {
+                    if x >= y {
+                        match x.checked_sub(y) {
+                            Some(diff) => stein_recursive(diff >> 1, y),
+                            None => x,
+                        }
+                    } else {
+                        match b.checked_sub(x) {
+                            Some(diff) => stein_recursive(diff >> 1, x),
+                            None => y,
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 
