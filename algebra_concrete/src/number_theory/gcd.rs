@@ -20,7 +20,6 @@ macro_rules! impl_unsigned_gcd {
         pub mod $mod_name {
 
             use super::GcdStrategy;
-            use super::GcdStrategy::*;
 
             /// Returns the greatest common divisor (GCD) of two numbers.
             ///
@@ -31,6 +30,7 @@ macro_rules! impl_unsigned_gcd {
             /// # Examples
             ///
             /// ```rust
+            /// # use gcd::gcd;
             /// assert_eq!(gcd(48, 18), 6);
             /// assert_eq!(gcd(101, 103), 1);
             /// assert_eq!(gcd(0, 5), 5);
@@ -55,7 +55,8 @@ macro_rules! impl_unsigned_gcd {
                 stein_iterative(a, b)
             }
 
-            /// Returns the greatest common divisor (GCD) of two numbers using a specific [`GcdStrategy`].
+            /// Returns the greatest common divisor (GCD) of two numbers using a specific 
+            /// [`GcdStrategy`].
             ///
             /// This function provides the same mathematical result as [`gcd`], but allows
             /// manual selection of the underlying algorithm. This is useful for benchmarking
@@ -64,18 +65,24 @@ macro_rules! impl_unsigned_gcd {
             /// # Examples
             ///
             /// ```rust
-            /// # use your_crate::{gcd_with_strategy, GcdStrategy};
+            /// # use gcd::{gcd_with_strategy, GcdStrategy};
             /// let result = gcd_with_strategy(48, 18, GcdStrategy::EuclideanIterative);
             /// assert_eq!(result, 6);
             /// ```
             ///
             /// # Strategies
             ///
-            /// * [`GcdStrategy::SteinIterative`]: The default binary GCD algorithm.
-            /// * [`GcdStrategy::EuclideanIterative`]: Standard modulus-based approach.
-            /// * [`GcdStrategy::EuclideanSubtraction`]: The original "Greek" approach (slower for large numbers).
+            /// * [`GcdStrategy::SteinIterative`]: Binary GCD. Efficient; uses shifts and `ctz`.
+            /// * [`GcdStrategy::SteinRecursive`]: Binary GCD using recursion.
+            /// * [`GcdStrategy::EuclideanIterative`]: Standard modulus-based algorithm using a 
+            ///   loop.
+            /// * [`GcdStrategy::EuclideanRecursive`]: Standard modulus-based algorithm using 
+            ///   recursion.
+            /// * [`GcdStrategy::EuclideanSubtraction`]: The original Greek approach using repeated 
+            ///   subtraction. Slower, but demonstrates the fundamental logic of the ideal.
             ///
-            /// For detailed mathematical properties and complexity analysis, see the [`gcd`] function.
+            /// For detailed mathematical properties and complexity analysis, see the [`gcd`] 
+            /// function.
             pub const fn gcd_with_strategy(a: $t, b: $t, strategy: GcdStrategy) -> $t {
                 match strategy {
                     GcdStrategy::SteinIterative => stein_iterative(a, b),
