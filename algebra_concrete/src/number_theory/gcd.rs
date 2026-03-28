@@ -335,51 +335,6 @@ macro_rules! impl_unsigned_gcd {
                 }
                 a
             }
-
-            #[cfg(test)]
-            mod tests {
-                extern crate std; // needed for println!() and I don't like it
-
-                use super::*;
-
-                const MAX: $t = <$t>::MAX;
-                const CASES: [($t, $t, $t); 6] = [
-                    (0, 0, 0),
-                    (0, MAX, MAX),
-                    (MAX, 0, MAX),
-                    (MAX, MAX, MAX),
-                    (48, 18, 6),
-                    (17, 7, 1),
-                ];
-
-                type FuncDef = fn($t, $t) -> $t;
-                const FUNCTIONS: &[(&str, FuncDef)] = &[
-                    ("iterative Stein's algorithm", stein_iterative),
-                    ("recursive Stein's algorithm", stein_recursive),
-                    ("Iterative", euclidean_iterative),
-                    ("Subtraction", euclidean_subtraction),
-                    ("Recursive", euclidean_recursive),
-                ];
-
-                #[test]
-                fn test_all() {
-                    for (a, b, expected) in CASES {
-                        assert_eq!(
-                            gcd_with_strategy(a, b, GcdStrategy::EuclideanRecursive), expected
-                        );
-                        for (name, func) in FUNCTIONS {
-                            // std::println!(
-                            //     "Testing {name} implementation for the inputs {a} and {b}."
-                            // );
-                            let result = func(a, b);
-                            assert_eq!(
-                                result, expected,
-                                "{name} failed for gcd({a}, {b}). Expected {expected}, got {result}"
-                            );
-                        }
-                    }
-                }
-            }
         }
     };
 }
@@ -422,54 +377,6 @@ macro_rules! impl_signed_gcd {
             pub(crate) const fn euclidean_recursive(a: $t_signed, b: $t_signed) -> $t_unsigned {
                 unsigned::euclidean_recursive(a.unsigned_abs(), b.unsigned_abs())
             }
-
-            #[cfg(test)]
-            mod tests {
-                extern crate std; // needed for println!() and I don't like it
-
-                use super::*;
-
-                const MAX: $t_signed = <$t_signed>::MAX;
-                const MAX_UNSINGED: $t_unsigned = <$t_unsigned>::MAX;
-                const CASES: [($t_signed, $t_signed, $t_unsigned); 6] = [
-                    (-1, 0, 1),
-                    (0, -MAX, MAX_UNSINGED),
-                    (-MAX, 0, MAX_UNSINGED),
-                    (-MAX, -MAX, MAX_UNSINGED),
-                    (48, -18, 6),
-                    (-17, -7, 1),
-                ];
-
-                type FuncDef = fn($t_signed, $t_signed) -> $t_unsigned;
-                const FUNCTIONS: &[(&str, FuncDef)] = &[
-                    ("gcd", gcd),
-                    ("iterative Stein's algorithm", stein_iterative),
-                    ("recursive Stein's algorithm", stein_recursive),
-                    ("iterative Euclidean algorithm", euclidean_iterative),
-                    ("Euclidean algorithm with subtraction", euclidean_subtraction),
-                    ("recursive Euclidean algorithm", euclidean_recursive),
-                ];
-
-                #[test]
-                fn test_all() {
-                    for (a, b, expected) in CASES {
-                        assert_eq!(
-                            gcd_with_strategy(a, b, GcdStrategy::EuclideanRecursive), expected
-                        );
-
-                        for (name, func) in FUNCTIONS {
-                            // std::println!(
-                            //     "Testing {name} implementation for the inputs {a} and {b}."
-                            // );
-                            let result = func(a, b);
-                            assert_eq!(
-                                result, expected,
-                                "{name} failed for gcd({a}, {b}). Expected {expected}, got {result}"
-                            );
-                        }
-                    }
-                }
-            }
         }
     }
 }
@@ -487,3 +394,6 @@ impl_signed_gcd!(i16, u16, gcd_i16, gcd_u16);
 impl_signed_gcd!(i32, u32, gcd_i32, gcd_u32);
 impl_signed_gcd!(i64, u64, gcd_i64, gcd_u64);
 impl_signed_gcd!(i128, u128, gcd_i128, gcd_u128);
+
+#[cfg(test)]
+mod test;
