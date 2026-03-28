@@ -432,12 +432,12 @@ macro_rules! impl_signed_gcd {
                 const MAX: $t_signed = <$t_signed>::MAX;
                 const MAX_UNSINGED: $t_unsigned = <$t_unsigned>::MAX;
                 const CASES: [($t_signed, $t_signed, $t_unsigned); 6] = [
-                    (0, 0, 0),
-                    (0, MAX, MAX_UNSINGED),
-                    (MAX, 0, MAX_UNSINGED),
-                    (MAX, MAX, MAX_UNSINGED),
-                    (48, 18, 6),
-                    (17, 7, 1),
+                    (-1, 0, 1),
+                    (0, -MAX, MAX_UNSINGED),
+                    (-MAX, 0, MAX_UNSINGED),
+                    (-MAX, -MAX, MAX_UNSINGED),
+                    (48, -18, 6),
+                    (-17, -7, 1),
                 ];
 
                 type FuncDef = fn($t_signed, $t_signed) -> $t_unsigned;
