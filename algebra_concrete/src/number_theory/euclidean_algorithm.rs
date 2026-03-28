@@ -122,7 +122,8 @@ mod tests {
 
     type FuncDef = fn(u64, u64) -> u64;
     const FUNCTIONS: &[(&str, FuncDef)] = &[
-        ("Stein's Algorithm recursive", stein_recursive),
+        ("iterative Stein's algorithm", stein_iterative),
+        ("recursive Stein's algorithm", stein_recursive),
         ("Iterative", euclidean_algorithm_iterative),
         ("Subtraction", euclidean_algorithm_subtraction),
         ("Recursive", euclidean_algorithm_recursive),
