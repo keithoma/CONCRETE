@@ -55,6 +55,29 @@ pub fn gcd<T: Natural + BitwiseOps>(a: T, b: T, strategy: GcdStrategy) -> T {
     }
 }
 
+/// Computes the GCD using the iterative Stein's Algorithm (Binary GCD).
+///
+/// This implementation is specialized for unsigned integers, avoiding division by
+/// using arithmetic shifts and subtractions.
+///
+/// # Examples
+///
+/// ```rust,ignore
+/// assert_eq!(stein_iterative(48u32, 18u32), 6);
+/// assert_eq!(stein_iterative(0u32, 5u32), 5);
+/// ```
+///
+/// # Implementation
+///
+/// The algorithm follows these logical steps:
+/// 1. Handle identity cases where `a` or `b` is zero.
+/// 2. Find the common power of 2 by comparing trailing zeros.
+/// 3. Shift out all powers of 2 to make both numbers odd.
+/// 4. Iteratively subtract the smaller from the larger and shift until `b` is 0.
+/// 5. Re-apply the common power of 2 to the result.
+///
+/// * Time Complexity: O(n^2) where n is the number of bits.
+/// * Space Complexity: O(1) auxiliary.
 const fn stein_iterative<T: Natural + BitwiseOps>(mut a: T, mut b: T) -> T {
     if a == T::ZERO {
         return b;
@@ -88,6 +111,28 @@ const fn stein_iterative<T: Natural + BitwiseOps>(mut a: T, mut b: T) -> T {
     a << common_zeros
 }
 
+/// Computes the GCD using the recursive Stein's Algorithm (Binary GCD).
+///
+/// This implementation follows the binary GCD logic through structural recursion,
+/// identifying common factors of 2 and reducing odd numbers via subtraction.
+///
+/// # Examples
+///
+/// ```rust,ignore
+/// assert_eq!(stein_recursive(48u32, 18u32), 6);
+/// assert_eq!(stein_recursive(7u32, 13u32), 1);
+/// ```
+///
+/// # Implementation
+///
+/// The algorithm uses a match-based state machine to handle bitwise reduction:
+/// 1. Base cases: If either `a` or `b` is 0, the other is the GCD.
+/// 2. Both even: `gcd(a/2, b/2) * 2`.
+/// 3. One even, one odd: `gcd(even/2, odd)`.
+/// 4. Both odd: `gcd(|a-b|/2, min(a,b))`.
+///
+/// * Time Complexity: O(n^2) bit operations where n is the number of bits.
+/// * Space Complexity: O(n) stack frames due to recursion depth.
 const fn stein_recursive<T: Natural + BitwiseOps>(a: T, b: T) -> T {
     if a == T::ZERO {
         return b;
@@ -110,6 +155,28 @@ const fn stein_recursive<T: Natural + BitwiseOps>(a: T, b: T) -> T {
     }
 }
 
+/// Computes the GCD using the iterative Euclidean Algorithm.
+///
+/// This implementation uses the modulo operator to reduce the numbers until the
+/// remainder is zero.
+///
+/// # Examples
+///
+/// ```rust,ignore
+/// assert_eq!(euclidean_iterative(48u32, 18u32), 6);
+/// assert_eq!(euclidean_iterative(101u32, 103u32), 1);
+/// ```
+///
+/// # Implementation
+///
+/// The algorithm repeatedly applies the property gcd(a, b) = gcd(b, a % b):
+/// 1. Loop while the divisor `b` is not zero.
+/// 2. Compute the remainder of `a` divided by `b`.
+/// 3. Update `a` with the previous divisor and `b` with the remainder.
+/// 4. Return `a` once `b` reaches zero.
+///
+/// * Time Complexity: O(n^2) where n is the number of bits.
+/// * Space Complexity: O(1) auxiliary space.
 const fn euclidean_iterative<T: Natural>(mut a: T, mut b: T) -> T {
     while b != T::ZERO {
         (a, b) = (b, a & b);
@@ -117,6 +184,27 @@ const fn euclidean_iterative<T: Natural>(mut a: T, mut b: T) -> T {
     a
 }
 
+/// Computes the GCD using the Euclidean Algorithm via repeated subtraction.
+///
+/// This is the classical "Greek" approach (anthyphairesis), which avoids division
+/// and modulus by repeatedly subtracting the smaller value from the larger.
+///
+/// # Examples
+///
+/// ```rust,ignore
+/// assert_eq!(euclidean_subtraction(48u32, 18u32), 6);
+/// assert_eq!(euclidean_subtraction(7u32, 13u32), 1);
+/// ```
+///
+/// # Implementation
+///
+/// The algorithm proceeds until both numbers are equal:
+/// 1. Handle identity cases where `a` or `b` is zero.
+/// 2. While `a` and `b` are not equal, subtract the smaller from the larger.
+/// 3. Return the remaining value once equality is reached.
+///
+/// * Time Complexity: O(max(a, b)) in the worst case (e.g., gcd(n, 1)).
+/// * Space Complexity: O(1) auxiliary space.
 const fn euclidean_subtraction<T: Natural>(mut a: T, mut b: T) -> T {
     if a == T::ZERO {
         return b;
@@ -136,6 +224,27 @@ const fn euclidean_subtraction<T: Natural>(mut a: T, mut b: T) -> T {
     a
 }
 
+/// Computes the GCD using the recursive Euclidean Algorithm.
+///
+/// This implementation reduces the problem size by taking the remainder of `a`
+/// divided by `b` in each recursive step until the base case of zero is reached.
+///
+/// # Examples
+///
+/// ```rust,ignore
+/// assert_eq!(euclidean_recursive(48u32, 18u32), 6);
+/// assert_eq!(euclidean_recursive(101u32, 103u32), 1);
+/// ```
+///
+/// # Implementation
+///
+/// The algorithm relies on the recurrence gcd(a, b) = gcd(b, a % b):
+/// 1. Base case: If `b` is 0, then `a` is the GCD.
+/// 2. Recursive step: Calculate the remainder of `a` / `b`.
+/// 3. Tail call: Recurse with `b` as the new `a`, and the remainder as the new `b`.
+///
+/// * Time Complexity: O(n^2) where n is the number of bits.
+/// * Space Complexity: O(n) stack frames (logarithmic relative to the value).
 const fn euclidean_recursive<T: Natural>(mut a: T, mut b: T) -> T {
     if b != T::ZERO {
         euclidean_recursive(b, a % b)
@@ -176,29 +285,6 @@ const fn euclidean_recursive<T: Natural>(mut a: T, mut b: T) -> T {
 
 
 
-
-
-
-
-
-
-
-//! Arithmetic utility for computing the Greatest Common Divisor (GCD).
-//!
-//! This module provides multiple implementations of the GCD algorithm, ranging from classical
-//! Euclidean methods to hardware-optimized binary (Stein's) algorithms.
-//!
-//! # Main Entry Point
-//!
-//! For most use cases, the [`gcd`] function is the recommended entry point as it defaults
-//! to the most efficient strategy for the underlying integer type.
-//!
-//! # Performance Note
-//!
-//! Different strategies have different performance characteristics based on the input size
-//! and CPU architecture (e.g., availability of the `ctz` instruction).
-
-// TODO: ``lcm()``
 
 
 
@@ -283,123 +369,19 @@ macro_rules! impl_unsigned_gcd {
                 }
             }
 
-            /// Computes the GCD using the iterative Stein's Algorithm (Binary GCD).
-            ///
-            /// This implementation is specialized for unsigned integers, avoiding division by
-            /// using arithmetic shifts and subtractions.
-            ///
-            /// # Examples
-            ///
-            /// ```rust,ignore
-            /// assert_eq!(stein_iterative(48u32, 18u32), 6);
-            /// assert_eq!(stein_iterative(0u32, 5u32), 5);
-            /// ```
-            ///
-            /// # Implementation
-            ///
-            /// The algorithm follows these logical steps:
-            /// 1. Handle identity cases where `a` or `b` is zero.
-            /// 2. Find the common power of 2 by comparing trailing zeros.
-            /// 3. Shift out all powers of 2 to make both numbers odd.
-            /// 4. Iteratively subtract the smaller from the larger and shift until `b` is 0.
-            /// 5. Re-apply the common power of 2 to the result.
-            ///
-            /// * Time Complexity: O(n^2) where n is the number of bits.
-            /// * Space Complexity: O(1) auxiliary.
 
 
-            /// Computes the GCD using the recursive Stein's Algorithm (Binary GCD).
-            ///
-            /// This implementation follows the binary GCD logic through structural recursion,
-            /// identifying common factors of 2 and reducing odd numbers via subtraction.
-            ///
-            /// # Examples
-            ///
-            /// ```rust,ignore
-            /// assert_eq!(stein_recursive(48u32, 18u32), 6);
-            /// assert_eq!(stein_recursive(7u32, 13u32), 1);
-            /// ```
-            ///
-            /// # Implementation
-            ///
-            /// The algorithm uses a match-based state machine to handle bitwise reduction:
-            /// 1. Base cases: If either `a` or `b` is 0, the other is the GCD.
-            /// 2. Both even: `gcd(a/2, b/2) * 2`.
-            /// 3. One even, one odd: `gcd(even/2, odd)`.
-            /// 4. Both odd: `gcd(|a-b|/2, min(a,b))`.
-            ///
-            /// * Time Complexity: O(n^2) bit operations where n is the number of bits.
-            /// * Space Complexity: O(n) stack frames due to recursion depth.
 
 
-            /// Computes the GCD using the iterative Euclidean Algorithm.
-            ///
-            /// This implementation uses the modulo operator to reduce the numbers until the
-            /// remainder is zero.
-            ///
-            /// # Examples
-            ///
-            /// ```rust,ignore
-            /// assert_eq!(euclidean_iterative(48u32, 18u32), 6);
-            /// assert_eq!(euclidean_iterative(101u32, 103u32), 1);
-            /// ```
-            ///
-            /// # Implementation
-            ///
-            /// The algorithm repeatedly applies the property gcd(a, b) = gcd(b, a % b):
-            /// 1. Loop while the divisor `b` is not zero.
-            /// 2. Compute the remainder of `a` divided by `b`.
-            /// 3. Update `a` with the previous divisor and `b` with the remainder.
-            /// 4. Return `a` once `b` reaches zero.
-            ///
-            /// * Time Complexity: O(n^2) where n is the number of bits.
-            /// * Space Complexity: O(1) auxiliary space.
 
 
-            /// Computes the GCD using the Euclidean Algorithm via repeated subtraction.
-            ///
-            /// This is the classical "Greek" approach (anthyphairesis), which avoids division
-            /// and modulus by repeatedly subtracting the smaller value from the larger.
-            ///
-            /// # Examples
-            ///
-            /// ```rust,ignore
-            /// assert_eq!(euclidean_subtraction(48u32, 18u32), 6);
-            /// assert_eq!(euclidean_subtraction(7u32, 13u32), 1);
-            /// ```
-            ///
-            /// # Implementation
-            ///
-            /// The algorithm proceeds until both numbers are equal:
-            /// 1. Handle identity cases where `a` or `b` is zero.
-            /// 2. While `a` and `b` are not equal, subtract the smaller from the larger.
-            /// 3. Return the remaining value once equality is reached.
-            ///
-            /// * Time Complexity: O(max(a, b)) in the worst case (e.g., gcd(n, 1)).
-            /// * Space Complexity: O(1) auxiliary space.
 
 
-            /// Computes the GCD using the recursive Euclidean Algorithm.
-            ///
-            /// This implementation reduces the problem size by taking the remainder of `a`
-            /// divided by `b` in each recursive step until the base case of zero is reached.
-            ///
-            /// # Examples
-            ///
-            /// ```rust,ignore
-            /// assert_eq!(euclidean_recursive(48u32, 18u32), 6);
-            /// assert_eq!(euclidean_recursive(101u32, 103u32), 1);
-            /// ```
-            ///
-            /// # Implementation
-            ///
-            /// The algorithm relies on the recurrence gcd(a, b) = gcd(b, a % b):
-            /// 1. Base case: If `b` is 0, then `a` is the GCD.
-            /// 2. Recursive step: Calculate the remainder of `a` / `b`.
-            /// 3. Tail call: Recurse with `b` as the new `a`, and the remainder as the new `b`.
-            ///
-            /// * Time Complexity: O(n^2) where n is the number of bits.
-            /// * Space Complexity: O(n) stack frames (logarithmic relative to the value).
+
+
+
+
+
 
         }
     };
