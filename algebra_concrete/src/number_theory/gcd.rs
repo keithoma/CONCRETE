@@ -14,8 +14,10 @@
 //! and CPU architecture (e.g., availability of the `ctz` instruction).
 
 // TODO: ``lcm()``
-// TODO: trait achitecture
-// TODO: maybe gcd should return the same type as the input
+
+use core::str;
+
+use crate::{number_theory::gcd::gcd_u128::{euclidean_iterative, euclidean_recursive, euclidean_subtraction, stein_iterative, stein_recursive}, structures::integer::{BitwiseOps, Natural}};
 
 /// Strategies available for computing the Greatest Common Divisor.
 #[non_exhaustive]
@@ -23,8 +25,7 @@
 pub enum GcdStrategy {
     /// Iterative Binary GCD (Stein's Algorithm).
     /// Optimized for modern CPUs using shifts and count-trailing-zeros.
-    #[default]
-    SteinIterative,
+    #[default] SteinIterative,
 
     /// Recursive Binary GCD (Stein's Algorithm).
     /// Uses structural recursion; primarily for educational or verification use.
@@ -42,6 +43,164 @@ pub enum GcdStrategy {
     /// The original "Greek" method; significantly slower for numbers with large differences.
     EuclideanSubtraction,
 }
+
+/// The universal entry point.
+pub fn gcd<T: Natural + BitwiseOps>(a: T, b: T, strategy: GcdStrategy) -> T {
+    match strategy {
+        GcdStrategy::SteinIterative => stein_iterative(a, b),
+        GcdStrategy::SteinRecursive => stein_recursive(a, b),
+        GcdStrategy::EuclideanIterative => euclidean_iterative(a, b),
+        GcdStrategy::EuclideanSubtraction => euclidean_subtraction(a, b),
+        GcdStrategy::EuclideanRecursive => euclidean_recursive(a, b),
+    }
+}
+
+const fn stein_iterative<T: Natural + BitwiseOps>(mut a: T, mut b: T) -> T {
+    if a == T::ZERO {
+        return b;
+    }
+    if b == T::ZERO {
+        return a;
+    }
+
+    let a_zeros = a.trailing_zeros();
+    a >>= a_zeros;
+
+    let b_zeros = b.trailing_zeros();
+    b >>= b_zeros;
+
+    let common_zeros = if a_zeros < b_zeros { a_zeros } else { b_zeros };
+
+    loop {
+        if a > b {
+            (a, b) = (b, a);
+        }
+
+        b -= a;
+
+        if b == T::ZERO {
+            break;
+        }
+
+        b >>= b.trailing_zeros();
+    }
+
+    a << common_zeros
+}
+
+const fn stein_recursive<T: Natural + BitwiseOps>(a: T, b: T) -> T {
+    if a == T::ZERO {
+        return b;
+    }
+    if b == T::ZERO {
+        return a;
+    }
+
+    match (x & 1 == T::ZERO, y & 1 == T::ZERO) {
+        (true, true) => stein_recursive(x >> 1, y >> 1) << 1,
+        (true, false) => stein_recursive(x >> 1, y),
+        (false, true) => stein_recursive(x, y >> 1),
+        (false, false) => {
+            if x <= y {
+                stein_recursive((y - x) >> 1, x)
+            } else {
+                stein_recursive((x - y) >> 1, y)
+            }
+        },
+    }
+}
+
+const fn euclidean_iterative<T: Natural>(mut a: T, mut b: T) -> T {
+    while b != T::ZERO {
+        (a, b) = (b, a & b);
+    }
+    a
+}
+
+const fn euclidean_subtraction<T: Natural>(mut a: T, mut b: T) -> T {
+    if a == T::ZERO {
+        return b;
+    }
+    if b == T::ZERO {
+        return a;
+    }
+
+    while a != b {
+        if a > b {
+            a -= b
+        } else {
+            b -= a
+        }
+    }
+
+    a
+}
+
+const fn euclidean_recursive<T: Natural>(mut a: T, mut b: T) -> T {
+    if b != T::ZERO {
+        euclidean_recursive(b, a % b)
+    } else {
+        a
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//! Arithmetic utility for computing the Greatest Common Divisor (GCD).
+//!
+//! This module provides multiple implementations of the GCD algorithm, ranging from classical
+//! Euclidean methods to hardware-optimized binary (Stein's) algorithms.
+//!
+//! # Main Entry Point
+//!
+//! For most use cases, the [`gcd`] function is the recommended entry point as it defaults
+//! to the most efficient strategy for the underlying integer type.
+//!
+//! # Performance Note
+//!
+//! Different strategies have different performance characteristics based on the input size
+//! and CPU architecture (e.g., availability of the `ctz` instruction).
+
+// TODO: ``lcm()``
+
+
 
 /// Internal macro to implement GCD functions for unsigned integer primitives.
 ///
@@ -147,37 +306,7 @@ macro_rules! impl_unsigned_gcd {
             ///
             /// * Time Complexity: O(n^2) where n is the number of bits.
             /// * Space Complexity: O(1) auxiliary.
-            pub const fn stein_iterative(mut a: $t, mut b: $t) -> $t {
-                if a == 0 {
-                    return b;
-                }
-                if b == 0 {
-                    return a;
-                }
 
-                let a_zeros = a.trailing_zeros();
-                a >>= a_zeros;
-
-                let b_zeros = b.trailing_zeros();
-                b >>= b_zeros;
-
-                let common_zeros = if a_zeros < b_zeros { a_zeros } else { b_zeros };
-
-                loop {
-                    if a > b {
-                        (a, b) = (b, a);
-                    }
-                    if let Some(diff) = b.checked_sub(a) {
-                        b = diff;
-                    }
-                    if b == 0 {
-                        break;
-                    }
-                    b >>= b.trailing_zeros();
-                }
-
-                a << common_zeros
-            }
 
             /// Computes the GCD using the recursive Stein's Algorithm (Binary GCD).
             ///
@@ -201,30 +330,7 @@ macro_rules! impl_unsigned_gcd {
             ///
             /// * Time Complexity: O(n^2) bit operations where n is the number of bits.
             /// * Space Complexity: O(n) stack frames due to recursion depth.
-            pub const fn stein_recursive(a: $t, b: $t) -> $t {
-                match (a, b) {
-                    (0, y) => y,
-                    (x, 0) => x,
-                    (x, y) => match (x & 1 == 0, y & 1 == 0) {
-                        (true, true) => stein_recursive(x >> 1, y >> 1) << 1,
-                        (true, false) => stein_recursive(x >> 1, y),
-                        (false, true) => stein_recursive(x, y >> 1),
-                        (false, false) => {
-                            if x >= y {
-                                match x.checked_sub(y) {
-                                    Some(diff) => stein_recursive(diff >> 1, y),
-                                    None => x,
-                                }
-                            } else {
-                                match y.checked_sub(x) {
-                                    Some(diff) => stein_recursive(diff >> 1, x),
-                                    None => y,
-                                }
-                            }
-                        }
-                    },
-                }
-            }
+
 
             /// Computes the GCD using the iterative Euclidean Algorithm.
             ///
@@ -248,15 +354,7 @@ macro_rules! impl_unsigned_gcd {
             ///
             /// * Time Complexity: O(n^2) where n is the number of bits.
             /// * Space Complexity: O(1) auxiliary space.
-            pub const fn euclidean_iterative(mut a: $t, mut b: $t) -> $t {
-                while b != 0 {
-                    if let Some(rem) = a.checked_rem(b) {
-                        a = b;
-                        b = rem;
-                    }
-                }
-                a
-            }
+
 
             /// Computes the GCD using the Euclidean Algorithm via repeated subtraction.
             ///
@@ -279,25 +377,7 @@ macro_rules! impl_unsigned_gcd {
             ///
             /// * Time Complexity: O(max(a, b)) in the worst case (e.g., gcd(n, 1)).
             /// * Space Complexity: O(1) auxiliary space.
-            pub const fn euclidean_subtraction(mut a: $t, mut b: $t) -> $t {
-                if a == 0 {
-                    return b;
-                }
-                if b == 0 {
-                    return a;
-                }
 
-                while a != b {
-                    if let Some(diff) = a.checked_sub(b) {
-                        a = diff;
-                    } else if let Some(diff) = b.checked_sub(a) {
-                        b = diff;
-                    } else {
-                        break;
-                    }
-                }
-                a
-            }
 
             /// Computes the GCD using the recursive Euclidean Algorithm.
             ///
@@ -320,15 +400,7 @@ macro_rules! impl_unsigned_gcd {
             ///
             /// * Time Complexity: O(n^2) where n is the number of bits.
             /// * Space Complexity: O(n) stack frames (logarithmic relative to the value).
-            pub const fn euclidean_recursive(a: $t, b: $t) -> $t {
-                // Formatting adjusted slightly for macro evaluation
-                if b != 0 {
-                    if let Some(rem) = a.checked_rem(b) {
-                        return euclidean_recursive(b, rem);
-                    }
-                }
-                a
-            }
+
         }
     };
 }

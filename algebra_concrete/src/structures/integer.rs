@@ -53,7 +53,10 @@ macro_rules! impl_traits {
         }
 
         impl BitwiseOps for $t {
-
+            #[inline]
+            fn trailing_zeros(mut self) -> u32 {
+                self.trailing_zeros()
+            }
         }
 
 

@@ -20,3 +20,5 @@ pub mod number_theory;
 /// operations—such as addition or multiplication—that follow specific logical
 /// rules known as axioms.
 pub mod structures;
+
+pub use structures::integer::{Natural, Signed, BitwiseOps, RationalOps};
