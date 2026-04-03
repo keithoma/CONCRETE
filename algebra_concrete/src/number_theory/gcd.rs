@@ -142,15 +142,15 @@ const fn stein_recursive<T: Natural + BitwiseOps>(a: T, b: T) -> T {
         return a;
     }
 
-    match (x & 1 == T::ZERO, y & 1 == T::ZERO) {
-        (true, true) => stein_recursive(x >> 1, y >> 1) << 1,
-        (true, false) => stein_recursive(x >> 1, y),
-        (false, true) => stein_recursive(x, y >> 1),
+    match (a & T::ONE == T::ZERO, b & T::ONE == T::ZERO) {
+        (true, true) => stein_recursive(a >> 1, b >> 1) << 1,
+        (true, false) => stein_recursive(a >> 1, b),
+        (false, true) => stein_recursive(a, b >> 1),
         (false, false) => {
-            if x <= y {
-                stein_recursive((y - x) >> 1, x)
+            if a <= b {
+                stein_recursive((b - a) >> 1, a)
             } else {
-                stein_recursive((x - y) >> 1, y)
+                stein_recursive((a - b) >> 1, b)
             }
         },
     }
