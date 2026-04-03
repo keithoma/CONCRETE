@@ -13,11 +13,12 @@
 //! Different strategies have different performance characteristics based on the input size
 //! and CPU architecture (e.g., availability of the `ctz` instruction).
 
+// ISSUES: in stable Rust, we cannot call trait methods isnide a const fn
+
 // TODO: ``lcm()``
+// TODO: add a wrapper functions for gcd so that it works for unsigned ints
 
-use core::str;
-
-use crate::{number_theory::gcd::gcd_u128::{euclidean_iterative, euclidean_recursive, euclidean_subtraction, stein_iterative, stein_recursive}, structures::integer::{BitwiseOps, Natural}};
+use crate::structures::integer::{BitwiseOps, Natural};
 
 /// Strategies available for computing the Greatest Common Divisor.
 #[non_exhaustive]
@@ -179,7 +180,7 @@ const fn stein_recursive<T: Natural + BitwiseOps>(a: T, b: T) -> T {
 /// * Space Complexity: O(1) auxiliary space.
 const fn euclidean_iterative<T: Natural>(mut a: T, mut b: T) -> T {
     while b != T::ZERO {
-        (a, b) = (b, a & b);
+        (a, b) = (b, a % b);
     }
     a
 }
@@ -252,176 +253,6 @@ const fn euclidean_recursive<T: Natural>(mut a: T, mut b: T) -> T {
         a
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/// Internal macro to implement GCD functions for unsigned integer primitives.
-///
-/// This macro generates a submodule for the specified type, containing both the
-/// default [`gcd`] function and the [`gcd_with_strategy`] variant.
-macro_rules! impl_unsigned_gcd {
-    ($t:ty, $mod_name:ident) => {
-        /// docstring
-        pub mod $mod_name {
-
-            use super::GcdStrategy;
-
-            /// Returns the greatest common divisor (GCD) of two numbers.
-            ///
-            /// The GCD is the largest positive integer that divides both `a` and `b` without
-            /// a remainder. In ring theory, this is the unique non-negative generator of the
-            /// ideal `aZ + bZ`.
-            ///
-            /// # Examples
-            ///
-            /// ```rust,ignore
-            /// assert_eq!(gcd(48, 18), 6);
-            /// assert_eq!(gcd(101, 103), 1);
-            /// assert_eq!(gcd(0, 5), 5);
-            /// assert_eq!(gcd(0, 0), 0);
-            /// ```
-            ///
-            /// # Mathematical Properties
-            ///
-            /// * Commutativity: `gcd(a, b) == gcd(b, a)`
-            /// * Identity: `gcd(a, 0) == a`
-            /// * LCM Relation: `gcd(a, b) * lcm(a, b) == a * b`
-            ///
-            /// # Implementation
-            ///
-            /// This function uses Stein's Algorithm (Binary GCD). It replaces standard Euclidean
-            /// division with arithmetic shifts and subtractions, leveraging the `ctz` (count
-            /// trailing zeros) instruction for O(1) power-of-2 extraction.
-            ///
-            /// * Time Complexity: O(n^2) bit operations, where n is the number of bits.
-            /// * Space Complexity: O(1) auxiliary space.
-            pub const fn gcd(a: $t, b: $t) -> $t {
-                stein_iterative(a, b)
-            }
-
-            /// Returns the greatest common divisor (GCD) of two numbers using a specific
-            /// [`GcdStrategy`].
-            ///
-            /// This function provides the same mathematical result as [`gcd`], but allows
-            /// manual selection of the underlying algorithm. This is useful for benchmarking
-            /// or specialized hardware constraints.
-            ///
-            /// # Examples
-            ///
-            /// ```rust,ignore
-            /// let result = gcd_with_strategy(48, 18, GcdStrategy::EuclideanIterative);
-            /// assert_eq!(result, 6);
-            /// ```
-            ///
-            /// # Strategies
-            ///
-            /// * [`GcdStrategy::SteinIterative`]: Binary GCD. Efficient; uses shifts and `ctz`.
-            /// * [`GcdStrategy::SteinRecursive`]: Binary GCD using recursion.
-            /// * [`GcdStrategy::EuclideanIterative`]: Standard modulus-based algorithm using a
-            ///   loop.
-            /// * [`GcdStrategy::EuclideanRecursive`]: Standard modulus-based algorithm using
-            ///   recursion.
-            /// * [`GcdStrategy::EuclideanSubtraction`]: The original Greek approach using repeated
-            ///   subtraction. Slower, but demonstrates the fundamental logic of the ideal.
-            ///
-            /// For detailed mathematical properties and complexity analysis, see the [`gcd`]
-            /// function.
-            pub const fn gcd_with_strategy(a: $t, b: $t, strategy: GcdStrategy) -> $t {
-                match strategy {
-                    GcdStrategy::SteinIterative => stein_iterative(a, b),
-                    GcdStrategy::SteinRecursive => stein_recursive(a, b),
-                    GcdStrategy::EuclideanIterative => euclidean_iterative(a, b),
-                    GcdStrategy::EuclideanSubtraction => euclidean_subtraction(a, b),
-                    GcdStrategy::EuclideanRecursive => euclidean_recursive(a, b),
-                }
-            }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        }
-    };
-}
-
-macro_rules! impl_signed_gcd {
-    ($t_signed:ty, $t_unsigned:ty, $signed_mod:ident, $unsigned_mod:ident) => {
-        pub mod $signed_mod {
-            use super::GcdStrategy;
-            use super::$unsigned_mod as unsigned;
-
-            /// gcd with strategy
-            pub const fn gcd(a: $t_signed, b: $t_signed) -> $t_unsigned {
-                unsigned::gcd(a.unsigned_abs(), b.unsigned_abs())
-            }
-
-            /// gcd with strategy
-            pub const fn gcd_with_strategy(
-                a: $t_signed,
-                b: $t_signed,
-                strategy: GcdStrategy,
-            ) -> $t_unsigned {
-                unsigned::gcd_with_strategy(a.unsigned_abs(), b.unsigned_abs(), strategy)
-            }
-        }
-    };
-}
-
-impl_unsigned_gcd!(u8, gcd_u8);
-impl_unsigned_gcd!(u16, gcd_u16);
-impl_unsigned_gcd!(u32, gcd_u32);
-impl_unsigned_gcd!(u64, gcd_u64);
-impl_unsigned_gcd!(u128, gcd_u128);
-impl_unsigned_gcd!(usize, gcd_usize);
-
-impl_signed_gcd!(i8, u8, gcd_i8, gcd_u8);
-impl_signed_gcd!(i16, u16, gcd_i16, gcd_u16);
-impl_signed_gcd!(i32, u32, gcd_i32, gcd_u32);
-impl_signed_gcd!(i64, u64, gcd_i64, gcd_u64);
-impl_signed_gcd!(i128, u128, gcd_i128, gcd_u128);
 
 #[cfg(test)]
 mod test;
