@@ -70,12 +70,10 @@ macro_rules! impl_all {
         )*
     };
     
-    // Internal rule for unsigned types
     (@step unsigned $t:ty) => {
         impl_unsigned_traits!($t);
     };
     
-    // Internal rule for signed types
     (@step signed $t:ty) => {
         impl_unsigned_traits!($t);
         impl Signed for $t {}
@@ -84,5 +82,5 @@ macro_rules! impl_all {
 
 impl_all!(
     unsigned u8, unsigned u16, unsigned u32, unsigned u64, unsigned u128, unsigned usize,
-    signed i8,   signed i16,   signed i32,   signed i64,   signed i128,   signed isize
+    signed i8,   signed i16,   signed i32,   signed i64,   signed i128,   signed isize,
 );
