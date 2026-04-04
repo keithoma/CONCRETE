@@ -12,6 +12,8 @@ pub trait Natural:
 {
     const ZERO: Self;
     const ONE: Self;
+    const MIN: Self;
+    const MAX: Self;
 }
 
 pub trait Signed: Natural {
@@ -50,6 +52,8 @@ macro_rules! impl_unsigned_traits {
         impl Natural for $t {
             const ZERO: Self = 0;
             const ONE: Self = 1;
+            const MIN: Self = <$t>::MIN;
+            const MAX: Self = <$t>::MAX;
         }
 
         impl BitwiseOps for $t {
