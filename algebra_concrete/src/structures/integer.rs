@@ -87,7 +87,12 @@ macro_rules! impl_all {
             type Unsigned = $u;
 
             fn unsigned_abs(self) -> Self::Unsigned {
-                todo!()
+                let bits = self as Self::Unsigned;
+                if self < 0 {
+                    (!bits) + 1
+                } else {
+                    bits
+                }
             }
         }
     };
