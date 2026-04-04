@@ -15,8 +15,19 @@ pub trait Natural:
 }
 
 pub trait Signed: Natural {
-    fn is_negative(self) -> bool;
-    fn abs(self) -> Self; 
+    #[inline]
+    fn is_negative(self) -> bool {
+        self < Self::ZERO
+    }
+
+    #[inline]
+    fn abs(self) -> Self {
+        if self.is_negative() {
+            Self::ZERO - self
+        } else {
+            self
+        }
+    }
 }
 
 pub trait BitwiseOps: Natural +
@@ -37,66 +48,42 @@ pub trait RationalOps: Natural {
 macro_rules! impl_unsigned_traits {
     ($t:ty) => {
         impl Natural for $t {
-            const ZERO: Self = 0 as $t;
-            const ONE: Self = 1 as $t;
+            const ZERO: Self = 0;
+            const ONE: Self = 1;
         }
 
         impl BitwiseOps for $t {
-            #[inline]
-            fn trailing_zeros(self) -> u32 {
-                self.trailing_zeros()
-            }
+            #[inline] fn trailing_zeros(self) -> u32 { self.trailing_zeros() }
         }
 
         impl RationalOps for $t {
-            #[inline]
-            fn gcd(self, other: Self) -> Self {
-                crate::number_theory::gcd(self, other)
-            }
-            
-            #[inline]
-            fn lcm(self, other: Self) -> Self {
-                crate::number_theory::lcm(self, other)
-            }
+            #[inline] fn gcd(self, other: Self) -> Self { crate::number_theory::gcd(self, other) }
+            #[inline] fn lcm(self, other: Self) -> Self { crate::number_theory::lcm(self, other) }
         }
-    }
-}
-
-macro_rules! impl_signed_traits {
-    ($t:ty) => {
-        impl Signed for $t {
-            #[inline]
-            fn is_negative(self) -> bool {
-                self < Self::ZERO
-            }
-
-            #[inline]
-            fn abs(self) -> Self {
-                if self.is_negative() {
-                    Self::ZERO - self
-                } else {
-                    self
-                }
-            }
-        }        
     };
 }
 
-impl_unsigned_traits!(u8);
-impl_unsigned_traits!(u16);
-impl_unsigned_traits!(u32);
-impl_unsigned_traits!(u64);
-impl_unsigned_traits!(u128);
-impl_unsigned_traits!(usize);
+macro_rules! impl_all {
+    // Match a comma-separated list of `ident type` pairs
+    ($( $sign:ident $t:ty ),* $(,)?) => {
+        $(
+            impl_all!(@step $sign $t);
+        )*
+    };
+    
+    // Internal rule for unsigned types
+    (@step unsigned $t:ty) => {
+        impl_unsigned_traits!($t);
+    };
+    
+    // Internal rule for signed types
+    (@step signed $t:ty) => {
+        impl_unsigned_traits!($t);
+        impl Signed for $t {}
+    };
+}
 
-impl_unsigned_traits!(i8);
-impl_unsigned_traits!(i16);
-impl_unsigned_traits!(i32);
-impl_unsigned_traits!(i64);
-impl_unsigned_traits!(i128);
-
-impl_signed_traits!(i8);
-impl_signed_traits!(i16);
-impl_signed_traits!(i32);
-impl_signed_traits!(i64);
-impl_signed_traits!(i128);
+impl_all!(
+    unsigned u8, unsigned u16, unsigned u32, unsigned u64, unsigned u128, unsigned usize,
+    signed i8,   signed i16,   signed i32,   signed i64,   signed i128,   signed isize
+);
