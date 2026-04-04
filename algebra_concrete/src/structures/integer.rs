@@ -59,10 +59,18 @@ macro_rules! impl_signed_traits {
     ($t:ty) => {
         impl Signed for $t {
             #[inline]
-            fn is_negative(self) -> bool { self < 0 as $t }
+            fn is_negative(self) -> bool {
+                self < Self::ZERO
+            }
 
             #[inline]
-            fn abs(self) -> Self { if !self.is_negative() { self } else { Self::ZERO - self } }
+            fn abs(self) -> Self {
+                if self.is_negative() {
+                    Self::ZERO - self
+                } else {
+                    self
+                }
+            }
         }        
     };
 }
