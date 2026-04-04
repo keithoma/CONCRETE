@@ -13,12 +13,12 @@
 /// integers and their intricate properties, focusing heavily on concepts like
 /// prime numbers, divisibility, and solving equations using whole numbers.
 pub mod number_theory;
+pub use number_theory::gcd::{GcdStrategy, gcd, lcm};
 
-/// A module concerned with
+/// A module concerned with algebraic structures.
 ///
 /// Algebraic structures are mathematical sets equipped with one or more
 /// operations—such as addition or multiplication—that follow specific logical
 /// rules known as axioms.
 pub mod structures;
-
 pub use structures::integer::{Natural, Signed, BitwiseOps, RationalOps};
