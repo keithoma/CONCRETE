@@ -60,6 +60,11 @@ pub trait Signed: Natural {
     }
 
     #[inline] fn unsigned_abs(self) -> Self::Unsigned;
+    #[inline] fn checked_abs(self) -> Option<Self>;
+    #[inline] fn strict_abs(self) -> Self;
+    #[inline] fn wrapping_abs(self) -> Self;
+    #[inline] fn saturating_abs(self) -> Self;
+    #[inline] fn overflowing_abs(self) -> (Self, bool);
 }
 
 macro_rules! impl_all {
@@ -92,6 +97,14 @@ macro_rules! impl_all {
                     (!bits) + 1
                 } else {
                     bits
+                }
+            }
+
+            fn checked_abs(self) -> Option<Self> {
+                if self == Self::MIN {
+                    None
+                } else {
+                    Self::ZERO - self
                 }
             }
         }
