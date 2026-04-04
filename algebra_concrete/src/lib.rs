@@ -13,7 +13,8 @@
 /// integers and their intricate properties, focusing heavily on concepts like
 /// prime numbers, divisibility, and solving equations using whole numbers.
 pub mod number_theory;
-pub use number_theory::gcd::{GcdStrategy, gcd, lcm};
+pub use number_theory::gcd::{GcdStrategy, gcd};
+pub use number_theory::lcm::{LcmStrategy, lcm};
 
 /// A module concerned with algebraic structures.
 ///
