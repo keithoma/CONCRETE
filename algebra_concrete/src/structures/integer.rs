@@ -16,22 +16,6 @@ pub trait Natural:
     const MAX: Self;
 }
 
-pub trait Signed: Natural {
-    #[inline]
-    fn is_negative(self) -> bool {
-        self < Self::ZERO
-    }
-
-    #[inline]
-    fn abs(self) -> Self {
-        if self.is_negative() {
-            Self::ZERO - self
-        } else {
-            self
-        }
-    }
-}
-
 pub trait BitwiseOps: Natural +
     BitAnd<Output = Self> + BitOr<Output = Self> + BitXor<Output = Self> +
     Not<Output = Self> + 
@@ -67,24 +51,60 @@ macro_rules! impl_unsigned_traits {
     };
 }
 
+pub trait Signed: Natural {
+    type Unsigned: Natural;
+
+    #[inline]
+    fn is_negative(self) -> bool {
+        self < Self::ZERO
+    }
+
+    #[inline] fn unsigned_abs(self) -> Self::Unsigned;
+}
+
 macro_rules! impl_all {
-    ($( $sign:ident $t:ty ),* $(,)?) => {
+    (
+        $( unsigned $u:ty, )*
+        $( signed $s:ty => $su:ty, )*
+    ) => {
         $(
-            impl_all!(@step $sign $t);
+            impl_all!(@step unsigned $u);
+        )*
+
+        $(
+            impl_all!(@step signed $s => $su);
         )*
     };
-    
+
     (@step unsigned $t:ty) => {
         impl_unsigned_traits!($t);
     };
-    
-    (@step signed $t:ty) => {
-        impl_unsigned_traits!($t);
-        impl Signed for $t {}
+
+    (@step signed $s:ty => $u:ty) => {
+        impl_unsigned_traits!($s);
+
+        impl Signed for $s {
+            type Unsigned = $u;
+
+            fn unsigned_abs(self) -> Self::Unsigned {
+                todo!()
+            }
+        }
     };
 }
 
 impl_all!(
-    unsigned u8, unsigned u16, unsigned u32, unsigned u64, unsigned u128, unsigned usize,
-    signed i8,   signed i16,   signed i32,   signed i64,   signed i128,   signed isize,
+    unsigned u8,
+    unsigned u16,
+    unsigned u32,
+    unsigned u64,
+    unsigned u128,
+    unsigned usize,
+
+    signed i8 => u8,
+    signed i16 => u16,
+    signed i32 => u32,
+    signed i64 => u64,
+    signed i128 => u128,
+    signed isize => usize,
 );
