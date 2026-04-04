@@ -34,20 +34,14 @@ pub trait BitwiseOps: Natural +
     fn trailing_zeros(self) -> u32;
 }
 
-macro_rules! impl_traits {
-    ($t:ty, $mod_name:ident) => {
+macro_rules! impl_unsigned_traits {
+    ($t:ty) => {
         impl Natural for $t {
             const ZERO: Self = 0;
             const ONE: Self = 1;
         }
 
-        impl Signed for $t {
-            fn is_negative(self) -> bool { self < 0 as $t }
-            fn abs(self) -> Self { if !self.is_negative() { self } else { Self::ZERO - self } }
-        }
-
         impl RationalOps for $t {
-            // TODO
             fn gcd(self, other: Self) -> Self { self }
             fn lcm(self, other: Self) -> Self { self }
         }
@@ -58,20 +52,36 @@ macro_rules! impl_traits {
                 self.trailing_zeros()
             }
         }
-
-
     }
 }
 
-impl_integer!(u8, gcd_u8);
-impl_integer!(u16, gcd_u16);
-impl_integer!(u32, gcd_u32);
-impl_integer!(u64, gcd_u64);
-impl_integer!(u128, gcd_u128);
-impl_integer!(usize, gcd_usize);
+macro_rules! impl_signed_traits {
+    ($t:ty) => {
+        impl Signed for $t {
+            #[inline]
+            fn is_negative(self) -> bool { self < 0 as $t }
 
-impl_integer!(i8, gcd_i8);
-impl_integer!(i16, gcd_i16);
-impl_integer!(i32, gcd_i32);
-impl_integer!(i64, gcd_i64);
-impl_integer!(i128, gcd_i128);
+            #[inline]
+            fn abs(self) -> Self { if !self.is_negative() { self } else { Self::ZERO - self } }
+        }        
+    };
+}
+
+impl_unsigned_traits!(u8);
+impl_unsigned_traits!(u16);
+impl_unsigned_traits!(u32);
+impl_unsigned_traits!(u64);
+impl_unsigned_traits!(u128);
+impl_unsigned_traits!(usize);
+
+impl_unsigned_traits!(i8);
+impl_unsigned_traits!(i16);
+impl_unsigned_traits!(i32);
+impl_unsigned_traits!(i64);
+impl_unsigned_traits!(i128);
+
+impl_signed_traits!(i8);
+impl_signed_traits!(i16);
+impl_signed_traits!(i32);
+impl_signed_traits!(i64);
+impl_signed_traits!(i128);
