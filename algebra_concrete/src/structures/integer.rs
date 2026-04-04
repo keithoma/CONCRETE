@@ -19,11 +19,6 @@ pub trait Signed: Natural {
     fn abs(self) -> Self; 
 }
 
-pub trait RationalOps: Natural {
-    fn gcd(self, other: Self) -> Self;
-    fn lcm(self, other: Self) -> Self;
-}
-
 pub trait BitwiseOps: Natural +
     BitAnd<Output = Self> + BitOr<Output = Self> + BitXor<Output = Self> +
     Not<Output = Self> + 
@@ -34,22 +29,34 @@ pub trait BitwiseOps: Natural +
     fn trailing_zeros(self) -> u32;
 }
 
+pub trait RationalOps: Natural {
+    fn gcd(self, other: Self) -> Self;
+    fn lcm(self, other: Self) -> Self;
+}
+
 macro_rules! impl_unsigned_traits {
     ($t:ty) => {
         impl Natural for $t {
-            const ZERO: Self = 0;
-            const ONE: Self = 1;
-        }
-
-        impl RationalOps for $t {
-            fn gcd(self, other: Self) -> Self { self }
-            fn lcm(self, other: Self) -> Self { self }
+            const ZERO: Self = 0 as $t;
+            const ONE: Self = 1 as $t;
         }
 
         impl BitwiseOps for $t {
             #[inline]
-            fn trailing_zeros(mut self) -> u32 {
+            fn trailing_zeros(self) -> u32 {
                 self.trailing_zeros()
+            }
+        }
+
+        impl RationalOps for $t {
+            #[inline]
+            fn gcd(self, other: Self) -> Self {
+                crate::number_theory::gcd(self, other)
+            }
+            
+            #[inline]
+            fn lcm(self, other: Self) -> Self {
+                crate::number_theory::lcm(self, other)
             }
         }
     }

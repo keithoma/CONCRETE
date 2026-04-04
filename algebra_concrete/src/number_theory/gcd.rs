@@ -45,8 +45,20 @@ pub enum GcdStrategy {
     EuclideanSubtraction,
 }
 
+pub fn lcm<T: Natural + BitwiseOps>(a: T, b: T, strategy: GcdStrategy)-> T {
+    a
+}
+
+
+
 /// The universal entry point.
-pub fn gcd<T: Natural + BitwiseOps>(a: T, b: T, strategy: GcdStrategy) -> T {
+#[inline]
+pub const fn gcd<T: Natural + BitwiseOps>(a: T, b: T) -> T {
+    gcd_with_strategy(a, b, GcdStrategy::default())
+}
+
+
+pub fn gcd_with_strategy<T: Natural + BitwiseOps>(a: T, b: T, strategy: GcdStrategy) -> T {
     match strategy {
         GcdStrategy::SteinIterative => stein_iterative(a, b),
         GcdStrategy::SteinRecursive => stein_recursive(a, b),
