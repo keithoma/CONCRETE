@@ -45,7 +45,7 @@ pub enum GcdStrategy {
     EuclideanSubtraction,
 }
 
-pub fn lcm<T: Natural + BitwiseOps>(a: T, b: T, strategy: GcdStrategy)-> T {
+pub fn lcm<T: Natural + BitwiseOps>(a: T, b: T)-> T {
     a
 }
 

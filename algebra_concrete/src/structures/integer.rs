@@ -64,7 +64,6 @@ macro_rules! impl_unsigned_traits {
 }
 
 macro_rules! impl_all {
-    // Match a comma-separated list of `ident type` pairs
     ($( $sign:ident $t:ty ),* $(,)?) => {
         $(
             impl_all!(@step $sign $t);
