@@ -1,4 +1,2 @@
-mod gcd;
-
-pub use gcd::GcdStrategy;
-pub use gcd::gcd;
+pub mod gcd;
+pub use gcd::{GcdStrategy, gcd, lcm};
