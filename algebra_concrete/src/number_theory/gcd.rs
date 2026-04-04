@@ -15,7 +15,6 @@
 
 // ISSUES: in stable Rust, we cannot call trait methods isnide a const fn
 
-// TODO: ``lcm()``
 // TODO: add a wrapper functions for gcd so that it works for unsigned ints
 
 use crate::structures::integer::{BitwiseOps, Natural};
@@ -51,7 +50,7 @@ pub const fn gcd<T: Natural + BitwiseOps>(a: T, b: T) -> T {
     gcd_with_strategy(a, b, GcdStrategy::default())
 }
 
-pub fn gcd_with_strategy<T: Natural + BitwiseOps>(a: T, b: T, strategy: GcdStrategy) -> T {
+pub const fn gcd_with_strategy<T: Natural + BitwiseOps>(a: T, b: T, strategy: GcdStrategy) -> T {
     match strategy {
         GcdStrategy::SteinIterative => stein_iterative(a, b),
         GcdStrategy::SteinRecursive => stein_recursive(a, b),
@@ -68,7 +67,7 @@ pub fn gcd_with_strategy<T: Natural + BitwiseOps>(a: T, b: T, strategy: GcdStrat
 ///
 /// # Examples
 ///
-/// ```rust,ignore
+/// ```rust
 /// assert_eq!(stein_iterative(48u32, 18u32), 6);
 /// assert_eq!(stein_iterative(0u32, 5u32), 5);
 /// ```
@@ -124,7 +123,7 @@ const fn stein_iterative<T: Natural + BitwiseOps>(mut a: T, mut b: T) -> T {
 ///
 /// # Examples
 ///
-/// ```rust,ignore
+/// ```rust
 /// assert_eq!(stein_recursive(48u32, 18u32), 6);
 /// assert_eq!(stein_recursive(7u32, 13u32), 1);
 /// ```
@@ -168,7 +167,7 @@ const fn stein_recursive<T: Natural + BitwiseOps>(a: T, b: T) -> T {
 ///
 /// # Examples
 ///
-/// ```rust,ignore
+/// ```rust
 /// assert_eq!(euclidean_iterative(48u32, 18u32), 6);
 /// assert_eq!(euclidean_iterative(101u32, 103u32), 1);
 /// ```
@@ -197,7 +196,7 @@ const fn euclidean_iterative<T: Natural>(mut a: T, mut b: T) -> T {
 ///
 /// # Examples
 ///
-/// ```rust,ignore
+/// ```rust
 /// assert_eq!(euclidean_subtraction(48u32, 18u32), 6);
 /// assert_eq!(euclidean_subtraction(7u32, 13u32), 1);
 /// ```
@@ -237,7 +236,7 @@ const fn euclidean_subtraction<T: Natural>(mut a: T, mut b: T) -> T {
 ///
 /// # Examples
 ///
-/// ```rust,ignore
+/// ```rust
 /// assert_eq!(euclidean_recursive(48u32, 18u32), 6);
 /// assert_eq!(euclidean_recursive(101u32, 103u32), 1);
 /// ```
