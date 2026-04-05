@@ -1,19 +1,28 @@
 //! least common multiple
 
-use crate::structures::integer::{BitwiseOps, Integer};
-use crate::number_theory::gcd;
+use core::marker::PhantomData;
 
-#[non_exhaustive]
-#[derive(Debug, Default, Copy, Clone, PartialEq, Eq)]
-pub enum LcmStrategy {
-    #[default] UsingGcd,
+use crate::structures::integer::Integer;
+use crate::number_theory::gcd::GcdAlgorithm;
+
+pub trait LcmAlgorithm<T: Integer> {
+    fn compute(a: T, b: T) -> T;
 }
 
-pub fn lcm<T: Integer + BitwiseOps>(a: T, b: T) -> T {
-    using_gcd(a, b)
-}
+// The struct takes a generic type G representing the GCD strategy
+pub struct FormulaicGcd<G>(PhantomData<G>);
 
-#[inline]
-pub fn using_gcd<T: Integer + BitwiseOps>(a: T, b: T) -> T {
-    a * b / gcd(a, b)
+// We bound G to ensure it is a valid GcdAlgorithm for our integer T
+impl<T, G> LcmAlgorithm<T> for FormulaicGcd<G> 
+where 
+    T: Integer,
+    G: GcdAlgorithm<T> 
+{
+    #[inline]
+    fn compute(a: T, b: T) -> T {
+        if a.is_zero() || b.is_zero() { return T::ZERO; }
+        
+        // We bypass a.gcd() and explicitly inject the user's chosen strategy!
+        (a / G::compute(a, b)) * b
+    }
 }

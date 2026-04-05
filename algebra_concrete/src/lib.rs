@@ -35,7 +35,10 @@ pub use number_theory::gcd::{
     EuclideanIterative, EuclideanSubtraction, EuclideanRecursive,
     SteinIterative, SteinRecursive,
 };
-pub use number_theory::lcm::{LcmStrategy, lcm}; // will change later
+pub use number_theory::lcm::{
+    LcmAlgorithm, 
+    FormulaicGcd,
+};
 
 // -----------------------------------------------------------------------------
 // The Prelude

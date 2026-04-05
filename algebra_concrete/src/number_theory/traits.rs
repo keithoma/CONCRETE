@@ -1,5 +1,6 @@
 use crate::structures::integer::{Integer, Signed, Unsigned};
-use crate::number_theory::gcd::{GcdAlgorithm, gcd, lcm};
+use crate::number_theory::gcd::{GcdAlgorithm, SteinIterative};
+use crate::number_theory::lcm::{LcmAlgorithm, FormulaicGcd};
 
 pub trait RationalOps: Integer {
     type UnsignedType: Unsigned;
@@ -10,8 +11,11 @@ pub trait RationalOps: Integer {
     where
         Algo: GcdAlgorithm<Self::UnsignedType>;
 
-
     fn lcm(self, other: Self) -> Self::UnsignedType;
+
+    fn lcm_with<Algo>(self, other: Self) -> Self::UnsignedType
+    where
+        Algo: LcmAlgorithm<Self::UnsignedType>;
 }
 
 macro_rules! impl_unsigned_math {
@@ -32,6 +36,20 @@ macro_rules! impl_unsigned_math {
                 {
                     Algo::compute(self, other)
                 }
+
+                #[inline]
+                fn lcm(self, other: Self) -> Self::UnsignedType {
+                    // Seed the generic FormulaicGcd with our default GCD algorithm
+                    self.lcm_with::<FormulaicGcd<$default_algo>>(other)
+                }
+
+                #[inline]
+                fn lcm_with<Algo>(self, other: Self) -> Self::UnsignedType
+                where
+                    Algo: LcmAlgorithm<Self::UnsignedType>
+                {
+                    Algo::compute(self, other)
+                }
             }
         )*
     };
@@ -49,19 +67,45 @@ impl_unsigned_math!(
 macro_rules! impl_signed_math {
     ($($s:ty => $u:ty),*) => {
         $(
-            impl IntegerMath for $s {
+            impl RationalOps for $s {
                 type UnsignedType = $u;
                 
                 #[inline]
                 fn gcd(self, other: Self) -> Self::UnsignedType {
                     // Mathematically: the GCD of a and b is the positive generator of the ideal (a, b)
-                    let a = self.unsigned_absolute();
-                    let b = other.unsigned_absolute();
-                    a.gcd(b) // delegates to the unsigned implementation
+                    self.unsigned_absolute().gcd(other.unsigned_absolute())
+                }
+
+                #[inline]
+                fn gcd_with<Algo>(self, other: Self) -> Self::UnsignedType
+                where
+                    Algo: GcdAlgorithm<Self::UnsignedType>
+                {
+                    self.unsigned_absolute().gcd_with::<Algo>(other.unsigned_absolute())
+                }
+
+                #[inline]
+                fn lcm(self, other: Self) -> Self::UnsignedType {
+                    self.unsigned_absolute().lcm(other.unsigned_absolute())
+                }
+
+                #[inline]
+                fn lcm_with<Algo>(self, other: Self) -> Self::UnsignedType
+                where
+                    Algo: LcmAlgorithm<Self::UnsignedType>
+                {
+                    self.unsigned_absolute().lcm_with::<Algo>(other.unsigned_absolute())
                 }
             }
         )*
     };
 }
 
-impl_signed_math!(i8 => u8, i16 => u16, i32 => u32, i64 => u64, i128 => u128, isize => usize);
+impl_signed_math!(
+    i8 => u8, 
+    i16 => u16, 
+    i32 => u32, 
+    i64 => u64, 
+    i128 => u128, 
+    isize => usize
+);
