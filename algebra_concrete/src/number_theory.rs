@@ -1,5 +1,7 @@
+pub mod traits;
 pub mod gcd;
-pub use gcd::{GcdStrategy, gcd};
-
 pub mod lcm;
-pub use lcm::{LcmStrategy, lcm};
+
+pub use traits::RationalOps;
+pub use gcd::*;
+pub use lcm::*;
