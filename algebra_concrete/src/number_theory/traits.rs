@@ -2,17 +2,23 @@ use crate::structures::integer::{Integer, Signed, Unsigned};
 use crate::number_theory::gcd::{GcdAlgorithm, SteinIterative};
 use crate::number_theory::lcm::{LcmAlgorithm, FormulaicGcd};
 
+/// Trait for rational operations.
 pub trait RationalOps: Integer {
+    /// Type for absolute value.
     type UnsignedType: Unsigned;
 
+    /// greatest common divisor
     fn gcd(self, other: Self) -> Self::UnsignedType;
 
+    /// greatest common divisor with strategy
     fn gcd_with<Algo>(self, other: Self) -> Self::UnsignedType
     where
         Algo: GcdAlgorithm<Self::UnsignedType>;
 
+    /// least common multiple
     fn lcm(self, other: Self) -> Self::UnsignedType;
 
+    /// least common multiple with strategy
     fn lcm_with<Algo>(self, other: Self) -> Self::UnsignedType
     where
         Algo: LcmAlgorithm<Self::UnsignedType>;

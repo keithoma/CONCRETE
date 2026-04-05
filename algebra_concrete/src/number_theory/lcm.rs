@@ -9,7 +9,7 @@ pub trait LcmAlgorithm<T: Integer> {
     fn compute(a: T, b: T) -> T;
 }
 
-// The struct takes a generic type G representing the GCD strategy
+/// The struct takes a generic type G representing the GCD strategy
 pub struct FormulaicGcd<G>(PhantomData<G>);
 
 // We bound G to ensure it is a valid GcdAlgorithm for our integer T
