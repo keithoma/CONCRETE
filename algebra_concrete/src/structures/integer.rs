@@ -78,15 +78,23 @@ pub trait Signed: Natural {
             .expect("attempted to take the absolute value of the minimum signed value")
     }
 
-    #[inline] fn wrapping_abs(self) -> Self {
-        match self.checked_abs() {
-            Some(x) => x,
-            None => Self::MIN,
-        }
+    #[inline]
+    fn wrapping_abs(self) -> Self {
+        self.checked_abs()
+            .unwrap_or(Self::MIN)
     }
 
-    #[inline] fn saturating_abs(self) -> Self;
-    #[inline] fn overflowing_abs(self) -> (Self, bool);
+    #[inline]
+    fn saturating_abs(self) -> Self {
+        self.checked_abs()
+            .unwrap_or(Self::MAX)
+    }
+
+    #[inline]
+    fn overflowing_abs(self) -> (Self, bool) {
+        self.checked_abs()
+            .unwrap_or()
+    }
 }
 
 macro_rules! impl_all {
