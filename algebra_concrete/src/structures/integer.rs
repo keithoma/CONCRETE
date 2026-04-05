@@ -4,6 +4,7 @@ use core::ops::{
     Shl, ShlAssign, Shr, ShrAssign,
 };
 
+/// A core trait for discrete, totally ordered, integer-like scalar types.
 pub trait Integer: 
     Sized + Copy + PartialEq + Eq + PartialOrd + Ord +
     Add<Output = Self> + Sub<Output = Self> + Mul<Output = Self> + 
@@ -14,6 +15,8 @@ pub trait Integer:
     const ONE: Self;
     const MIN: Self;
     const MAX: Self;
+
+    type AbsoluteValueType: Unsigned;
 
     #[inline] fn is_zero(self) -> bool { self == Self::ZERO }
     #[inline] fn is_nonzero(self) -> bool { self != Self::ZERO }
@@ -30,16 +33,13 @@ pub trait BitwiseOps: Integer +
 }
 
 pub trait RationalOps: Integer {
-    type Output;
-    
-    fn gcd(self, other: Self) -> Self::Output;
-    fn lcm(self, other: Self) -> Self::Output;
+    fn gcd(self, other: Self) -> Self::AbsoluteValueType;
+    fn lcm(self, other: Self) -> Self::AbsoluteValueType;
 }
 
 pub trait Unsigned: Integer {}
 
 pub trait Signed: Integer {
-    type Unsigned: Unsigned;
 
     #[inline] fn is_positive(self) -> bool { self > Self::ZERO }
     #[inline] fn is_nonpositive(self) -> bool { self <= Self::ZERO }
