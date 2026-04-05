@@ -44,6 +44,9 @@ pub use number_theory::lcm::{
 // The Prelude
 // -----------------------------------------------------------------------------
 
+/// Common imports for working with the crate.
+///
+/// `use algebra_concrete::prelude::*;` 
 pub mod prelude {
     pub use crate::structures::integer::{Integer, Signed, Unsigned, BitwiseOps};
     pub use crate::number_theory::traits::RationalOps;
