@@ -13,9 +13,6 @@
 /// integers and their intricate properties, focusing heavily on concepts like
 /// prime numbers, divisibility, and solving equations using whole numbers.
 pub mod number_theory;
-pub use number_theory::traits::{RationalOps};
-pub use number_theory::gcd::{GcdStrategy, gcd};
-pub use number_theory::lcm::{LcmStrategy, lcm};
 
 /// A module concerned with algebraic structures.
 ///
@@ -23,4 +20,28 @@ pub use number_theory::lcm::{LcmStrategy, lcm};
 /// operations—such as addition or multiplication—that follow specific logical
 /// rules known as axioms.
 pub mod structures;
-pub use structures::integer::{Integer, Signed, BitwiseOps, RationalOps};
+
+// -----------------------------------------------------------------------------
+// Public API
+// -----------------------------------------------------------------------------
+
+// Core Structures
+pub use structures::integer::{Integer, Signed, Unsigned, BitwiseOps};
+
+// Number Theory Traits & Algorithms
+pub use number_theory::traits::RationalOps; 
+pub use number_theory::gcd::{
+    GcdAlgorithm,
+    EuclideanIterative, EuclideanSubtraction, EuclideanRecursive,
+    SteinIterative, SteinRecursive,
+};
+pub use number_theory::lcm::{LcmStrategy, lcm}; // will change later
+
+// -----------------------------------------------------------------------------
+// The Prelude
+// -----------------------------------------------------------------------------
+
+pub mod prelude {
+    pub use crate::structures::integer::{Integer, Signed, Unsigned, BitwiseOps};
+    pub use crate::number_theory::traits::RationalOps;
+}
