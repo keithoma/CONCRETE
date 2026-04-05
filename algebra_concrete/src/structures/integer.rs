@@ -32,11 +32,6 @@ pub trait BitwiseOps: Integer +
     fn trailing_zeros(self) -> u32;
 }
 
-pub trait RationalOps: Integer {
-    fn gcd(self, other: Self) -> Self::AbsoluteValueType;
-    fn lcm(self, other: Self) -> Self::AbsoluteValueType;
-}
-
 pub trait Unsigned: Integer {}
 
 pub trait Signed: Integer {
@@ -127,19 +122,6 @@ macro_rules! impl_all {
     (@step unsigned $t:ty) => {
         impl Unsigned for $t {}
 
-        impl RationalOps for $t {
-            type Output = $t;
-
-            #[inline]
-            fn gcd(self, other: Self) -> Self::Output {
-                crate::number_theory::gcd(self, other)
-            }
-
-            #[inline]
-            fn lcm(self, other: Self) -> Self::Output {
-                crate::number_theory::lcm(self, other)
-            }
-        }
     };
 
     (@step signed $s:ty => $u:ty) => {
@@ -156,20 +138,6 @@ macro_rules! impl_all {
                 } else {
                     bits
                 }
-            }
-        }
-
-        impl RationalOps for $s {
-            type Output = $u;
-
-            #[inline]
-            fn gcd(self, other: Self) -> Self::Output {
-                crate::number_theory::gcd(self.unsigned_absolute(), other.unsigned_absolute())
-            }
-
-            #[inline]
-            fn lcm(self, other: Self) -> Self::Output {
-                crate::number_theory::lcm(self.unsigned_absolute(), other.unsigned_absolute())
             }
         }
     };
