@@ -1,7 +1,5 @@
 //! Example usage of the CONCRETE algebra library's GCD utilities.
 
-// We use `std` here just so we can print to the terminal, 
-// even though our actual library is perfectly `no_std`!
 use algebra_concrete::number_theory::{
     EuclideanIterative, EuclideanRecursive, EuclideanSubtraction,
     SteinIterative, SteinRecursive, RationalOps
