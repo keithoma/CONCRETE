@@ -14,6 +14,9 @@ pub trait Integer:
     const ONE: Self;
     const MIN: Self;
     const MAX: Self;
+
+    #[inline] fn is_zero(self) -> bool { self == Self::ZERO }
+    #[inline] fn is_nonzero(self) -> bool { self != Self::ZERO }
 }
 
 pub trait BitwiseOps: Integer +
@@ -31,23 +34,25 @@ pub trait RationalOps: Integer {
     fn lcm(self, other: Self) -> Self;
 }
 
-pub trait Signed: Integer {
-    type Unsigned: Integer;
+pub trait Unsigned: Integer {}
 
-    #[inline]
-    fn is_negative(self) -> bool {
-        self < Self::ZERO
-    }
+pub trait Signed: Integer {
+    type Unsigned: Unsigned;
+
+    #[inline] fn is_positive(self) -> bool { self > Self::ZERO }
+    #[inline] fn is_nonpositive(self) -> bool { self <= Self:: ZERO }
+    #[inline] fn is_negative(self) -> bool { self < Self::ZERO }
+    #[inline] fn is_nonnegative(self) -> bool { self >= Self:: ZERO }
 
     #[inline] fn abs(self) -> Self {
         self.strict_abs()
     }
 
-    #[inline] fn unsigned_abs(self) -> Self::Unsigned;
+    fn unsigned_abs(self) -> Self::Unsigned;
 
     #[inline]
     fn checked_abs(self) -> Option<Self> {
-        if self >= Self::ZERO {
+        if self.is_nonnegative() {
             Some(self)
         } else if self != Self::MIN {
             Some(Self::ZERO - self)
@@ -81,7 +86,7 @@ pub trait Signed: Integer {
     }
 }
 
-macro_rules! impl_unsigned_traits {
+macro_rules! impl_integer_traits {
     ($t:ty) => {
         impl Integer for $t {
             const ZERO: Self = 0;
@@ -116,18 +121,21 @@ macro_rules! impl_all {
     };
 
     (@step unsigned $t:ty) => {
-        impl_unsigned_traits!($t);
+        impl_integer_traits!($t);
+
+        impl Unsigned for $t {}
     };
 
     (@step signed $s:ty => $u:ty) => {
-        impl_unsigned_traits!($s);
+        impl_integer_traits!($s);
 
         impl Signed for $s {
             type Unsigned = $u;
 
+            #[inline]
             fn unsigned_abs(self) -> Self::Unsigned {
                 let bits = self as Self::Unsigned;
-                if self < Self::ZERO {
+                if self.is_negative() {
                     (!bits) + 1
                 } else {
                     bits
