@@ -72,7 +72,12 @@ pub trait Signed: Natural {
         }
     }
 
-    #[inline] fn strict_abs(self) -> Self;
+    #[inline]
+    fn strict_abs(self) -> Self {
+        self.checked_abs()
+            .expect("attempted to take the absolute value of the minimum signed value")
+    }
+
     #[inline] fn wrapping_abs(self) -> Self;
     #[inline] fn saturating_abs(self) -> Self;
     #[inline] fn overflowing_abs(self) -> (Self, bool);
