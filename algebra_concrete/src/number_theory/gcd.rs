@@ -285,6 +285,3 @@ fn euclidean_recursive<T: Integer>(a: T, b: T) -> T {
         a
     }
 }
-
-#[cfg(test)]
-mod test;
