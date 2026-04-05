@@ -45,37 +45,43 @@ pub enum SteinGcdStrategy {
     Recursive,
 }
 
-#[derive(Debug, Default, Copy, Clone, PartialEq, Eq)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
 pub enum GcdStrategy {
-    #[default] Euclidean(EuclideanGcdStrategy),
+    Euclidean(EuclideanGcdStrategy),
     Stein(SteinGcdStrategy),
+}
+
+impl Default for GcdStrategy {
+    fn default() -> Self {
+        Self::Euclidean(EuclideanGcdStrategy::default())
+    }
 }
 
 #[inline]
 pub fn gcd<T: Integer>(a: T, b: T) -> T {
-    gcd_with_strategy(a, b, GcdStrategy::default())
+    gcd_with_strategy(a, b, EuclideanGcdStrategy::default())
 }
 
-pub fn gcd_with_strategy<T: Integer>(a: T, b: T, strategy: GcdStrategy) -> T {
+pub fn gcd_with_strategy<T: Integer>(a: T, b: T, strategy: EuclideanGcdStrategy) -> T {
     match strategy {
-        GcdStrategy::EuclideanIterative => euclidean_iterative(a, b),
-        GcdStrategy::EuclideanSubtraction => euclidean_subtraction(a, b),
-        GcdStrategy::EuclideanRecursive => euclidean_recursive(a, b),
+        EuclideanGcdStrategy::Iterative => euclidean_iterative(a, b),
+        EuclideanGcdStrategy::Subtraction => euclidean_subtraction(a, b),
+        EuclideanGcdStrategy::Recursive => euclidean_recursive(a, b),
     }
 }
 
 #[inline]
 pub fn gcd_binary<T: Integer + BitwiseOps>(a: T, b: T) -> T {
-    gcd_binary_with_strategy(a, b, GcdStrategy::SteinIterative)
+    gcd_binary_with_strategy(a, b, GcdStrategy::Stein(SteinGcdStrategy::default()))
 }
 
-pub fn gcd_binary_with_strategy<T: Integer + BitwiseOps>(a: T, b:T, strategy: GcdStrategy) -> T {
+pub fn gcd_binary_with_strategy<T: Integer + BitwiseOps>(a: T, b: T, strategy: GcdStrategy) -> T {
     match strategy {
-        GcdStrategy::SteinIterative => stein_iterative(a, b),
-        GcdStrategy::SteinRecursive => stein_recursive(a, b),
-        GcdStrategy::EuclideanIterative => euclidean_iterative(a, b),
-        GcdStrategy::EuclideanSubtraction => euclidean_subtraction(a, b),
-        GcdStrategy::EuclideanRecursive => euclidean_recursive(a, b),
+        GcdStrategy::Stein(SteinGcdStrategy::Iterative) => stein_iterative(a, b),
+        GcdStrategy::Stein(SteinGcdStrategy::Recursive) => stein_recursive(a, b),
+        GcdStrategy::Euclidean(EuclideanGcdStrategy::Iterative) => euclidean_iterative(a, b),
+        GcdStrategy::Euclidean(EuclideanGcdStrategy::Subtraction) => euclidean_subtraction(a, b),
+        GcdStrategy::Euclidean(EuclideanGcdStrategy::Recursive) => euclidean_recursive(a, b),
     }
 }
 
