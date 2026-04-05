@@ -19,6 +19,18 @@
 
 use crate::structures::integer::{BitwiseOps, Integer};
 
+pub struct EuclideanIterative;
+pub struct EuclideanSubtraction;
+pub struct EuclideanRecursive;
+pub struct SteinIterative;
+pub struct SteinRecursive;
+
+pub trait Gcd {
+    fn compute<T: Integer>(mut a: T, mut b: T) -> T;
+    fn compute_bitwise<T: Integer + BitwiseOps>(mut a: T, mut b: T) -> T;
+}
+
+
 #[non_exhaustive]
 #[derive(Debug, Default, Copy, Clone, PartialEq, Eq)]
 pub enum EuclideanGcdStrategy {
