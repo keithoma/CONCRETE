@@ -1,0 +1,30 @@
+graph TD
+    subgraph "CONCRETE Algebra Library Architecture"
+        %% Main Core Module
+        MathCore["MathCore Module"] --> |defines| NumberTraits["Number Traits (i32, u64...)"]
+        MathCore --> |exposes| NumTheoryFunctions["Number Theory Functions"]
+
+        %% Primitive Number Implementations
+        NumberTraits --> |implemented by| PrimitiveInts["Primitive Integers (i32, u64...)"]
+
+        subgraph "Number Theory Module"
+            %% GCD Function & Plausible Internal Algorithms
+            NumTheoryFunctions --> |contains| GCDFunc["gcd(a, b)"]
+            GCDFunc -.-> |uses| NumberTraits
+            GCDFunc -.-> |uses| PrimitiveInts
+            
+            %% Strategy Selection
+            GCDFunc --> |potentially selects| EuclideanGCD["Euclidean GCD (Iterative)"]
+            GCDFunc -.-> |or implicitly selects| BinaryGCD["Binary/Stein's GCD"]
+
+            %% LCM Function & Plausible Internal Method
+            NumTheoryFunctions --> |contains| LCMFunc["lcm(a, b)"]
+            LCMFunc -.-> |uses| NumberTraits
+            LCMFunc -.-> |uses| PrimitiveInts
+            LCMFunc -.-> |potentially uses| GCDFunc
+            LCMFunc --> |calculates via| SimpleLCM["lcm = |a*b| / gcd(a,b)"]
+            
+            %% Future Extensibility
+            LCMFunc -.-> |potentially uses if large/factored| FactoringLCM["lcm = highest powers of prime factors"]
+        end
+    end
