@@ -115,12 +115,6 @@ macro_rules! impl_all {
                     bits
                 }
             }
-
-
-
-            fn strict_abs(self) -> Self {
-
-            }
         }
     };
 }
