@@ -44,14 +44,14 @@ pub trait Signed: Integer {
     #[inline] fn is_negative(self) -> bool { self < Self::ZERO }
     #[inline] fn is_nonnegative(self) -> bool { self >= Self:: ZERO }
 
-    #[inline] fn abs(self) -> Self {
-        self.strict_abs()
+    #[inline] fn absolute(self) -> Self {
+        self.strict_absolute()
     }
 
-    fn unsigned_abs(self) -> Self::Unsigned;
+    fn unsigned_absolute(self) -> Self::Unsigned;
 
     #[inline]
-    fn checked_abs(self) -> Option<Self> {
+    fn checked_absolute(self) -> Option<Self> {
         if self.is_nonnegative() {
             Some(self)
         } else if self != Self::MIN {
@@ -62,26 +62,26 @@ pub trait Signed: Integer {
     }
 
     #[inline]
-    fn strict_abs(self) -> Self {
-        self.checked_abs()
+    fn strict_absolute(self) -> Self {
+        self.checked_absolute()
             .expect("attempted to take the absolute value of the minimum signed value")
     }
 
     #[inline]
-    fn wrapping_abs(self) -> Self {
-        self.checked_abs()
+    fn wrapping_absolute(self) -> Self {
+        self.checked_absolute()
             .unwrap_or(Self::MIN)
     }
 
     #[inline]
-    fn saturating_abs(self) -> Self {
-        self.checked_abs()
+    fn saturating_absolute(self) -> Self {
+        self.checked_absolute()
             .unwrap_or(Self::MAX)
     }
 
     #[inline]
-    fn overflowing_abs(self) -> (Self, bool) {
-        self.checked_abs()
+    fn overflowing_absolute(self) -> (Self, bool) {
+        self.checked_absolute()
             .map_or((Self::MIN, true), |x| (x, false))
     }
 }
@@ -133,7 +133,7 @@ macro_rules! impl_all {
             type Unsigned = $u;
 
             #[inline]
-            fn unsigned_abs(self) -> Self::Unsigned {
+            fn unsigned_absolute(self) -> Self::Unsigned {
                 let bits = self as Self::Unsigned;
                 if self.is_negative() {
                     (!bits) + 1
