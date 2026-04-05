@@ -1,4 +1,5 @@
 use crate::structures::integer::{Integer, Signed, Unsigned};
+use crate::number_theory::gcd::{gcd, lcm};
 
 pub trait RationalOps: Integer {
     type UnsignedType: Unsigned;

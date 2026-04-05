@@ -1,3 +1,6 @@
+pub mod traits;
+pub use traits::{RationalOps};
+
 pub mod gcd;
 pub use gcd::{GcdStrategy, gcd};
 
