@@ -99,6 +99,12 @@ pub trait Signed: Integer {
         if self.is_nonnegative() {
             Some(self)
         } else if self != Self::MIN {
+            // We explicitly checked for MIN, so this subtraction is mathematically
+            // guaranteed not to underflow for two's complement integers.
+            #[expect(
+                clippy::arithmetic_side_effects, 
+                reason = "Explicit MIN check guarantees safe subtraction"
+            )]
             Some(Self::ZERO - self)
         } else {
             None
@@ -111,6 +117,10 @@ pub trait Signed: Integer {
     #[must_use]
     #[inline]
     fn strict_absolute(self) -> Self {
+        #[expect(
+            clippy::expect_used, 
+            reason = "strict_absolute is documented to panic on overflow"
+        )]
         self.checked_absolute()
             .expect("attempted to take the absolute value of the minimum signed value")
     }
@@ -197,7 +207,15 @@ macro_rules! impl_all {
         impl Signed for $s {
             #[inline]
             fn unsigned_absolute(self) -> Self::AbsoluteValueType {
+                #[expect(
+                    clippy::cast_sign_loss,
+                    reason = "we want sign loss"
+                )]
                 let bits = self as Self::AbsoluteValueType;
+                #[expect(
+                    clippy::arithmetic_side_effects, 
+                    reason = "Explicit MIN check guarantees safe subtraction"
+                )]
                 if self.is_negative() {
                     (!bits) + 1
                 } else {
