@@ -19,6 +19,7 @@
 
 use crate::structures::integer::{BitwiseOps, Integer};
 
+#[non_exhaustive]
 #[derive(Debug, Default, Copy, Clone, PartialEq, Eq)]
 pub enum EuclideanGcdStrategy {
     /// Iterative Euclidean Algorithm.
@@ -34,6 +35,7 @@ pub enum EuclideanGcdStrategy {
     Subtraction,
 }
 
+#[non_exhaustive]
 #[derive(Debug, Default, Copy, Clone, PartialEq, Eq)]
 pub enum SteinGcdStrategy {
     /// Iterative Binary GCD (Stein's Algorithm).
@@ -45,6 +47,7 @@ pub enum SteinGcdStrategy {
     Recursive,
 }
 
+#[non_exhaustive]
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]
 pub enum GcdStrategy {
     Euclidean(EuclideanGcdStrategy),
