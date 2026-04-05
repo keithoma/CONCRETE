@@ -17,7 +17,7 @@ pub trait RationalOps: Integer {
 macro_rules! impl_unsigned_math {
     ($($t:ty => $default_algo:ty),*) => {
         $(
-            impl IntegerMath for $t {
+            impl RationalOps for $t {
                 type UnsignedType = $t;
 
                 #[inline]

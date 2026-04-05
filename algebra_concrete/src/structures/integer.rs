@@ -16,6 +16,7 @@ pub trait Integer:
     const MIN: Self;
     const MAX: Self;
 
+    /// The unsigned counterpart of this type, used for magnitude representations.
     type AbsoluteValueType: Unsigned;
 
     #[inline] fn is_zero(self) -> bool { self == Self::ZERO }
@@ -35,7 +36,6 @@ pub trait BitwiseOps: Integer +
 pub trait Unsigned: Integer {}
 
 pub trait Signed: Integer {
-
     #[inline] fn is_positive(self) -> bool { self > Self::ZERO }
     #[inline] fn is_nonpositive(self) -> bool { self <= Self::ZERO }
     #[inline] fn is_negative(self) -> bool { self < Self::ZERO }
@@ -45,7 +45,7 @@ pub trait Signed: Integer {
         self.strict_absolute()
     }
 
-    fn unsigned_absolute(self) -> Self::Unsigned;
+    fn unsigned_absolute(self) -> Self::AbsoluteValueType;
 
     #[inline]
     fn checked_absolute(self) -> Option<Self> {
@@ -83,17 +83,20 @@ pub trait Signed: Integer {
     }
 }
 
-
-
-
+// -----------------------------------------------------------------------------
+// Macro Implementations
+// -----------------------------------------------------------------------------
 
 macro_rules! impl_integer_traits {
-    ($t:ty) => {
+    // We now pass both the target type ($t) and its unsigned absolute type ($abs)
+    ($t:ty, $abs:ty) => {
         impl Integer for $t {
             const ZERO: Self = 0;
             const ONE: Self = 1;
             const MIN: Self = <$t>::MIN;
             const MAX: Self = <$t>::MAX;
+            
+            type AbsoluteValueType = $abs;
         }
 
         impl BitwiseOps for $t {
@@ -120,19 +123,19 @@ macro_rules! impl_all {
     };
 
     (@step unsigned $t:ty) => {
+        // For unsigned types, their absolute value type is just themselves
+        impl_integer_traits!($t, $t);
         impl Unsigned for $t {}
-
     };
 
     (@step signed $s:ty => $u:ty) => {
-        impl_integer_traits!($s);
+        // For signed types, their absolute value type is the mapped unsigned type
+        impl_integer_traits!($s, $u);
 
         impl Signed for $s {
-            type Unsigned = $u;
-
             #[inline]
-            fn unsigned_absolute(self) -> Self::Unsigned {
-                let bits = self as Self::Unsigned;
+            fn unsigned_absolute(self) -> Self::AbsoluteValueType {
+                let bits = self as Self::AbsoluteValueType;
                 if self.is_negative() {
                     (!bits) + 1
                 } else {
