@@ -30,8 +30,10 @@ pub trait BitwiseOps: Integer +
 }
 
 pub trait RationalOps: Integer {
-    fn gcd(self, other: Self) -> Self;
-    fn lcm(self, other: Self) -> Self;
+    type Output;
+    
+    fn gcd(self, other: Self) -> Self::Output;
+    fn lcm(self, other: Self) -> Self::Output;
 }
 
 pub trait Unsigned: Integer {}
@@ -86,6 +88,10 @@ pub trait Signed: Integer {
     }
 }
 
+
+
+
+
 macro_rules! impl_integer_traits {
     ($t:ty) => {
         impl Integer for $t {
@@ -96,12 +102,10 @@ macro_rules! impl_integer_traits {
         }
 
         impl BitwiseOps for $t {
-            #[inline] fn trailing_zeros(self) -> u32 { self.trailing_zeros() }
-        }
-
-        impl RationalOps for $t {
-            #[inline] fn gcd(self, other: Self) -> Self { crate::number_theory::gcd(self, other) }
-            #[inline] fn lcm(self, other: Self) -> Self { crate::number_theory::lcm(self, other) }
+            #[inline]
+            fn trailing_zeros(self) -> u32 {
+                self.trailing_zeros()
+            }
         }
     };
 }
@@ -121,9 +125,21 @@ macro_rules! impl_all {
     };
 
     (@step unsigned $t:ty) => {
-        impl_integer_traits!($t);
-
         impl Unsigned for $t {}
+
+        impl RationalOps for $t {
+            type Output = $t;
+
+            #[inline]
+            fn gcd(self, other: Self) -> Self::Output {
+                crate::number_theory::gcd(self, other)
+            }
+
+            #[inline]
+            fn lcm(self, other: Self) -> Self::Output {
+                crate::number_theory::lcm(self, other)
+            }
+        }
     };
 
     (@step signed $s:ty => $u:ty) => {
@@ -140,6 +156,20 @@ macro_rules! impl_all {
                 } else {
                     bits
                 }
+            }
+        }
+
+        impl RationalOps for $s {
+            type Output = $u;
+
+            #[inline]
+            fn gcd(self, other: Self) -> Self::Output {
+                crate::number_theory::gcd(self.unsigned_absolute(), other.unsigned_absolute())
+            }
+
+            #[inline]
+            fn lcm(self, other: Self) -> Self::Output {
+                crate::number_theory::lcm(self.unsigned_absolute(), other.unsigned_absolute())
             }
         }
     };
