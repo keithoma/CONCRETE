@@ -31,26 +31,6 @@ pub trait RationalOps: Natural {
     fn lcm(self, other: Self) -> Self;
 }
 
-macro_rules! impl_unsigned_traits {
-    ($t:ty) => {
-        impl Natural for $t {
-            const ZERO: Self = 0;
-            const ONE: Self = 1;
-            const MIN: Self = <$t>::MIN;
-            const MAX: Self = <$t>::MAX;
-        }
-
-        impl BitwiseOps for $t {
-            #[inline] fn trailing_zeros(self) -> u32 { self.trailing_zeros() }
-        }
-
-        impl RationalOps for $t {
-            #[inline] fn gcd(self, other: Self) -> Self { crate::number_theory::gcd(self, other) }
-            #[inline] fn lcm(self, other: Self) -> Self { crate::number_theory::lcm(self, other) }
-        }
-    };
-}
-
 pub trait Signed: Natural {
     type Unsigned: Natural;
 
@@ -101,6 +81,26 @@ pub trait Signed: Natural {
     }
 }
 
+macro_rules! impl_unsigned_traits {
+    ($t:ty) => {
+        impl Natural for $t {
+            const ZERO: Self = 0;
+            const ONE: Self = 1;
+            const MIN: Self = <$t>::MIN;
+            const MAX: Self = <$t>::MAX;
+        }
+
+        impl BitwiseOps for $t {
+            #[inline] fn trailing_zeros(self) -> u32 { self.trailing_zeros() }
+        }
+
+        impl RationalOps for $t {
+            #[inline] fn gcd(self, other: Self) -> Self { crate::number_theory::gcd(self, other) }
+            #[inline] fn lcm(self, other: Self) -> Self { crate::number_theory::lcm(self, other) }
+        }
+    };
+}
+
 macro_rules! impl_all {
     (
         $( unsigned $u:ty, )*
@@ -127,7 +127,7 @@ macro_rules! impl_all {
 
             fn unsigned_abs(self) -> Self::Unsigned {
                 let bits = self as Self::Unsigned;
-                if self < 0 {
+                if self < Self::ZERO {
                     (!bits) + 1
                 } else {
                     bits
