@@ -40,9 +40,9 @@ pub trait Signed: Integer {
     type Unsigned: Unsigned;
 
     #[inline] fn is_positive(self) -> bool { self > Self::ZERO }
-    #[inline] fn is_nonpositive(self) -> bool { self <= Self:: ZERO }
+    #[inline] fn is_nonpositive(self) -> bool { self <= Self::ZERO }
     #[inline] fn is_negative(self) -> bool { self < Self::ZERO }
-    #[inline] fn is_nonnegative(self) -> bool { self >= Self:: ZERO }
+    #[inline] fn is_nonnegative(self) -> bool { self >= Self::ZERO }
 
     #[inline] fn absolute(self) -> Self {
         self.strict_absolute()
