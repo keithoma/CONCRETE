@@ -59,6 +59,10 @@ pub trait Signed: Natural {
         self < Self::ZERO
     }
 
+    #[inline] fn abs(self) -> Self {
+        self.strict_abs()
+    }
+
     #[inline] fn unsigned_abs(self) -> Self::Unsigned;
 
     #[inline]
@@ -93,7 +97,7 @@ pub trait Signed: Natural {
     #[inline]
     fn overflowing_abs(self) -> (Self, bool) {
         self.checked_abs()
-            .unwrap_or()
+            .map_or((Self::MIN, true), |x| (x, false))
     }
 }
 
