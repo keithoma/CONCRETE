@@ -46,11 +46,11 @@ pub enum GcdStrategy {
 
 /// The universal entry point.
 #[inline]
-pub const fn gcd<T: Integer + BitwiseOps>(a: T, b: T) -> T {
+pub fn gcd<T: Integer + BitwiseOps>(a: T, b: T) -> T {
     gcd_with_strategy(a, b, GcdStrategy::default())
 }
 
-pub const fn gcd_with_strategy<T: Integer + BitwiseOps>(a: T, b: T, strategy: GcdStrategy) -> T {
+pub fn gcd_with_strategy<T: Integer + BitwiseOps>(a: T, b: T, strategy: GcdStrategy) -> T {
     match strategy {
         GcdStrategy::SteinIterative => stein_iterative(a, b),
         GcdStrategy::SteinRecursive => stein_recursive(a, b),
@@ -83,11 +83,11 @@ pub const fn gcd_with_strategy<T: Integer + BitwiseOps>(a: T, b: T, strategy: Gc
 ///
 /// * Time Complexity: O(n^2) where n is the number of bits.
 /// * Space Complexity: O(1) auxiliary.
-const fn stein_iterative<T: Integer + BitwiseOps>(mut a: T, mut b: T) -> T {
-    if a == T::ZERO {
+fn stein_iterative<T: Integer + BitwiseOps>(mut a: T, mut b: T) -> T {
+    if a.is_zero() {
         return b;
     }
-    if b == T::ZERO {
+    if b.is_zero() {
         return a;
     }
 
@@ -106,7 +106,7 @@ const fn stein_iterative<T: Integer + BitwiseOps>(mut a: T, mut b: T) -> T {
 
         b -= a;
 
-        if b == T::ZERO {
+        if b.is_zero() {
             break;
         }
 
@@ -138,11 +138,11 @@ const fn stein_iterative<T: Integer + BitwiseOps>(mut a: T, mut b: T) -> T {
 ///
 /// * Time Complexity: O(n^2) bit operations where n is the number of bits.
 /// * Space Complexity: O(n) stack frames due to recursion depth.
-const fn stein_recursive<T: Integer + BitwiseOps>(a: T, b: T) -> T {
-    if a == T::ZERO {
+fn stein_recursive<T: Integer + BitwiseOps>(a: T, b: T) -> T {
+    if a.is_zero() {
         return b;
     }
-    if b == T::ZERO {
+    if b.is_zero() {
         return a;
     }
 
@@ -182,8 +182,8 @@ const fn stein_recursive<T: Integer + BitwiseOps>(a: T, b: T) -> T {
 ///
 /// * Time Complexity: O(n^2) where n is the number of bits.
 /// * Space Complexity: O(1) auxiliary space.
-const fn euclidean_iterative<T: Integer>(mut a: T, mut b: T) -> T {
-    while b != T::ZERO {
+fn euclidean_iterative<T: Integer>(mut a: T, mut b: T) -> T {
+    while b.is_nonzero() {
         (a, b) = (b, a % b);
     }
     a
@@ -210,11 +210,11 @@ const fn euclidean_iterative<T: Integer>(mut a: T, mut b: T) -> T {
 ///
 /// * Time Complexity: O(max(a, b)) in the worst case (e.g., gcd(n, 1)).
 /// * Space Complexity: O(1) auxiliary space.
-const fn euclidean_subtraction<T: Integer>(mut a: T, mut b: T) -> T {
-    if a == T::ZERO {
+fn euclidean_subtraction<T: Integer>(mut a: T, mut b: T) -> T {
+    if a.is_zero() {
         return b;
     }
-    if b == T::ZERO {
+    if b.is_zero() {
         return a;
     }
 
@@ -250,8 +250,8 @@ const fn euclidean_subtraction<T: Integer>(mut a: T, mut b: T) -> T {
 ///
 /// * Time Complexity: O(n^2) where n is the number of bits.
 /// * Space Complexity: O(n) stack frames (logarithmic relative to the value).
-const fn euclidean_recursive<T: Integer>(mut a: T, mut b: T) -> T {
-    if b != T::ZERO {
+fn euclidean_recursive<T: Integer>(a: T, b: T) -> T {
+    if b.is_nonzero() {
         euclidean_recursive(b, a % b)
     } else {
         a
