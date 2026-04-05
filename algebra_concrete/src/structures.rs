@@ -1,4 +1,4 @@
 pub mod integer;
-pub use integer::{Natural, Signed, BitwiseOps, RationalOps};
+pub use integer::{Integer, Signed, BitwiseOps, RationalOps};
 
 pub mod rational;

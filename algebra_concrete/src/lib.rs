@@ -22,4 +22,4 @@ pub use number_theory::lcm::{LcmStrategy, lcm};
 /// operations—such as addition or multiplication—that follow specific logical
 /// rules known as axioms.
 pub mod structures;
-pub use structures::integer::{Natural, Signed, BitwiseOps, RationalOps};
+pub use structures::integer::{Integer, Signed, BitwiseOps, RationalOps};

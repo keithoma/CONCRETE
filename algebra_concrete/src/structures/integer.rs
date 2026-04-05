@@ -4,7 +4,7 @@ use core::ops::{
     Shl, ShlAssign, Shr, ShrAssign,
 };
 
-pub trait Natural: 
+pub trait Integer: 
     Sized + Copy + PartialEq + Eq + PartialOrd + Ord +
     Add<Output = Self> + Sub<Output = Self> + Mul<Output = Self> + 
     Div<Output = Self> + Rem<Output = Self> +
@@ -16,7 +16,7 @@ pub trait Natural:
     const MAX: Self;
 }
 
-pub trait BitwiseOps: Natural +
+pub trait BitwiseOps: Integer +
     BitAnd<Output = Self> + BitOr<Output = Self> + BitXor<Output = Self> +
     Not<Output = Self> + 
     Shl<u32, Output = Self> + Shr<u32, Output = Self> +
@@ -26,13 +26,13 @@ pub trait BitwiseOps: Natural +
     fn trailing_zeros(self) -> u32;
 }
 
-pub trait RationalOps: Natural {
+pub trait RationalOps: Integer {
     fn gcd(self, other: Self) -> Self;
     fn lcm(self, other: Self) -> Self;
 }
 
-pub trait Signed: Natural {
-    type Unsigned: Natural;
+pub trait Signed: Integer {
+    type Unsigned: Integer;
 
     #[inline]
     fn is_negative(self) -> bool {
@@ -83,7 +83,7 @@ pub trait Signed: Natural {
 
 macro_rules! impl_unsigned_traits {
     ($t:ty) => {
-        impl Natural for $t {
+        impl Integer for $t {
             const ZERO: Self = 0;
             const ONE: Self = 1;
             const MIN: Self = <$t>::MIN;
