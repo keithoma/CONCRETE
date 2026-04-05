@@ -19,38 +19,57 @@
 
 use crate::structures::integer::{BitwiseOps, Integer};
 
-/// Strategies available for computing the Greatest Common Divisor.
-#[non_exhaustive]
 #[derive(Debug, Default, Copy, Clone, PartialEq, Eq)]
-pub enum GcdStrategy {
-    /// Iterative Binary GCD (Stein's Algorithm).
-    /// Optimized for modern CPUs using shifts and count-trailing-zeros.
-    #[default] SteinIterative,
-
-    /// Recursive Binary GCD (Stein's Algorithm).
-    /// Uses structural recursion; primarily for educational or verification use.
-    SteinRecursive,
-
+pub enum EuclideanGcdStrategy {
     /// Iterative Euclidean Algorithm.
     /// The standard approach using the modulus operator in a loop.
-    EuclideanIterative,
+    #[default] Iterative,
 
     /// Recursive Euclidean Algorithm.
     /// The standard modulus approach using tail recursion.
-    EuclideanRecursive,
+    Recursive,
 
     /// Classical Euclidean Algorithm via repeated subtraction.
     /// The original "Greek" method; significantly slower for numbers with large differences.
-    EuclideanSubtraction,
+    Subtraction,
 }
 
-/// The universal entry point.
+#[derive(Debug, Default, Copy, Clone, PartialEq, Eq)]
+pub enum SteinGcdStrategy {
+    /// Iterative Binary GCD (Stein's Algorithm).
+    /// Optimized for modern CPUs using shifts and count-trailing-zeros.
+    #[default] Iterative,
+    
+    /// Recursive Binary GCD (Stein's Algorithm).
+    /// Uses structural recursion; primarily for educational or verification use.
+    Recursive,
+}
+
+#[derive(Debug, Default, Copy, Clone, PartialEq, Eq)]
+pub enum GcdStrategy {
+    #[default] Euclidean(EuclideanGcdStrategy),
+    Stein(SteinGcdStrategy),
+}
+
 #[inline]
-pub fn gcd<T: Integer + BitwiseOps>(a: T, b: T) -> T {
+pub fn gcd<T: Integer>(a: T, b: T) -> T {
     gcd_with_strategy(a, b, GcdStrategy::default())
 }
 
-pub fn gcd_with_strategy<T: Integer + BitwiseOps>(a: T, b: T, strategy: GcdStrategy) -> T {
+pub fn gcd_with_strategy<T: Integer>(a: T, b: T, strategy: GcdStrategy) -> T {
+    match strategy {
+        GcdStrategy::EuclideanIterative => euclidean_iterative(a, b),
+        GcdStrategy::EuclideanSubtraction => euclidean_subtraction(a, b),
+        GcdStrategy::EuclideanRecursive => euclidean_recursive(a, b),
+    }
+}
+
+#[inline]
+pub fn gcd_binary<T: Integer + BitwiseOps>(a: T, b: T) -> T {
+    gcd_binary_with_strategy(a, b, GcdStrategy::SteinIterative)
+}
+
+pub fn gcd_binary_with_strategy<T: Integer + BitwiseOps>(a: T, b:T, strategy: GcdStrategy) -> T {
     match strategy {
         GcdStrategy::SteinIterative => stein_iterative(a, b),
         GcdStrategy::SteinRecursive => stein_recursive(a, b),
