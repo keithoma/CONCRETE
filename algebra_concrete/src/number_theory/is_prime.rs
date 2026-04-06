@@ -1,9 +1,16 @@
 //! all about primes
 //! thinking if I should split is_prime(n) and primes_up_to(n) into two files, anyway
 
+// road map
+// 1. primes_up_to(n) using trial division
+// 2. the sieve of this greek guy
+// 3. is_prime(n) using the the sieve
+
+use alloc::vec::Vec;
+
 use crate::structures::integer::{Integer};
 
-/// strategy for iterative euclidean algorithm
+/// trial division
 #[derive(Debug)] #[non_exhaustive] pub struct TrialDivision;
 
 /// primes
@@ -11,7 +18,8 @@ pub trait PrimeAlgorithm<T: Integer> {
     /// computes the gcd
     fn is_prime(n: T) -> bool;
 
-    // maybe primes_up_to here?
+    /// outputs all the primes
+    fn primes_up_to(n: T) -> Vec<T>;
 }
 
 impl<T: Integer> PrimeAlgorithm<T> for TrialDivision {
@@ -33,5 +41,9 @@ impl<T: Integer> PrimeAlgorithm<T> for TrialDivision {
             i += T::ONE;
         }
         true
+    }
+
+    fn primes_up_to(n: T) -> Vec<T> {
+        todo!()
     }
 }

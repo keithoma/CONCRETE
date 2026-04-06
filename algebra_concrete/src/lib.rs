@@ -6,6 +6,9 @@
 #![no_std]
 #![warn(missing_docs)]
 
+// This deep magic is, unfortunataly, necessary, for now.
+extern crate alloc;
+
 /// A module concerned with number theory.
 ///
 /// Number theory is a branch of pure mathematics devoted to the study of integers and their 
