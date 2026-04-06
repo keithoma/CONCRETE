@@ -13,8 +13,6 @@
 //! Different strategies have different performance characteristics based on the input size
 //! and CPU architecture (e.g., availability of the `ctz` instruction).
 
-// TODO: add a wrapper functions for gcd so that it works for unsigned ints
-
 use crate::structures::integer::{BitwiseOps, Integer};
 
 pub struct EuclideanIterative;
