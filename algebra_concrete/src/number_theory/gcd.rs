@@ -13,22 +13,24 @@
 //! Different strategies have different performance characteristics based on the input size
 //! and CPU architecture (e.g., availability of the `ctz` instruction).
 
+#![expect(clippy::arithmetic_side_effects, reason = "we are making sure that nothing can break")]
+
 use crate::structures::integer::{BitwiseOps, Integer};
 
 /// strategy for iterative euclidean algorithm
-pub struct EuclideanIterative;
+#[derive(Debug)] #[non_exhaustive] pub struct EuclideanIterative;
 
 /// strategy for euclidean algorithm using subtraction
-pub struct EuclideanSubtraction;
+#[derive(Debug)] #[non_exhaustive] pub struct EuclideanSubtraction;
 
 /// strategy for recursive Euclidean algorithm
-pub struct EuclideanRecursive;
+#[derive(Debug)] #[non_exhaustive] pub struct EuclideanRecursive;
 
 /// strategy for iterative Stein's algorithm
-pub struct SteinIterative;
+#[derive(Debug)] #[non_exhaustive] pub struct SteinIterative;
 
 /// strategy for recursive Stein's algorithm
-pub struct SteinRecursive;
+#[derive(Debug)] #[non_exhaustive] pub struct SteinRecursive;
 
 /// trait for gcd using algorithm
 pub trait GcdAlgorithm<T: Integer> {
@@ -58,9 +60,9 @@ impl<T: Integer> GcdAlgorithm<T> for EuclideanSubtraction {
 
         while a != b {
             if a > b {
-                a -= b
+                a -= b;
             } else {
-                b -= a
+                b -= a;
             }
         }
 
