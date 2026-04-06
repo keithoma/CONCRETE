@@ -24,14 +24,21 @@ fn main() {
     // -------------------------------------------------------------------------
     println!("\nExplicit Strategies:");
     
-    let result_euclid = a.gcd_with::<EuclideanIterative>(b);
-    println!("  Using Euclidean Iterative: {}", result_euclid);
+    let result_euclidean_iteration = a.gcd_with::<EuclideanIterative>(b);
+    println!("  Using Euclidean Iterative: {}", result_euclidean_iteration);
 
-    let result_stein_rec = a.gcd_with::<SteinRecursive>(b);
-    println!("  Using Stein Recursive:     {}", result_stein_rec);
+    let result_euclidean_subtraction = a.gcd_with::<EuclideanSubtraction>(b);
+    println!("  Using Euclidean Sub:       {}", result_euclidean_subtraction);
 
-    let result_sub = a.gcd_with::<EuclideanSubtraction>(b);
-    println!("  Using Euclidean Sub:       {}", result_sub);
+    let result_euclidean_recursive = a.gcd_with::<EuclideanRecursive>(b);
+    println!("  Using Euclidean Recursive: {}", result_euclidean_recursive);
+
+    let result_stein_iterative = a.gcd_with::<SteinIterative>(b);
+    println!("  Using Stein Iterative:     {}", result_stein_iterative);
+
+    let result_stein_recursive = a.gcd_with::<SteinRecursive>(b);
+    println!("  Using Stein Recursive:     {}", result_stein_recursive);
+
 
     // -------------------------------------------------------------------------
     // 3. Signed Integer Safety
