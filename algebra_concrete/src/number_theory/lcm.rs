@@ -5,7 +5,9 @@ use core::marker::PhantomData;
 use crate::structures::integer::Integer;
 use crate::number_theory::gcd::GcdAlgorithm;
 
+/// trait for lcm algorithms
 pub trait LcmAlgorithm<T: Integer> {
+    /// computes the lcm
     fn compute(a: T, b: T) -> T;
 }
 
@@ -18,11 +20,12 @@ where
     T: Integer,
     G: GcdAlgorithm<T> 
 {
+    
+    #![expect(clippy::arithmetic_side_effects, reason = "it's safe I think")]
     #[inline]
     fn compute(a: T, b: T) -> T {
         if a.is_zero() || b.is_zero() { return T::ZERO; }
         
-        // We bypass a.gcd() and explicitly inject the user's chosen strategy!
         (a / G::compute(a, b)) * b
     }
 }

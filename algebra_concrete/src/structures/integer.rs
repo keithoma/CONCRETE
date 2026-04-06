@@ -53,6 +53,8 @@ pub trait BitwiseOps: Integer +
 /// A marker trait for unsigned integer types.
 pub trait Unsigned: Integer {}
 
+// TODO: yeah, this implementation of the absolute value function feels a bit wired too me ...
+
 /// A trait for signed integer types.
 pub trait Signed: Integer {
     /// Returns `true` if `self > 0`.
