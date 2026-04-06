@@ -15,13 +15,24 @@
 
 use crate::structures::integer::{BitwiseOps, Integer};
 
+/// strategy for iterative euclidean algorithm
 pub struct EuclideanIterative;
+
+/// strategy for euclidean algorithm using subtraction
 pub struct EuclideanSubtraction;
+
+/// strategy for recursive Euclidean algorithm
 pub struct EuclideanRecursive;
+
+/// strategy for iterative Stein's algorithm
 pub struct SteinIterative;
+
+/// strategy for recursive Stein's algorithm
 pub struct SteinRecursive;
 
+/// trait for gcd using algorithm
 pub trait GcdAlgorithm<T: Integer> {
+    /// computes the gcd
     fn compute(a: T, b: T) -> T;
 }
 
