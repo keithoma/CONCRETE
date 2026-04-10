@@ -40,6 +40,8 @@ pub use number_theory::lcm::{
     LcmAlgorithm, 
     FormulaicGcd,
 };
+pub use number_theory::is_prime::*;
+
 
 // -----------------------------------------------------------------------------
 // The Prelude

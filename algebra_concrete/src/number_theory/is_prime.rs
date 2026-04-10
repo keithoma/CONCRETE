@@ -6,9 +6,11 @@
 // 2. the sieve of this greek guy
 // 3. is_prime(n) using the the sieve
 
+#![expect(clippy::arithmetic_side_effects)]
+
 use alloc::vec::Vec;
 
-use crate::structures::integer::{Integer};
+use crate::{structures::integer::Integer};
 
 /// trial division
 #[derive(Debug)] #[non_exhaustive] pub struct TrialDivision;
@@ -44,6 +46,16 @@ impl<T: Integer> PrimeAlgorithm<T> for TrialDivision {
     }
 
     fn primes_up_to(n: T) -> Vec<T> {
-        todo!()
+        let mut primes_list: Vec<T> = Vec::new();
+        let mut i: T = T::ONE + T::ONE;
+
+        while i <= n {
+            if Self::is_prime(i) {
+                primes_list.push(i);
+            }
+            i += T::ONE;
+        }
+        
+        primes_list
     }
 }

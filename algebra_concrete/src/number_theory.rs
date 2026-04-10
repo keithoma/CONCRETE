@@ -13,3 +13,4 @@ pub mod is_prime;
 pub use traits::RationalOps;
 pub use gcd::*;
 pub use lcm::*;
+pub use is_prime::*;
