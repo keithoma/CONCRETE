@@ -20,8 +20,9 @@ impl<T: Integer> PrimeAlgorithm2<T> for SieveOfEratosthenes {
     fn primes_up_to(n: T) -> Vec<T> {
         // 0 and 1 are not primes by convention.
         if n == T::ZERO || n == T::ONE { return Vec::new() }
+        let vec_size = (n - T::ONE).to_usize();
 
-        let mut number_line = vec![true; n - 1]; // we check from 2 to n
+        let mut number_line = vec![true; vec_size]; // we check from 2 to n
         let two = T::ONE + T::ONE; // just a helper constant
         let mut i = two; // we start from 2
 
