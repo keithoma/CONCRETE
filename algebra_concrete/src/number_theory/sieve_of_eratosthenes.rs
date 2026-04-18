@@ -35,6 +35,8 @@ impl<T: Integer> PrimeAlgorithm2<T> for SieveOfEratosthenes {
                     j += i;
                 }
             }
+
+            i += T::ONE;
         }
 
         return number_line.iter()

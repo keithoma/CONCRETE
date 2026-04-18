@@ -26,6 +26,9 @@ pub trait Integer:
     /// The unsigned type used to represent absolute values of this type.
     type AbsoluteValueType: Unsigned;
 
+    /// The pointer sized unsigned integer type to be used as indecies.
+    type UsizeType: Usize;
+
     /// Returns `true` if `self == 0`.
     #[must_use]
     #[inline]
@@ -35,6 +38,9 @@ pub trait Integer:
     #[must_use]
     #[inline]
     fn is_nonzero(self) -> bool { self != Self::ZERO }
+
+    /// Converts to usize
+    fn to_usize(self) -> Self::UsizeType;
 }
 
 /// A trait for integer types supporting bitwise operations and shifts.
@@ -52,6 +58,11 @@ pub trait BitwiseOps: Integer +
 
 /// A marker trait for unsigned integer types.
 pub trait Unsigned: Integer {}
+
+/// A marker trait for pointer sized unsigned integer type.
+pub trait Usize: Integer {}
+
+
 
 // TODO: yeah, this implementation of the absolute value function feels a bit wired too me ...
 
@@ -171,6 +182,11 @@ macro_rules! impl_integer_traits {
             const MAX: Self = <$t>::MAX;
 
             type AbsoluteValueType = $abs;
+            type UsizeType = usize;
+
+            fn to_usize(self) -> Self::UsizeType {
+                self as Self::UsizeType
+            }
         }
 
         impl BitwiseOps for $t {
@@ -200,6 +216,7 @@ macro_rules! impl_all {
         // For unsigned types, the absolute value type is the type itself.
         impl_integer_traits!($t, $t);
         impl Unsigned for $t {}
+        impl Usize for $t {}
     };
 
     (@step signed $s:ty => $u:ty) => {
