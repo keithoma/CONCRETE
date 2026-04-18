@@ -1,5 +1,6 @@
 //! the greek guy
 
+use alloc::vec;
 use alloc::vec::Vec;
 
 use crate::{structures::integer::Integer};
@@ -20,7 +21,7 @@ impl<T: Integer> PrimeAlgorithm2<T> for SieveOfEratosthenes {
         // 0 and 1 are not primes by convention.
         if n == T::ZERO || n == T::ONE { return Vec::new() }
 
-        let mut number_line = Vec::from_elem(true, n - T::ONE); // we check from 2 to n
+        let mut number_line = vec![true; n - 1]; // we check from 2 to n
         let two = T::ONE + T::ONE; // just a helper constant
         let mut i = two; // we start from 2
 
@@ -36,7 +37,7 @@ impl<T: Integer> PrimeAlgorithm2<T> for SieveOfEratosthenes {
             }
         }
 
-        return vec.iter()
+        return number_line.iter()
             .enumerate()
             .filter(|(_, &val)| val)
             .map(|(i, _)| i + two)
