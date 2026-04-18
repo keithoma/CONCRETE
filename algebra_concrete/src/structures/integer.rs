@@ -26,7 +26,7 @@ pub trait Integer:
     /// The unsigned type used to represent absolute values of this type.
     type AbsoluteValueType: Unsigned;
 
-    /// The pointer sized unsigned integer type to be used as indecies.
+    /// The pointer sized unsigned integer type to be used as indices.
     type UsizeType: Usize;
 
     /// Returns `true` if `self == 0`.
@@ -185,7 +185,11 @@ macro_rules! impl_integer_traits {
             type UsizeType = usize;
 
             fn to_usize(self) -> Self::UsizeType {
-                self as Self::UsizeType
+                #[expect(
+                    clippy::expect_used,
+                    reason = "native integer conversion to usize is required by strict to_usize API"
+                )]
+                usize::try_from(self).expect("value cannot be represented as usize")
             }
         }
 
@@ -212,11 +216,16 @@ macro_rules! impl_all {
         )*
     };
 
+    (@step unsigned usize) => {
+        impl_integer_traits!(usize, usize);
+        impl Unsigned for usize {}
+        impl Usize for usize {}
+    };
+
     (@step unsigned $t:ty) => {
         // For unsigned types, the absolute value type is the type itself.
         impl_integer_traits!($t, $t);
         impl Unsigned for $t {}
-        impl Usize for $t {}
     };
 
     (@step signed $s:ty => $u:ty) => {
@@ -244,6 +253,9 @@ macro_rules! impl_all {
         }
     };
 }
+
+// Explicit Usize marker for pointer-sized integer
+impl Usize for usize {}
 
 impl_all!(
     unsigned u8,
