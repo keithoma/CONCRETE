@@ -1,10 +1,4 @@
-//! all about primes
-//! thinking if I should split is_prime(n) and primes_up_to(n) into two files, anyway
-
-// road map
-// 1. primes_up_to(n) using trial division
-// 2. the sieve of this greek guy
-// 3. is_prime(n) using the the sieve
+//! all about trial_division
 
 #![expect(clippy::arithmetic_side_effects)]
 
