@@ -19,7 +19,7 @@ pub trait PrimeAlgorithm2<T: Integer> {
 
 impl<T> PrimeAlgorithm2<T> for SieveOfEratosthenes
 where
-    T: Integer + TryFrom<usize>,
+    T: Integer<UsizeType = usize> + TryFrom<usize>,
     usize: TryFrom<T>,
 {
     fn primes_up_to(n: T) -> Vec<T> {
@@ -34,7 +34,7 @@ where
         while i <= n_usize / i {
             // remember that the index of the vector has an offset of 2
             if number_line[i - 2] {
-                let j = i * i;
+                let mut j = i * i;
                 while j <= n_usize {
                     number_line[j - 2] = false;
                     j += i;
