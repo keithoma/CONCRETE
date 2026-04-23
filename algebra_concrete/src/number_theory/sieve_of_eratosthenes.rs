@@ -45,13 +45,12 @@ where
         }
 
         number_line.iter()
-            .enumerate()
-            .filter(|(_, &val)| val)
+            .enumerate() // Returns (usize, &bool)
+            .filter(|&(_, val)| *val) // Destructure the reference to the bool
             .map(|(index, _)| {
                 let prime_usize = index + 2;
-                // Convert back from usize to T
-                T::try_from(prime_usize).ok().expect("Value fits in usize but not T")
-            })
+                T::try_from(prime_usize).ok().expect("Failed to convert prime back to T")
+                })
             .collect()
     }
 
