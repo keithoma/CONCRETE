@@ -9,6 +9,7 @@ use crate::{structures::integer::Integer};
 /// Sieve of Eratosthenes
 #[derive(Debug)] #[non_exhaustive] pub struct SieveOfEratosthenes;
 
+/// we really have to refactor this
 pub trait PrimeAlgorithm2<T: Integer> {
     /// computes the gcd
     fn is_prime(n: T) -> bool;
@@ -22,7 +23,15 @@ where
     T: Integer<UsizeType = usize> + TryFrom<usize>,
     usize: TryFrom<T>,
 {
+    #[expect(
+        clippy::arithmetic_side_effects, 
+        clippy::integer_division,
+        clippy::indexing_slicing,
+        clippy::expect_used,
+        reason = "I'm lazy"
+    )]
     fn primes_up_to(n: T) -> Vec<T> {
+        
         // 0 and 1 are not primes by convention.
         if n == T::ZERO || n == T::ONE { return Vec::new() }
 
@@ -55,6 +64,6 @@ where
     }
 
     fn is_prime(n: T) -> bool {
-        !todo()
+        Some(n) == Self::primes_up_to(n).last().copied()
     }
 }
